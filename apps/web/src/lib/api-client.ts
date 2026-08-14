@@ -5,7 +5,6 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const STORAGE_KEYS = {
   accessToken: "mos.accessToken",
   activeOrg: "mos.activeOrg",
-  activeBusiness: "mos.activeBusiness",
 };
 
 export class ApiError extends Error {
@@ -33,11 +32,23 @@ export function getActiveOrganizationId(): string | null {
   return typeof window === "undefined" ? null : window.localStorage.getItem(STORAGE_KEYS.activeOrg);
 }
 
-export function getActiveBusinessId(): string | null {
-  return typeof window === "undefined" ? null : window.localStorage.getItem(STORAGE_KEYS.activeBusiness);
+type AuthFailureHandler = () => void;
+
+const authFailureHandlers = new Set<AuthFailureHandler>();
+
+/** Registers a handler invoked when a refresh attempt fails (session over). */
+export function onAuthFailure(handler: AuthFailureHandler): () => void {
+  authFailureHandlers.add(handler);
+  return () => authFailureHandlers.delete(handler);
 }
 
-async function refreshSession(): Promise<boolean> {
+function notifyAuthFailure(): void {
+  for (const handler of authFailureHandlers) handler();
+}
+
+let refreshPromise: Promise<boolean> | null = null;
+
+async function performRefresh(): Promise<boolean> {
   try {
     const res = await fetch(`${API_URL}/api/v1/auth/refresh`, {
       method: "POST",
@@ -52,6 +63,28 @@ async function refreshSession(): Promise<boolean> {
   }
 }
 
+/**
+ * Single-flight refresh: concurrent 401s share ONE refresh rotation.
+ * On failure the access token is cleared and auth-failure handlers are
+ * notified exactly once (all pending callers then fail fast).
+ */
+function refreshSession(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = performRefresh()
+      .then((ok) => {
+        if (!ok) {
+          setAccessToken(null);
+          notifyAuthFailure();
+        }
+        return ok;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 export async function apiRequest<T>(
   path: string,
   init: RequestInit = {},
@@ -62,9 +95,7 @@ export async function apiRequest<T>(
   const token = getAccessToken();
   if (token) headers.set("Authorization", `Bearer ${token}`);
   const orgId = getActiveOrganizationId();
-  const businessId = getActiveBusinessId();
   if (orgId) headers.set("X-Organization-Id", orgId);
-  if (businessId) headers.set("X-Business-Id", businessId);
 
   const res = await fetch(`${API_URL}${path}`, {
     ...init,
@@ -73,9 +104,8 @@ export async function apiRequest<T>(
   });
 
   if (res.status === 401 && retryOnUnauthorized) {
-    const refreshed = await refreshSession();
-    if (refreshed) return apiRequest<T>(path, init, false);
-    setAccessToken(null);
+    await refreshSession();
+    return apiRequest<T>(path, init, false);
   }
 
   if (!res.ok) {

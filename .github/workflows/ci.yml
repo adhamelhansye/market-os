@@ -51,8 +51,8 @@ jobs:
         working-directory: apps/api
         env:
           APP_ENV: test
-          JWT_SECRET: ci-jwt-secret
-          JWT_REFRESH_SECRET: ci-refresh-secret
+          JWT_SECRET: ci-jwt-secret-for-tests-123456
+          JWT_REFRESH_SECRET: ci-refresh-secret-98765
           ENCRYPTION_KEY: ci-encryption-key
           TEST_DATABASE_URL: postgresql+asyncpg://marketingos:marketingos_ci@localhost:5432/marketingos_test
           TEST_REDIS_URL: redis://localhost:6379/15

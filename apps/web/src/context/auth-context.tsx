@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 
-import { apiGet, apiPost, setAccessToken } from "@/lib/api-client";
+import { apiGet, apiPost, onAuthFailure, setAccessToken } from "@/lib/api-client";
 import { ApiError } from "@/lib/api-client";
 
 import type { components } from "@marketing-os/shared-types";
@@ -58,6 +58,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // When a refresh attempt fails (session expired / revoked), flip to the
+  // anonymous state so pending callers fail and the UI redirects to login.
+  useEffect(() => {
+    const unsubscribe = onAuthFailure(() => {
+      setAccessToken(null);
+      setUser(null);
+      setMemberships([]);
+      setStatus("anonymous");
+    });
+    return unsubscribe;
+  }, []);
 
   const login = useCallback(
     async (payload: LoginRequest) => {

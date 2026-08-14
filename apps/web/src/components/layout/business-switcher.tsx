@@ -14,9 +14,10 @@ import { useBusiness } from "@/context/business-context";
 import { fetchBusinesses } from "@/features/businesses/api";
 
 /**
- * Business selector. The active business is persisted in the client/session
- * context and sent to the API as X-Business-Id; the backend re-validates
- * agency/business access on every request.
+ * Business selector. The active business is client-side context only: it is
+ * NOT sent to the API as a context header. Business-scoped requests will be
+ * addressed explicitly by Phase 1 business workflows (path-resolved
+ * business ids, validated server-side).
  */
 export function BusinessSwitcher() {
   const t = useTranslations("common");

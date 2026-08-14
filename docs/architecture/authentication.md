@@ -36,8 +36,12 @@ GET  /api/v1/auth/me      → current user + memberships
 - Refresh tokens are **not stored as plaintext**. Redis key
   `refresh_token:{jti}` holds the SHA-256 fingerprint of the token, the
   user id and an expiry; the token itself exists only on the client.
-- Refresh is rotation-based: each `/refresh` issues a new refresh token and
-  revokes the previous fingerprint (single-use semantics).
+- Refresh is rotation-based: each `/refresh` **atomically consumes** the
+  presented session (Redis `GETDEL` plus fingerprint comparison) and issues
+  a fresh pair. Because claim-and-validate is a single atomic operation,
+  concurrent replays of the same refresh token can never both succeed:
+  exactly one rotation wins, every other caller observes a consumed session
+  (single-use semantics, correct across multiple API instances).
 - `/logout` deletes the session fingerprint; a revoked session is rejected
   on any subsequent refresh attempt.
 - Cookie attributes: `httponly`, `path=/api/v1/auth`, `samesite=lax`,

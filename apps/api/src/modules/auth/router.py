@@ -112,7 +112,10 @@ async def refresh_endpoint(
     except pyjwt.InvalidTokenError:
         raise AuthenticationError("Invalid or expired refresh token") from None
     jti = payload.get("jti")
-    if not jti or not await service.refresh_token_valid(redis, jti, token):
+    # Atomic consume: validates the fingerprint AND revokes the session in
+    # one Redis operation, so a replayed token (even concurrent) can only
+    # win once. The used session is already deleted at this point.
+    if not jti or not await service.consume_refresh_token(redis, jti, token):
         raise AuthenticationError("Invalid or expired refresh token")
 
     user_id = uuid.UUID(payload["sub"])
@@ -120,8 +123,6 @@ async def refresh_endpoint(
     if user is None or not user.is_active:
         raise AuthenticationError("Invalid or expired refresh token")
 
-    # Rotate: revoke the used token, issue a fresh pair.
-    await service.revoke_refresh_token(redis, jti)
     access, refresh, new_jti = service.issue_tokens(user, settings)
     await service.store_refresh_token(redis, new_jti, refresh, settings)
     _set_refresh_cookie(response, refresh, settings)
