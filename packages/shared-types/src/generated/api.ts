@@ -167,7 +167,8 @@ export interface paths {
         /** List Businesses */
         get: operations["list_businesses_api_v1_businesses_get"];
         put?: never;
-        post?: never;
+        /** Create Business */
+        post: operations["create_business_api_v1_businesses_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -183,6 +184,366 @@ export interface paths {
         };
         /** Get Business */
         get: operations["get_business_api_v1_businesses__business_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Business */
+        patch: operations["update_business_api_v1_businesses__business_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Profile */
+        get: operations["get_profile_api_v1_businesses__business_id__profile_get"];
+        /** Upsert Profile */
+        put: operations["upsert_profile_api_v1_businesses__business_id__profile_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Products */
+        get: operations["list_products_api_v1_businesses__business_id__products_get"];
+        put?: never;
+        /** Create Product */
+        post: operations["create_product_api_v1_businesses__business_id__products_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Product */
+        get: operations["get_product_api_v1_businesses__business_id__products__product_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Archive Product
+         * @description Soft delete: archives the product (history is preserved).
+         */
+        delete: operations["archive_product_api_v1_businesses__business_id__products__product_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Product */
+        patch: operations["update_product_api_v1_businesses__business_id__products__product_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/products/{product_id}/prices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Prices */
+        get: operations["list_prices_api_v1_businesses__business_id__products__product_id__prices_get"];
+        put?: never;
+        /** Create Price */
+        post: operations["create_price_api_v1_businesses__business_id__products__product_id__prices_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/products/{product_id}/costs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Costs */
+        get: operations["list_costs_api_v1_businesses__business_id__products__product_id__costs_get"];
+        put?: never;
+        /** Create Cost */
+        post: operations["create_cost_api_v1_businesses__business_id__products__product_id__costs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/products/{product_id}/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Inventory */
+        get: operations["get_inventory_api_v1_businesses__business_id__products__product_id__inventory_get"];
+        /** Set Inventory */
+        put: operations["set_inventory_api_v1_businesses__business_id__products__product_id__inventory_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Adjust Inventory */
+        patch: operations["adjust_inventory_api_v1_businesses__business_id__products__product_id__inventory_patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/shipping-rules": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Shipping Rules */
+        get: operations["list_shipping_rules_api_v1_businesses__business_id__shipping_rules_get"];
+        put?: never;
+        /** Create Shipping Rule */
+        post: operations["create_shipping_rule_api_v1_businesses__business_id__shipping_rules_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/shipping-rules/{rule_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Shipping Rule */
+        delete: operations["delete_shipping_rule_api_v1_businesses__business_id__shipping_rules__rule_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Shipping Rule */
+        patch: operations["update_shipping_rule_api_v1_businesses__business_id__shipping_rules__rule_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/discounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Discounts */
+        get: operations["list_discounts_api_v1_businesses__business_id__discounts_get"];
+        put?: never;
+        /** Create Discount */
+        post: operations["create_discount_api_v1_businesses__business_id__discounts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/discounts/{discount_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update Discount */
+        patch: operations["update_discount_api_v1_businesses__business_id__discounts__discount_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/bundles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Bundles */
+        get: operations["list_bundles_api_v1_businesses__business_id__bundles_get"];
+        put?: never;
+        /** Create Bundle */
+        post: operations["create_bundle_api_v1_businesses__business_id__bundles_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/bundles/{bundle_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Bundle */
+        get: operations["get_bundle_api_v1_businesses__business_id__bundles__bundle_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Bundle */
+        delete: operations["delete_bundle_api_v1_businesses__business_id__bundles__bundle_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Bundle */
+        patch: operations["update_bundle_api_v1_businesses__business_id__bundles__bundle_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/bundles/{bundle_id}/economics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Bundle Economics */
+        get: operations["get_bundle_economics_api_v1_businesses__business_id__bundles__bundle_id__economics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Goals */
+        get: operations["get_goals_api_v1_businesses__business_id__goals_get"];
+        put?: never;
+        /** Create Goal */
+        post: operations["create_goal_api_v1_businesses__business_id__goals_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/goals/{goal_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Goal */
+        delete: operations["delete_goal_api_v1_businesses__business_id__goals__goal_id__delete"];
+        options?: never;
+        head?: never;
+        /** Update Goal */
+        patch: operations["update_goal_api_v1_businesses__business_id__goals__goal_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/economics/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Economics Summary */
+        get: operations["economics_summary_api_v1_businesses__business_id__economics_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/economics/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Economics Products */
+        get: operations["economics_products_api_v1_businesses__business_id__economics_products_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/economics/products/{product_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Economics Product */
+        get: operations["economics_product_api_v1_businesses__business_id__economics_products__product_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/economics/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Economics Goals */
+        get: operations["economics_goals_api_v1_businesses__business_id__economics_goals_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/economics/bundles/{bundle_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Economics Bundle */
+        get: operations["economics_bundle_api_v1_businesses__business_id__economics_bundles__bundle_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -206,6 +567,199 @@ export interface components {
              */
             token_type: "bearer";
             user: components["schemas"]["UserRead"];
+        };
+        /** BundleCreate */
+        BundleCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+            /** Price */
+            price: number | string;
+            /** Currency */
+            currency: string;
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+            /** Items */
+            items: components["schemas"]["BundleItemIn"][];
+        };
+        /** BundleEconomicsRead */
+        BundleEconomicsRead: {
+            /**
+             * Bundle Id
+             * Format: uuid
+             */
+            bundle_id: string;
+            /** Name */
+            name: string;
+            /** Currency */
+            currency: string;
+            /** Bundle Price */
+            bundle_price: string;
+            /** Items Cost */
+            items_cost: string;
+            /** Contribution Profit */
+            contribution_profit: string;
+            /** Contribution Margin */
+            contribution_margin: string | null;
+        };
+        /** BundleItemIn */
+        BundleItemIn: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+        };
+        /** BundleItemRead */
+        BundleItemRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Bundle Id
+             * Format: uuid
+             */
+            bundle_id: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+        };
+        /** BundleRead */
+        BundleRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Price */
+            price: string;
+            /** Currency */
+            currency: string;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Items */
+            items: components["schemas"]["BundleItemRead"][];
+        };
+        /** BundleUpdate */
+        BundleUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Price */
+            price?: number | string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Active */
+            active?: boolean | null;
+            /** Items */
+            items?: components["schemas"]["BundleItemIn"][] | null;
+        };
+        /** BusinessCreate */
+        BusinessCreate: {
+            /** Name */
+            name: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            /** Industry */
+            industry?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Website Url */
+            website_url?: string | null;
+            /**
+             * Onboarding Status
+             * @default not_started
+             */
+            onboarding_status: string;
+        };
+        /** BusinessProfileRead */
+        BusinessProfileRead: {
+            /** Description */
+            description?: string | null;
+            /** Industry */
+            industry?: string | null;
+            /** Business Model */
+            business_model?: string | null;
+            /** Target Market */
+            target_market?: string | null;
+            /** Brand Positioning */
+            brand_positioning?: string | null;
+            /** Average Order Value */
+            average_order_value?: string | null;
+            /** Primary Customer Type */
+            primary_customer_type?: string | null;
+            /** Brand Voice */
+            brand_voice?: string | null;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** BusinessProfileWrite */
+        BusinessProfileWrite: {
+            /** Description */
+            description?: string | null;
+            /** Industry */
+            industry?: string | null;
+            /** Business Model */
+            business_model?: string | null;
+            /** Target Market */
+            target_market?: string | null;
+            /** Brand Positioning */
+            brand_positioning?: string | null;
+            /** Average Order Value */
+            average_order_value?: number | string | null;
+            /** Primary Customer Type */
+            primary_customer_type?: string | null;
+            /** Brand Voice */
+            brand_voice?: string | null;
         };
         /** BusinessRead */
         BusinessRead: {
@@ -236,11 +790,285 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+            /** Description */
+            description: string | null;
+            /** Country */
+            country: string | null;
+            /** Website Url */
+            website_url: string | null;
+        };
+        /** BusinessUpdate */
+        BusinessUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Industry */
+            industry?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Website Url */
+            website_url?: string | null;
+            /** Onboarding Status */
+            onboarding_status?: string | null;
+        };
+        /** DiscountCreate */
+        DiscountCreate: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Value */
+            value: number | string;
+            /** Minimum Order Value */
+            minimum_order_value?: number | string | null;
+            /** Maximum Discount */
+            maximum_discount?: number | string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+        };
+        /** DiscountRead */
+        DiscountRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Value */
+            value: string;
+            /** Minimum Order Value */
+            minimum_order_value: string | null;
+            /** Maximum Discount */
+            maximum_discount: string | null;
+            /**
+             * Starts At
+             * Format: date-time
+             */
+            starts_at: string;
+            /**
+             * Ends At
+             * Format: date-time
+             */
+            ends_at: string;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** DiscountUpdate */
+        DiscountUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Type */
+            type?: string | null;
+            /** Value */
+            value?: number | string | null;
+            /** Minimum Order Value */
+            minimum_order_value?: number | string | null;
+            /** Maximum Discount */
+            maximum_discount?: number | string | null;
+            /** Starts At */
+            starts_at?: string | null;
+            /** Ends At */
+            ends_at?: string | null;
+            /** Active */
+            active?: boolean | null;
+        };
+        /** EconomicsSummaryRead */
+        EconomicsSummaryRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Currency */
+            currency: string;
+            /** Active Products */
+            active_products: number;
+            /** Priced Products */
+            priced_products: number;
+            /** Average Product Price */
+            average_product_price: string | null;
+            /** Average Contribution Profit */
+            average_contribution_profit: string | null;
+            /** Average Contribution Margin */
+            average_contribution_margin: string | null;
+            /** Average Total Customer Revenue */
+            average_total_customer_revenue: string | null;
+            /** Break Even Cpa Range */
+            break_even_cpa_range: string[] | null;
+            /** Target Cpa */
+            target_cpa: string | null;
+            /** Target Cpa Reason */
+            target_cpa_reason: string | null;
+            /** Break Even Roas */
+            break_even_roas: string | null;
+            /** Inventory Value */
+            inventory_value: string | null;
+            current_goal: components["schemas"]["GoalRead"] | null;
+        };
+        /** GoalCreate */
+        GoalCreate: {
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+            /** Target Revenue */
+            target_revenue?: number | string | null;
+            /** Target Profit */
+            target_profit?: number | string | null;
+            /** Ad Budget */
+            ad_budget?: number | string | null;
+            /** Maximum Cpa */
+            maximum_cpa?: number | string | null;
+            /** Target Roas */
+            target_roas?: number | string | null;
+            /** Currency */
+            currency: string;
+        };
+        /** GoalRead */
+        GoalRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+            /** Target Revenue */
+            target_revenue: string | null;
+            /** Target Profit */
+            target_profit: string | null;
+            /** Ad Budget */
+            ad_budget: string | null;
+            /** Maximum Cpa */
+            maximum_cpa: string | null;
+            /** Target Roas */
+            target_roas: string | null;
+            /** Currency */
+            currency: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** GoalUpdate */
+        GoalUpdate: {
+            /** Period Start */
+            period_start?: string | null;
+            /** Period End */
+            period_end?: string | null;
+            /** Target Revenue */
+            target_revenue?: number | string | null;
+            /** Target Profit */
+            target_profit?: number | string | null;
+            /** Ad Budget */
+            ad_budget?: number | string | null;
+            /** Maximum Cpa */
+            maximum_cpa?: number | string | null;
+            /** Target Roas */
+            target_roas?: number | string | null;
+            /** Currency */
+            currency?: string | null;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /**
+         * InventoryAdjust
+         * @description Signed delta applied to the current quantity.
+         */
+        InventoryAdjust: {
+            /** Quantity Delta */
+            quantity_delta: number;
+        };
+        /** InventoryRead */
+        InventoryRead: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Quantity */
+            quantity: number;
+            /** Source */
+            source: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+        };
+        /**
+         * InventorySet
+         * @description Absolute quantity; replaces the current inventory.
+         */
+        InventorySet: {
+            /** Quantity */
+            quantity: number;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -314,6 +1142,271 @@ export interface components {
             /** Permissions */
             permissions: string[];
         };
+        /** ProductCostCreate */
+        ProductCostCreate: {
+            /**
+             * Cogs
+             * @default 0
+             */
+            cogs: number | string;
+            /**
+             * Packaging Cost
+             * @default 0
+             */
+            packaging_cost: number | string;
+            /**
+             * Payment Fee Fixed
+             * @default 0
+             */
+            payment_fee_fixed: number | string;
+            /**
+             * Payment Fee Percent
+             * @default 0
+             */
+            payment_fee_percent: number | string;
+            /**
+             * Effective From
+             * Format: date-time
+             */
+            effective_from: string;
+            /** Effective To */
+            effective_to?: string | null;
+        };
+        /** ProductCostRead */
+        ProductCostRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Cogs */
+            cogs: string;
+            /** Packaging Cost */
+            packaging_cost: string;
+            /** Payment Fee Fixed */
+            payment_fee_fixed: string;
+            /** Payment Fee Percent */
+            payment_fee_percent: string;
+            /**
+             * Effective From
+             * Format: date-time
+             */
+            effective_from: string;
+            /** Effective To */
+            effective_to: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ProductCreate */
+        ProductCreate: {
+            /** Name */
+            name: string;
+            /** Sku */
+            sku?: string | null;
+            /** Description */
+            description?: string | null;
+            /**
+             * Status
+             * @default active
+             */
+            status: string;
+            /**
+             * Currency
+             * @default USD
+             */
+            currency: string;
+        };
+        /**
+         * ProductDetailRead
+         * @description Product plus its current unit economics and inventory quantity.
+         */
+        ProductDetailRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Sku */
+            sku: string | null;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Status */
+            status: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Inventory Quantity
+             * @default 0
+             */
+            inventory_quantity: number;
+            /** Active Price */
+            active_price?: string | null;
+            /** Contribution Profit */
+            contribution_profit?: string | null;
+            /** Contribution Margin */
+            contribution_margin?: string | null;
+        };
+        /**
+         * ProductEconomicsRead
+         * @description Unit economics for one product plus its identity/inventory context.
+         */
+        ProductEconomicsRead: {
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Name */
+            name: string;
+            /** Sku */
+            sku: string | null;
+            /** Status */
+            status: string;
+            /** Currency */
+            currency: string;
+            /** Inventory Quantity */
+            inventory_quantity: number;
+            /** Product Revenue */
+            product_revenue: string | null;
+            /** Shipping Revenue */
+            shipping_revenue: string | null;
+            /** Total Customer Revenue */
+            total_customer_revenue: string | null;
+            /** Product Cost */
+            product_cost: string;
+            /** Shipping Cost */
+            shipping_cost: string;
+            /** Payment Fees */
+            payment_fees: string;
+            /** Discount Amount */
+            discount_amount: string;
+            /** Contribution Profit */
+            contribution_profit: string | null;
+            /** Contribution Margin */
+            contribution_margin: string | null;
+            /** Break Even Cpa */
+            break_even_cpa: string | null;
+            /** Break Even Roas */
+            break_even_roas: string | null;
+            /** Target Cpa */
+            target_cpa: string | null;
+            /** Target Cpa Reason */
+            target_cpa_reason: string | null;
+        };
+        /** ProductPriceCreate */
+        ProductPriceCreate: {
+            /** Price */
+            price: number | string;
+            /** Currency */
+            currency: string;
+            /**
+             * Effective From
+             * Format: date-time
+             */
+            effective_from: string;
+            /** Effective To */
+            effective_to?: string | null;
+        };
+        /** ProductPriceRead */
+        ProductPriceRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Product Id
+             * Format: uuid
+             */
+            product_id: string;
+            /** Price */
+            price: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Effective From
+             * Format: date-time
+             */
+            effective_from: string;
+            /** Effective To */
+            effective_to: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** ProductRead */
+        ProductRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Sku */
+            sku: string | null;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /** Status */
+            status: string;
+            /** Currency */
+            currency: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ProductUpdate */
+        ProductUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Sku */
+            sku?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Currency */
+            currency?: string | null;
+        };
         /** RefreshResponse */
         RefreshResponse: {
             /** Access Token */
@@ -324,6 +1417,101 @@ export interface components {
              * @constant
              */
             token_type: "bearer";
+        };
+        /** ShippingRuleCreate */
+        ShippingRuleCreate: {
+            /** Name */
+            name: string;
+            /** Country */
+            country: string;
+            /** Region */
+            region?: string | null;
+            /** Method */
+            method: string;
+            /**
+             * Cost
+             * @default 0
+             */
+            cost: number | string;
+            /**
+             * Customer Price
+             * @default 0
+             */
+            customer_price: number | string;
+            /** Free Shipping Threshold */
+            free_shipping_threshold?: number | string | null;
+            /**
+             * Is Default
+             * @default false
+             */
+            is_default: boolean;
+            /**
+             * Active
+             * @default true
+             */
+            active: boolean;
+        };
+        /** ShippingRuleRead */
+        ShippingRuleRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Name */
+            name: string;
+            /** Country */
+            country: string;
+            /** Region */
+            region: string | null;
+            /** Method */
+            method: string;
+            /** Cost */
+            cost: string;
+            /** Customer Price */
+            customer_price: string;
+            /** Free Shipping Threshold */
+            free_shipping_threshold: string | null;
+            /** Is Default */
+            is_default: boolean;
+            /** Active */
+            active: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ShippingRuleUpdate */
+        ShippingRuleUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Country */
+            country?: string | null;
+            /** Region */
+            region?: string | null;
+            /** Method */
+            method?: string | null;
+            /** Cost */
+            cost?: number | string | null;
+            /** Customer Price */
+            customer_price?: number | string | null;
+            /** Free Shipping Threshold */
+            free_shipping_threshold?: number | string | null;
+            /** Is Default */
+            is_default?: boolean | null;
+            /** Active */
+            active?: boolean | null;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -615,6 +1803,39 @@ export interface operations {
             };
         };
     };
+    create_business_api_v1_businesses_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_business_api_v1_businesses__business_id__get: {
         parameters: {
             query?: never;
@@ -631,6 +1852,968 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BusinessRead"];
+                };
+            };
+        };
+    };
+    update_business_api_v1_businesses__business_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_profile_api_v1_businesses__business_id__profile_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessProfileRead"];
+                };
+            };
+        };
+    };
+    upsert_profile_api_v1_businesses__business_id__profile_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessProfileWrite"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessProfileRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_products_api_v1_businesses__business_id__products_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductDetailRead"][];
+                };
+            };
+        };
+    };
+    create_product_api_v1_businesses__business_id__products_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_product_api_v1_businesses__business_id__products__product_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductRead"];
+                };
+            };
+        };
+    };
+    archive_product_api_v1_businesses__business_id__products__product_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_product_api_v1_businesses__business_id__products__product_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_prices_api_v1_businesses__business_id__products__product_id__prices_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductPriceRead"][];
+                };
+            };
+        };
+    };
+    create_price_api_v1_businesses__business_id__products__product_id__prices_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductPriceCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductPriceRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_costs_api_v1_businesses__business_id__products__product_id__costs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCostRead"][];
+                };
+            };
+        };
+    };
+    create_cost_api_v1_businesses__business_id__products__product_id__costs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProductCostCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductCostRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_inventory_api_v1_businesses__business_id__products__product_id__inventory_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryRead"];
+                };
+            };
+        };
+    };
+    set_inventory_api_v1_businesses__business_id__products__product_id__inventory_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InventorySet"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    adjust_inventory_api_v1_businesses__business_id__products__product_id__inventory_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InventoryAdjust"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InventoryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_shipping_rules_api_v1_businesses__business_id__shipping_rules_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShippingRuleRead"][];
+                };
+            };
+        };
+    };
+    create_shipping_rule_api_v1_businesses__business_id__shipping_rules_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShippingRuleCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShippingRuleRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_shipping_rule_api_v1_businesses__business_id__shipping_rules__rule_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_shipping_rule_api_v1_businesses__business_id__shipping_rules__rule_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShippingRuleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShippingRuleRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_discounts_api_v1_businesses__business_id__discounts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountRead"][];
+                };
+            };
+        };
+    };
+    create_discount_api_v1_businesses__business_id__discounts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscountCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_discount_api_v1_businesses__business_id__discounts__discount_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscountUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscountRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_bundles_api_v1_businesses__business_id__bundles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleRead"][];
+                };
+            };
+        };
+    };
+    create_bundle_api_v1_businesses__business_id__bundles_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BundleCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_bundle_api_v1_businesses__business_id__bundles__bundle_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleRead"];
+                };
+            };
+        };
+    };
+    delete_bundle_api_v1_businesses__business_id__bundles__bundle_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_bundle_api_v1_businesses__business_id__bundles__bundle_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BundleUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_bundle_economics_api_v1_businesses__business_id__bundles__bundle_id__economics_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleEconomicsRead"];
+                };
+            };
+        };
+    };
+    get_goals_api_v1_businesses__business_id__goals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalRead"][];
+                };
+            };
+        };
+    };
+    create_goal_api_v1_businesses__business_id__goals_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoalCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_goal_api_v1_businesses__business_id__goals__goal_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    update_goal_api_v1_businesses__business_id__goals__goal_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoalUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    economics_summary_api_v1_businesses__business_id__economics_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EconomicsSummaryRead"];
+                };
+            };
+        };
+    };
+    economics_products_api_v1_businesses__business_id__economics_products_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductEconomicsRead"][];
+                };
+            };
+        };
+    };
+    economics_product_api_v1_businesses__business_id__economics_products__product_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                product_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductEconomicsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    economics_goals_api_v1_businesses__business_id__economics_goals_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GoalRead"][];
+                };
+            };
+        };
+    };
+    economics_bundle_api_v1_businesses__business_id__economics_bundles__bundle_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                bundle_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BundleEconomicsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

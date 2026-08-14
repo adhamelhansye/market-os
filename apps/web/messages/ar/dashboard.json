@@ -15,5 +15,20 @@
   "organizationSection": "المؤسسة",
   "membershipSection": "العضويات",
   "orgType": "النوع",
-  "noMemberships": "لا توجد مؤسسات بعد."
+  "noMemberships": "لا توجد مؤسسات بعد.",
+  "businessActions": "نشاطك التجاري",
+  "startOnboarding": "بدء الإعداد",
+  "continueOnboarding": "متابعة الإعداد",
+  "viewEconomics": "لوحة الاقتصاديات",
+  "manageProducts": "المنتجات",
+  "businessSettings": "إعدادات النشاط التجاري",
+  "noActiveBusiness": "اختر نشاطًا تجاريًا من القائمة لفتح مساحة عمله.",
+  "createBusinessTitle": "أنشئ نشاطك التجاري",
+  "createBusinessHint": "يبدأ نشاطك التجاري بخطوات الإعداد: معلومات النشاط، المنتجات، الاقتصاديات، الشحن والأهداف.",
+  "businessName": "اسم النشاط التجاري",
+  "businessCurrency": "العملة",
+  "businessTimezone": "المنطقة الزمنية",
+  "creatingBusiness": "جارٍ الإنشاء…",
+  "createBusinessFailed": "تعذّر إنشاء النشاط التجاري.",
+  "createBusinessCta": "إنشاء"
 }

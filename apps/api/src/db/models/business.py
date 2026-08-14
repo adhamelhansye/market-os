@@ -3,12 +3,15 @@ organization (managed_by_organization_id)."""
 
 import uuid
 
-from sqlalchemy import CheckConstraint, ForeignKey, String, UniqueConstraint
+from sqlalchemy import CheckConstraint, ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 ONBOARDING_STATUSES = ("not_started", "in_progress", "completed")
+
+# ISO 3166-1 alpha-2 country code, e.g. "EG", "SA", "US".
+COUNTRY_CODE_PATTERN = r"^[A-Za-z]{2}$"
 
 
 class Business(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -29,6 +32,9 @@ class Business(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     name: Mapped[str] = mapped_column(String(255))
     industry: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    country: Mapped[str | None] = mapped_column(String(2), nullable=True)
+    website_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     timezone: Mapped[str] = mapped_column(String(64), default="UTC", server_default="UTC")
     currency: Mapped[str] = mapped_column(String(3), default="USD", server_default="USD")
     onboarding_status: Mapped[str] = mapped_column(

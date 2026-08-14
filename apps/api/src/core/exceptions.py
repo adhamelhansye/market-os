@@ -7,6 +7,7 @@ All API errors are returned as:
 from typing import Any
 
 from fastapi import Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
@@ -75,16 +76,22 @@ def register_exception_handlers(app) -> None:
     async def handle_validation_error(
         request: Request, exc: RequestValidationError
     ) -> JSONResponse:
+        # jsonable_encoder keeps Decimal inputs debt-free (serializes them
+        # as strings) so failing money fields never crash the error handler.
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=error_payload("validation_error", "Request validation failed", exc.errors()),
+            content=error_payload(
+                "validation_error", "Request validation failed", jsonable_encoder(exc.errors())
+            ),
         )
 
     @app.exception_handler(ValidationError)
     async def handle_pydantic_error(request: Request, exc: ValidationError) -> JSONResponse:
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            content=error_payload("validation_error", "Request validation failed", exc.errors()),
+            content=error_payload(
+                "validation_error", "Request validation failed", jsonable_encoder(exc.errors())
+            ),
         )
 
     @app.exception_handler(Exception)

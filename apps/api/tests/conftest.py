@@ -110,7 +110,24 @@ async def session(session_factory: async_sessionmaker[AsyncSession]) -> AsyncIte
 async def clean_tables(session: AsyncSession) -> AsyncIterator[None]:
     """Wipes all rows between tests (children first)."""
     yield
-    for table in ("memberships", "invitations", "businesses", "roles", "organizations", "users"):
+    for table in (
+        "bundle_items",
+        "inventory_snapshots",
+        "product_prices",
+        "product_costs",
+        "shipping_rules",
+        "discounts",
+        "bundles",
+        "products",
+        "business_profiles",
+        "business_goals",
+        "memberships",
+        "invitations",
+        "businesses",
+        "roles",
+        "organizations",
+        "users",
+    ):
         await session.execute(text(f"DELETE FROM {table}"))
     await session.commit()
 
@@ -218,3 +235,38 @@ async def auth_headers(
 ) -> dict[str, str]:
     token = create_access_token(user.id, get_settings())
     return {"Authorization": f"Bearer {token}", "X-Organization-Id": str(organization_id)}
+
+
+async def create_tenant(
+    session: AsyncSession,
+    *,
+    org_type: str = "business",
+    permissions: list[str] | None = None,
+    managed_by=None,
+    business_name: str | None = None,
+) -> dict:
+    """Builds a complete tenant: user, organization, owner role, membership
+    and a business. Returns dict with user/org/business/headers."""
+    from src.core.rbac import DEFAULT_ROLES
+
+    user = await create_user(session)
+    org = await create_organization(session, type=org_type)
+    perms = permissions or sorted(DEFAULT_ROLES["owner"])
+    role = await create_role(session, name="owner", organization_id=org.id, permissions=perms)
+    await create_membership(session, user=user, organization=org, role=role)
+    business = await create_business(
+        session, organization=org, managed_by=managed_by, name=business_name
+    )
+    await session.commit()
+    return {
+        "user": user,
+        "org": org,
+        "role": role,
+        "business": business,
+        "headers": await auth_headers(session, user, org.id),
+    }
+
+
+@pytest_asyncio.fixture
+async def tenant(session: AsyncSession) -> dict:
+    return await create_tenant(session)

@@ -21,7 +21,7 @@ export function isSupportedLocale(value: string | undefined): value is Locale {
   return value === "en" || value === "ar";
 }
 
-export function localePath(path: string, locale: Locale): string {
+export function localePath(path: string, locale: string): string {
   if (!path.startsWith("/")) {
     throw new Error("localePath expects a path starting with '/'");
   }

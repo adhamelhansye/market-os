@@ -15,5 +15,20 @@
   "organizationSection": "Organization",
   "membershipSection": "Memberships",
   "orgType": "Type",
-  "noMemberships": "No organizations yet."
+  "noMemberships": "No organizations yet.",
+  "businessActions": "Your business",
+  "startOnboarding": "Start onboarding",
+  "continueOnboarding": "Continue onboarding",
+  "viewEconomics": "Economics dashboard",
+  "manageProducts": "Products",
+  "businessSettings": "Business settings",
+  "noActiveBusiness": "Select a business from the switcher to open its workspace.",
+  "createBusinessTitle": "Create your business",
+  "createBusinessHint": "Your business starts with the onboarding flow: business info, products, economics, shipping and goals.",
+  "businessName": "Business name",
+  "businessCurrency": "Currency",
+  "businessTimezone": "Timezone",
+  "creatingBusiness": "Creating…",
+  "createBusinessFailed": "Could not create the business.",
+  "createBusinessCta": "Create"
 }

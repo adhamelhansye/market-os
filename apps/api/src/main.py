@@ -2,6 +2,7 @@
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from decimal import Decimal
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,9 +12,15 @@ from src.core.exceptions import register_exception_handlers
 from src.core.logging import get_logger, setup_logging
 from src.core.middleware import RequestContextMiddleware
 from src.modules.auth.router import router as auth_router
+from src.modules.bundles.router import router as bundles_router
 from src.modules.businesses.router import router as businesses_router
+from src.modules.discounts.router import router as discounts_router
+from src.modules.economics.router import router as economics_router
+from src.modules.goals.router import router as goals_router
 from src.modules.health.router import router as health_router
 from src.modules.organizations.router import router as organizations_router
+from src.modules.products.router import router as products_router
+from src.modules.shipping.router import router as shipping_router
 
 logger = get_logger(__name__)
 
@@ -33,9 +40,12 @@ def create_app() -> FastAPI:
 
     app = FastAPI(
         title="MarketingOS API",
-        version="0.1.0",
-        description="Multi-tenant AI marketing operating system — Phase 0 foundation.",
+        version="0.2.0",
+        description="MarketingOS API — Phase 1: business intelligence core.",
         lifespan=lifespan,
+        # Money never leaves the API as a float: Decimal fields serialize
+        # as strings everywhere (deterministic, no precision loss).
+        json_encoders={Decimal: str},
     )
 
     app.add_middleware(RequestContextMiddleware, settings=settings)
@@ -53,6 +63,12 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix=f"{API_PREFIX}/auth")
     app.include_router(organizations_router, prefix=API_PREFIX)
     app.include_router(businesses_router, prefix=API_PREFIX)
+    app.include_router(products_router, prefix=API_PREFIX)
+    app.include_router(shipping_router, prefix=API_PREFIX)
+    app.include_router(discounts_router, prefix=API_PREFIX)
+    app.include_router(bundles_router, prefix=API_PREFIX)
+    app.include_router(goals_router, prefix=API_PREFIX)
+    app.include_router(economics_router, prefix=API_PREFIX)
 
     return app
 
