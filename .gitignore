@@ -1,0 +1,35 @@
+# Env
+.env
+.env.local
+.env.*.local
+apps/api/.env
+apps/web/.env.local
+
+# Node
+node_modules/
+.next/
+out/
+dist/
+*.tsbuildinfo
+coverage/
+playwright-report/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
