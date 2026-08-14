@@ -1,0 +1,19 @@
+{
+  "title": "لوحة التحكم",
+  "greeting": "مرحبًا، {name}",
+  "currentOrganization": "المؤسسة",
+  "currentRole": "دورك",
+  "currentBusiness": "النشاط التجاري النشط",
+  "noBusinessYet": "لم يتم إنشاء أي نشاط تجاري بعد.",
+  "emptyStateTitle": "اربط بياناتك لبدء تحليل أداء التسويق.",
+  "emptyStateBody": "في المرحلة القادمة ستتمكن من ربط حساباتك الإعلانية ومتاجرك وأدوات التحليلات. المرحلة صفر تتعلق بالأساس.",
+  "switcherOrganizationLabel": "تبديل المؤسسة",
+  "switcherBusinessLabel": "تبديل النشاط التجاري",
+  "settingsTitle": "الإعدادات",
+  "settingsSubtitle": "إعدادات المؤسسة والملف الشخصي (للقراءة فقط في المرحلة صفر).",
+  "profileSection": "الملف الشخصي",
+  "organizationSection": "المؤسسة",
+  "membershipSection": "العضويات",
+  "orgType": "النوع",
+  "noMemberships": "لا توجد مؤسسات بعد."
+}

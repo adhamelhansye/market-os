@@ -1,0 +1,17 @@
+{
+  "appName": "MarketingOS",
+  "tagline": "The AI marketing operating system",
+  "localeName": "English",
+  "signInLink": "Sign in",
+  "createAccountLink": "Create account",
+  "logout": "Sign out",
+  "organization": "Organization",
+  "role": "Role",
+  "business": "Business",
+  "noBusiness": "No business yet",
+  "settings": "Settings",
+  "dashboard": "Dashboard",
+  "language": "Language",
+  "error": "Something went wrong. Please try again.",
+  "empty": "Nothing here yet."
+}

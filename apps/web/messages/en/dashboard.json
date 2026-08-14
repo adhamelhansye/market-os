@@ -1,0 +1,19 @@
+{
+  "title": "Dashboard",
+  "greeting": "Hello, {name}",
+  "currentOrganization": "Organization",
+  "currentRole": "Your role",
+  "currentBusiness": "Active business",
+  "noBusinessYet": "No business has been created yet.",
+  "emptyStateTitle": "Connect your data to start analyzing your marketing performance.",
+  "emptyStateBody": "In the next phase you will be able to connect your ad accounts, stores and analytics tools. Phase 0 is about the foundation.",
+  "switcherOrganizationLabel": "Switch organization",
+  "switcherBusinessLabel": "Switch business",
+  "settingsTitle": "Settings",
+  "settingsSubtitle": "Organization and profile settings (read-only in Phase 0).",
+  "profileSection": "Profile",
+  "organizationSection": "Organization",
+  "membershipSection": "Memberships",
+  "orgType": "Type",
+  "noMemberships": "No organizations yet."
+}
