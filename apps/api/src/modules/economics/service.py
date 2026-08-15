@@ -5,7 +5,7 @@ The service only decides WHICH records apply; the calculator owns all
 arithmetic (pure Decimal, no LLM).
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from statistics import mean
 
@@ -306,4 +306,56 @@ async def summary_data(
         "break_even_roas": break_even_roas,
         "inventory_value": inventory_value.quantize(Decimal("0.01")),
         "current_goal": await current_goal(session, business.id, as_of),
+    }
+
+
+async def revenue_summary(session: AsyncSession, business: Business) -> dict:
+    """Read-only revenue summary sourced from canonical orders.
+
+    Deterministic aggregation: pure Decimal sums over the orders table
+    filtered by (business_id). Multi-currency orders are converted to the
+    business's currency only when the order currency matches; otherwise
+    they are excluded from totals to keep the arithmetic honest (an order
+    in EUR is not silently summed into a USD business total).
+
+    Refunded revenue counts orders whose financial_status is in
+    {'refunded', 'partially_refunded'}.
+    """
+    from src.db.models import Order
+
+    as_of = _as_of()
+    window_start = as_of - timedelta(days=30)
+
+    rows = list(
+        await session.scalars(
+            select(Order)
+            .where(Order.business_id == business.id)
+            .order_by(Order.ordered_at)
+        )
+    )
+    total_revenue = ZERO
+    refunded_revenue = ZERO
+    last_30d_revenue = ZERO
+    last_30d_orders = 0
+    order_count = 0
+    for order in rows:
+        if order.currency != business.currency:
+            continue
+        order_count += 1
+        total_revenue += order.total
+        if order.financial_status in {"refunded", "partially_refunded"}:
+            refunded_revenue += order.total
+        if order.ordered_at >= window_start:
+            last_30d_revenue += order.total
+            last_30d_orders += 1
+
+    return {
+        "business_id": business.id,
+        "currency": business.currency,
+        "order_count": order_count,
+        "total_revenue": total_revenue.quantize(Decimal("0.01")),
+        "refunded_revenue": refunded_revenue.quantize(Decimal("0.01")),
+        "last_30d_revenue": last_30d_revenue.quantize(Decimal("0.01")),
+        "last_30d_orders": last_30d_orders,
+        "last_30d_window_start": window_start,
     }

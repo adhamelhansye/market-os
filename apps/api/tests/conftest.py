@@ -17,6 +17,10 @@ os.environ["JWT_SECRET"] = os.environ.get("JWT_SECRET", "test-jwt-secret-" + "x"
 os.environ["JWT_REFRESH_SECRET"] = os.environ.get("JWT_REFRESH_SECRET", "test-refresh-" + "y" * 32)
 os.environ["ENCRYPTION_KEY"] = os.environ.get("ENCRYPTION_KEY", "test-encryption-key-value")
 os.environ["WEB_URL"] = os.environ.get("WEB_URL", "http://localhost:3000")
+os.environ.setdefault("SHOPIFY_CLIENT_ID", "test-shopify-client")
+os.environ.setdefault("SHOPIFY_CLIENT_SECRET", "test-shopify-secret")
+os.environ.setdefault("SHOPIFY_REDIRECT_URI", "http://test/api/v1/integrations/shopify/callback")
+os.environ.setdefault("FRONTEND_BASE_URL", "http://test")
 
 TEST_DATABASE_URL = os.environ.get(
     "TEST_DATABASE_URL",
@@ -111,6 +115,13 @@ async def clean_tables(session: AsyncSession) -> AsyncIterator[None]:
     """Wipes all rows between tests (children first)."""
     yield
     for table in (
+        "order_items",
+        "orders",
+        "customers",
+        "webhook_events",
+        "sync_runs",
+        "integration_credentials",
+        "integration_connections",
         "bundle_items",
         "inventory_snapshots",
         "product_prices",

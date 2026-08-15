@@ -7,6 +7,7 @@ import onboardingEn from "../../messages/en/onboarding.json";
 import productsEn from "../../messages/en/products.json";
 import economicsEn from "../../messages/en/economics.json";
 import settingsEn from "../../messages/en/settings.json";
+import integrationsEn from "../../messages/en/integrations.json";
 import commonAr from "../../messages/ar/common.json";
 import authAr from "../../messages/ar/auth.json";
 import dashboardAr from "../../messages/ar/dashboard.json";
@@ -14,6 +15,7 @@ import onboardingAr from "../../messages/ar/onboarding.json";
 import productsAr from "../../messages/ar/products.json";
 import economicsAr from "../../messages/ar/economics.json";
 import settingsAr from "../../messages/ar/settings.json";
+import integrationsAr from "../../messages/ar/integrations.json";
 
 export const messagesByLocale: Record<string, AbstractIntlMessages> = {
   en: {
@@ -24,6 +26,7 @@ export const messagesByLocale: Record<string, AbstractIntlMessages> = {
     products: productsEn,
     economics: economicsEn,
     settings: settingsEn,
+    integrations: integrationsEn,
   },
   ar: {
     common: commonAr,
@@ -33,5 +36,6 @@ export const messagesByLocale: Record<string, AbstractIntlMessages> = {
     products: productsAr,
     economics: economicsAr,
     settings: settingsAr,
+    integrations: integrationsAr,
   },
 };

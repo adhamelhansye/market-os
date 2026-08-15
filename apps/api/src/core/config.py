@@ -25,6 +25,28 @@ class Settings(BaseSettings):
     jwt_secret: str
     jwt_refresh_secret: str
     encryption_key: str
+    encryption_key_version: int = 1
+
+    # Shopify OAuth (custom app). Shopify API version is configurable so the
+    # deployment can track its own upgrade schedule.
+    shopify_client_id: str = ""
+    shopify_client_secret: str = ""
+    shopify_redirect_uri: str = ""
+    shopify_api_version: str = "2026-04"
+    shopify_scopes: str = "read_products,read_orders,read_customers,read_inventory,read_locations"
+
+    # OAuth state: how long a connect state token stays valid (single-use).
+    oauth_state_ttl_seconds: int = 600
+
+    # Callback session cookie: binds the browser tab that started the OAuth
+    # connect to the identity of the authenticated user who initiated it, so
+    # the browser-redirect callback can reject a state used by the wrong user.
+    callback_session_cookie_name: str = "mos_cb_session"
+    callback_session_ttl_seconds: int = 900
+
+    # Origin the OAuth callback redirects to after completing the exchange.
+    # NEVER user-supplied: only this configured value is used.
+    frontend_base_url: str = "http://localhost:3000"
 
     cors_origins: str = ""
 
@@ -45,6 +67,15 @@ class Settings(BaseSettings):
     def validate_secret_length(cls, value: str) -> str:
         if len(value) < 16:
             raise ValueError("JWT secrets must be at least 16 characters")
+        return value
+
+    @field_validator("encryption_key")
+    @classmethod
+    def validate_encryption_key_length(cls, value: str) -> str:
+        # The AES-GCM key is derived from this value via HKDF; short values
+        # would make the derivation trivially brute-forceable.
+        if len(value) < 16:
+            raise ValueError("ENCRYPTION_KEY must be at least 16 characters")
         return value
 
     @property

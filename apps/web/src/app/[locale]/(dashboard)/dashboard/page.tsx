@@ -7,7 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowRight, BarChart3, Package, Settings } from "lucide-react";
+import { ArrowRight, BarChart3, Package, PlugZap, Settings } from "lucide-react";
 
 import {
   Card,
@@ -150,6 +150,12 @@ export default function DashboardPage() {
               <Link href={localePath(`/business/${activeBusiness.id}/products`, locale)}>
                 <Package className="me-2 h-4 w-4" />
                 {t("manageProducts")}
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href={localePath(`/business/${activeBusiness.id}/integrations`, locale)}>
+                <PlugZap className="me-2 h-4 w-4" />
+                {t("viewIntegrations")}
               </Link>
             </Button>
             <Button asChild variant="outline">

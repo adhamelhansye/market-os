@@ -371,7 +371,7 @@ def test_refresh_cookie_attributes_dev_and_prod() -> None:
             redis_url="redis://h:6379/0",
             jwt_secret="s" * 16,
             jwt_refresh_secret="r" * 16,
-            encryption_key="e",
+            encryption_key="e" * 16,
             web_url=web_url,
         )
 

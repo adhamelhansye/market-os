@@ -55,8 +55,10 @@ Rules:
 - Internal models are never returned as API responses; Pydantic schemas in
   `src/schemas/entities.py` define the API contract.
 - All endpoints live under `/api/v1`.
-- Provider-specific logic (Meta, Shopify, GA4, ...) does not exist yet; when
-  it arrives it must stay inside provider adapters behind interfaces.
+- Provider-specific logic (Shopify today; Meta, GA4, TikTok, Google Ads
+  later) stays inside provider adapters behind the `IntegrationAdapter`
+  interface — core business logic never calls provider APIs directly (see
+  `docs/architecture/integrations.md` and `docs/architecture/shopify.md`).
 
 ## Schema
 
@@ -149,6 +151,8 @@ this live schema into `packages/shared-types` by
 
 - `docs/architecture/tenancy.md` — tenancy model and enforcement
 - `docs/architecture/authentication.md` — auth flows and security
+- `docs/architecture/integrations.md` — adapter core, credentials, sync/webhooks
+- `docs/architecture/shopify.md` — Shopify provider specifics
 - `docs/adr/0001-monolith.md` — monolith decision
 - `docs/adr/0002-multi-tenancy.md` — tenancy decision (incl. why no RLS yet)
 - `AGENTS.md` — permanent engineering rules

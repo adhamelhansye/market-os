@@ -2,6 +2,11 @@
 
 Products are never hard-deleted in Phase 1: deletion archives them so that
 historical prices, costs and inventory snapshots stay consistent.
+
+When a product is synced from an external source (e.g. Shopify), `external_id`
+records the provider's identifier and `external_source` the provider; the pair
+is unique per business so re-syncing maps to the same row. External sync never
+writes COGS (product_costs) — those stay manually configured.
 """
 
 import uuid
@@ -12,6 +17,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
 
 PRODUCT_STATUSES = ("active", "inactive", "archived")
+EXTERNAL_SOURCES = ("shopify",)
 
 
 class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -28,6 +34,15 @@ class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             unique=True,
             postgresql_where=text("sku IS NOT NULL"),
         ),
+        # External mapping is optional; when present it must be unique within
+        # the business. This is the idempotency anchor for provider syncs.
+        Index(
+            "uq_products_business_external_id",
+            "business_id",
+            "external_id",
+            unique=True,
+            postgresql_where=text("external_id IS NOT NULL"),
+        ),
     )
 
     business_id: Mapped[uuid.UUID] = mapped_column(
@@ -42,6 +57,8 @@ class Product(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     currency: Mapped[str] = mapped_column(
         String(3), default="USD", server_default="USD"
     )
+    external_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    external_source: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     def __repr__(self) -> str:
         return f"<Product id={self.id} name={self.name!r}>"

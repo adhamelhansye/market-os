@@ -23,6 +23,7 @@ from src.modules.economics.schemas import (
     BundleEconomicsRead,
     EconomicsSummaryRead,
     ProductEconomicsRead,
+    RevenueSummaryRead,
 )
 from src.modules.goals.schemas import GoalRead
 
@@ -46,6 +47,19 @@ async def economics_summary(
         "current_goal": GoalRead.model_validate(current_goal) if current_goal else None,
     }
     return EconomicsSummaryRead(**data)
+
+
+@router.get(
+    "/businesses/{business_id}/economics/revenue",
+    response_model=RevenueSummaryRead,
+)
+async def revenue_summary(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> RevenueSummaryRead:
+    business = await get_business(session, business_id)
+    return RevenueSummaryRead(**await economics_service.revenue_summary(session, business))
 
 
 def _to_product_read(product: Product, economics, inventory: int) -> ProductEconomicsRead:

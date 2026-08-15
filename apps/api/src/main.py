@@ -18,6 +18,7 @@ from src.modules.discounts.router import router as discounts_router
 from src.modules.economics.router import router as economics_router
 from src.modules.goals.router import router as goals_router
 from src.modules.health.router import router as health_router
+from src.modules.integrations.router import router as integrations_router
 from src.modules.organizations.router import router as organizations_router
 from src.modules.products.router import router as products_router
 from src.modules.shipping.router import router as shipping_router
@@ -69,6 +70,7 @@ def create_app() -> FastAPI:
     app.include_router(bundles_router, prefix=API_PREFIX)
     app.include_router(goals_router, prefix=API_PREFIX)
     app.include_router(economics_router, prefix=API_PREFIX)
+    app.include_router(integrations_router, prefix=API_PREFIX)
 
     return app
 

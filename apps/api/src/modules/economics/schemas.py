@@ -5,6 +5,7 @@ Money fields are Decimal; the app serializes Decimals as strings
 """
 
 import uuid
+from datetime import datetime
 from decimal import Decimal
 
 from pydantic import BaseModel
@@ -44,6 +45,24 @@ class BundleEconomicsRead(BaseModel):
     items_cost: Decimal
     contribution_profit: Decimal
     contribution_margin: Decimal | None
+
+
+class RevenueSummaryRead(BaseModel):
+    """Read-only revenue summary sourced from canonical orders.
+
+    All values are deterministic (pure Decimal aggregation over the orders
+    table); no provider numerics or LLM involvement. Returns zero values for
+    a business with no synced orders rather than raising.
+    """
+
+    business_id: uuid.UUID
+    currency: str
+    order_count: int
+    total_revenue: Decimal
+    refunded_revenue: Decimal
+    last_30d_revenue: Decimal
+    last_30d_orders: int
+    last_30d_window_start: datetime
 
 
 class EconomicsSummaryRead(BaseModel):

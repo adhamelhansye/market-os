@@ -484,6 +484,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/economics/revenue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Revenue Summary */
+        get: operations["revenue_summary_api_v1_businesses__business_id__economics_revenue_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/businesses/{business_id}/economics/products": {
         parameters: {
             query?: never;
@@ -546,6 +563,136 @@ export interface paths {
         get: operations["economics_bundle_api_v1_businesses__business_id__economics_bundles__bundle_id__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Integrations */
+        get: operations["list_integrations_api_v1_businesses__business_id__integrations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations/{connection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Integration */
+        get: operations["get_integration_api_v1_businesses__business_id__integrations__connection_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations/shopify/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect Shopify */
+        post: operations["connect_shopify_api_v1_businesses__business_id__integrations_shopify_connect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/shopify/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Shopify Callback
+         * @description Completes the OAuth exchange for the browser that started it.
+         *
+         *     Rejected callbacks (missing/invalid/expired/reused state, wrong user,
+         *     revoked business access, failed token exchange) redirect to the
+         *     frontend with a safe generic error — no details, no credentials.
+         */
+        get: operations["shopify_callback_api_v1_integrations_shopify_callback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations/{connection_id}/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Sync Integration */
+        post: operations["sync_integration_api_v1_businesses__business_id__integrations__connection_id__sync_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations/{connection_id}/disconnect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Disconnect Integration */
+        post: operations["disconnect_integration_api_v1_businesses__business_id__integrations__connection_id__disconnect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/shopify/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Shopify Webhook
+         * @description Receives Shopify webhooks. HMAC is verified on the raw body first;
+         *     the event is deduplicated by provider event id; processing is queued.
+         */
+        post: operations["shopify_webhook_api_v1_integrations_shopify_webhook_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -815,6 +962,71 @@ export interface components {
             website_url?: string | null;
             /** Onboarding Status */
             onboarding_status?: string | null;
+        };
+        /** ConnectionRead */
+        ConnectionRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Provider */
+            provider: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "connected" | "disconnected" | "error";
+            /** External Account Id */
+            external_account_id?: string | null;
+            /** External Account Name */
+            external_account_name?: string | null;
+            /** Scopes */
+            scopes?: string[];
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            } | null;
+            /** Connected At */
+            connected_at?: string | null;
+            /** Last Sync At */
+            last_sync_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Products Count
+             * @default 0
+             */
+            products_count: number;
+            /**
+             * Orders Count
+             * @default 0
+             */
+            orders_count: number;
+            /**
+             * Customers Count
+             * @default 0
+             */
+            customers_count: number;
+            /**
+             * Inventory Count
+             * @default 0
+             */
+            inventory_count: number;
+            latest_sync?: components["schemas"]["SyncRunRead"] | null;
         };
         /** DiscountCreate */
         DiscountCreate: {
@@ -1418,6 +1630,38 @@ export interface components {
              */
             token_type: "bearer";
         };
+        /**
+         * RevenueSummaryRead
+         * @description Read-only revenue summary sourced from canonical orders.
+         *
+         *     All values are deterministic (pure Decimal aggregation over the orders
+         *     table); no provider numerics or LLM involvement. Returns zero values for
+         *     a business with no synced orders rather than raising.
+         */
+        RevenueSummaryRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Order Count */
+            order_count: number;
+            /** Total Revenue */
+            total_revenue: string;
+            /** Refunded Revenue */
+            refunded_revenue: string;
+            /** Last 30D Revenue */
+            last_30d_revenue: string;
+            /** Last 30D Orders */
+            last_30d_orders: number;
+            /**
+             * Last 30D Window Start
+             * Format: date-time
+             */
+            last_30d_window_start: string;
+        };
         /** ShippingRuleCreate */
         ShippingRuleCreate: {
             /** Name */
@@ -1513,6 +1757,22 @@ export interface components {
             /** Active */
             active?: boolean | null;
         };
+        /** ShopifyConnectRequest */
+        ShopifyConnectRequest: {
+            /** Shop Domain */
+            shop_domain: string;
+            /**
+             * Locale
+             * @default en
+             * @enum {string}
+             */
+            locale: "en" | "ar";
+        };
+        /** ShopifyConnectResponse */
+        ShopifyConnectResponse: {
+            /** Auth Url */
+            auth_url: string;
+        };
         /** SignupRequest */
         SignupRequest: {
             /** Name */
@@ -1532,6 +1792,51 @@ export interface components {
              * @enum {string}
              */
             organization_type: "agency" | "business";
+        };
+        /**
+         * SyncRequest
+         * @description Optional resource filter. Empty/absent syncs the incremental set.
+         */
+        SyncRequest: {
+            /** Resources */
+            resources?: string[] | null;
+        };
+        /** SyncResponse */
+        SyncResponse: {
+            /**
+             * Status
+             * @default accepted
+             * @constant
+             */
+            status: "accepted";
+            /** Resources */
+            resources: string[];
+        };
+        /** SyncRunRead */
+        SyncRunRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Resource Type */
+            resource_type: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "success" | "partial" | "failed";
+            /**
+             * Started At
+             * Format: date-time
+             */
+            started_at: string;
+            /** Finished At */
+            finished_at: string | null;
+            /** Records Processed */
+            records_processed: number;
+            /** Error Summary */
+            error_summary?: string | null;
         };
         /** UserRead */
         UserRead: {
@@ -1567,6 +1872,14 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** WebhookAck */
+        WebhookAck: {
+            /**
+             * Received
+             * @default true
+             */
+            received: boolean;
         };
     };
     responses: never;
@@ -2716,6 +3029,26 @@ export interface operations {
             };
         };
     };
+    revenue_summary_api_v1_businesses__business_id__economics_revenue_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RevenueSummaryRead"];
+                };
+            };
+        };
+    };
     economics_products_api_v1_businesses__business_id__economics_products_get: {
         parameters: {
             query?: never;
@@ -2814,6 +3147,208 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_integrations_api_v1_businesses__business_id__integrations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRead"][];
+                };
+            };
+        };
+    };
+    get_integration_api_v1_businesses__business_id__integrations__connection_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_shopify_api_v1_businesses__business_id__integrations_shopify_connect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ShopifyConnectRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShopifyConnectResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shopify_callback_api_v1_integrations_shopify_callback_get: {
+        parameters: {
+            query?: {
+                code?: string | null;
+                state?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    sync_integration_api_v1_businesses__business_id__integrations__connection_id__sync_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SyncRequest"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SyncResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    disconnect_integration_api_v1_businesses__business_id__integrations__connection_id__disconnect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    shopify_webhook_api_v1_integrations_shopify_webhook_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookAck"];
                 };
             };
         };

@@ -41,6 +41,7 @@ services:
       API_URL: ${API_URL:-http://localhost:8000}
       WEB_URL: ${WEB_URL:-http://localhost:3000}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:3000}
       PYTHONPATH: /app:/
     depends_on:
       postgres:
@@ -51,6 +52,28 @@ services:
       - ./apps/api:/app
       - ./infra:/infra
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.api
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+asyncpg://marketingos:marketingos_dev@postgres:5432/marketingos}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-me-please-123456}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me-please-98765}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key-placeholder-value}
+      PYTHONPATH: /app:/
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app
+      - ./infra:/infra
+    command: arq src.core.worker.WorkerSettings
 
   web:
     build:
