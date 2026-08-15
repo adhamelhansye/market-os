@@ -55,6 +55,10 @@ class Settings(BaseSettings):
     meta_initial_sync_days: int = 90
     meta_incremental_lookback_days: int = 2
 
+    # Analytics freshness: a provider whose facts stopped arriving this many
+    # hours ago is reported stale by the metrics data-quality endpoint.
+    metrics_stale_after_hours: int = 48
+
     # OAuth state: how long a connect state token stays valid (single-use).
     oauth_state_ttl_seconds: int = 600
 

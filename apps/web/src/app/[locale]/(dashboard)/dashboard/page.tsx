@@ -141,6 +141,12 @@ export default function DashboardPage() {
               </Button>
             ) : null}
             <Button asChild variant="outline">
+              <Link href={localePath(`/business/${activeBusiness.id}/metrics`, locale)}>
+                <BarChart3 className="me-2 h-4 w-4" />
+                {t("viewMetrics")}
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
               <Link href={localePath(`/business/${activeBusiness.id}/economics`, locale)}>
                 <BarChart3 className="me-2 h-4 w-4" />
                 {t("viewEconomics")}

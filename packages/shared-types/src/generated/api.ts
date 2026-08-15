@@ -781,10 +781,283 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/metrics/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Period summary KPIs */
+        get: operations["metrics_summary_api_v1_businesses__business_id__metrics_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/timeseries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Daily timeseries */
+        get: operations["metrics_timeseries_api_v1_businesses__business_id__metrics_timeseries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/funnel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Acquisition funnel */
+        get: operations["metrics_funnel_api_v1_businesses__business_id__metrics_funnel_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/campaigns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Campaign-level performance */
+        get: operations["metrics_campaigns_api_v1_businesses__business_id__metrics_campaigns_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/adsets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ad-set-level performance */
+        get: operations["metrics_ad_sets_api_v1_businesses__business_id__metrics_adsets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/ads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ad-level performance */
+        get: operations["metrics_ads_api_v1_businesses__business_id__metrics_ads_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Product-level performance */
+        get: operations["metrics_products_api_v1_businesses__business_id__metrics_products_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/data-quality": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Provider data quality and freshness */
+        get: operations["metrics_data_quality_api_v1_businesses__business_id__metrics_data_quality_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/metrics/comparison": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Current vs previous period comparison */
+        get: operations["metrics_comparison_api_v1_businesses__business_id__metrics_comparison_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AdMetrics */
+        AdMetrics: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Name */
+            name?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Impressions */
+            impressions?: number | null;
+            /** Reach */
+            reach?: number | null;
+            /** Clicks */
+            clicks?: number | null;
+            /** Link Clicks */
+            link_clicks?: number | null;
+            /** Landing Page Views */
+            landing_page_views?: number | null;
+            /** Spend */
+            spend?: string | null;
+            /** Conversions */
+            conversions?: number | null;
+            /** Conversion Value */
+            conversion_value?: string | null;
+            /** Revenue Source */
+            revenue_source?: string | null;
+            ctr?: components["schemas"]["MeasureRead"] | null;
+            cpc?: components["schemas"]["MoneyMeasureRead"] | null;
+            cpm?: components["schemas"]["MoneyMeasureRead"] | null;
+            cvr?: components["schemas"]["MeasureRead"] | null;
+            cpa?: components["schemas"]["MoneyMeasureRead"] | null;
+            aov?: components["schemas"]["MoneyMeasureRead"] | null;
+            roas?: components["schemas"]["MeasureRead"] | null;
+            /** Ad Id */
+            ad_id?: string | null;
+            /** Campaign Id */
+            campaign_id?: string | null;
+            /** Ad Set Id */
+            ad_set_id?: string | null;
+        };
+        /** AdSetMetrics */
+        AdSetMetrics: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Name */
+            name?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Impressions */
+            impressions?: number | null;
+            /** Reach */
+            reach?: number | null;
+            /** Clicks */
+            clicks?: number | null;
+            /** Link Clicks */
+            link_clicks?: number | null;
+            /** Landing Page Views */
+            landing_page_views?: number | null;
+            /** Spend */
+            spend?: string | null;
+            /** Conversions */
+            conversions?: number | null;
+            /** Conversion Value */
+            conversion_value?: string | null;
+            /** Revenue Source */
+            revenue_source?: string | null;
+            ctr?: components["schemas"]["MeasureRead"] | null;
+            cpc?: components["schemas"]["MoneyMeasureRead"] | null;
+            cpm?: components["schemas"]["MoneyMeasureRead"] | null;
+            cvr?: components["schemas"]["MeasureRead"] | null;
+            cpa?: components["schemas"]["MoneyMeasureRead"] | null;
+            aov?: components["schemas"]["MoneyMeasureRead"] | null;
+            roas?: components["schemas"]["MeasureRead"] | null;
+            /** Ad Set Id */
+            ad_set_id?: string | null;
+            /** Campaign Id */
+            campaign_id?: string | null;
+        };
+        /** AdSetsRead */
+        AdSetsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Campaign Id */
+            campaign_id?: string | null;
+            /** Ad Sets */
+            ad_sets: components["schemas"]["AdSetMetrics"][];
+        };
+        /** AdsRead */
+        AdsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Campaign Id */
+            campaign_id?: string | null;
+            /** Ad Set Id */
+            ad_set_id?: string | null;
+            /** Ads */
+            ads: components["schemas"]["AdMetrics"][];
+        };
         /** AuthResponse */
         AuthResponse: {
             /** Access Token */
@@ -1045,6 +1318,94 @@ export interface components {
             /** Onboarding Status */
             onboarding_status?: string | null;
         };
+        /** CampaignMetrics */
+        CampaignMetrics: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id?: string;
+            /** Name */
+            name?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Impressions */
+            impressions?: number | null;
+            /** Reach */
+            reach?: number | null;
+            /** Clicks */
+            clicks?: number | null;
+            /** Link Clicks */
+            link_clicks?: number | null;
+            /** Landing Page Views */
+            landing_page_views?: number | null;
+            /** Spend */
+            spend?: string | null;
+            /** Conversions */
+            conversions?: number | null;
+            /** Conversion Value */
+            conversion_value?: string | null;
+            /** Revenue Source */
+            revenue_source?: string | null;
+            ctr?: components["schemas"]["MeasureRead"] | null;
+            cpc?: components["schemas"]["MoneyMeasureRead"] | null;
+            cpm?: components["schemas"]["MoneyMeasureRead"] | null;
+            cvr?: components["schemas"]["MeasureRead"] | null;
+            cpa?: components["schemas"]["MoneyMeasureRead"] | null;
+            aov?: components["schemas"]["MoneyMeasureRead"] | null;
+            roas?: components["schemas"]["MeasureRead"] | null;
+            /** Campaign Id */
+            campaign_id?: string | null;
+            /** Ad Account Id */
+            ad_account_id?: string | null;
+        };
+        /** CampaignsRead */
+        CampaignsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Campaigns */
+            campaigns: components["schemas"]["CampaignMetrics"][];
+        };
+        /** ComparisonRead */
+        ComparisonRead: {
+            /** Current */
+            current?: string | null;
+            /** Previous */
+            previous?: string | null;
+            /** Absolute Change */
+            absolute_change?: string | null;
+            percentage_change?: components["schemas"]["MeasureRead"] | null;
+        };
+        /** ComparisonReadResponse */
+        ComparisonReadResponse: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            revenue: components["schemas"]["ComparisonRead"];
+            spend: components["schemas"]["ComparisonRead"];
+            purchases: components["schemas"]["ComparisonRead"];
+            roas: components["schemas"]["ComparisonRead"];
+            mer: components["schemas"]["ComparisonRead"];
+            cpa: components["schemas"]["ComparisonRead"];
+            aov: components["schemas"]["ComparisonRead"];
+            ctr: components["schemas"]["ComparisonRead"];
+            contribution_profit: components["schemas"]["ComparisonRead"];
+        };
         /** ConnectionRead */
         ConnectionRead: {
             /**
@@ -1129,6 +1490,34 @@ export interface components {
              */
             daily_records_count: number;
             latest_sync?: components["schemas"]["SyncRunRead"] | null;
+        };
+        /**
+         * CountMeasureRead
+         * @description Count-typed measure: value is an integer, never a Decimal string.
+         */
+        CountMeasureRead: {
+            /** Value */
+            value?: number | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** DataQualityRead */
+        DataQualityRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Providers */
+            providers: components["schemas"]["ProviderQuality"][];
         };
         /** DiscountCreate */
         DiscountCreate: {
@@ -1256,6 +1645,33 @@ export interface components {
             /** Inventory Value */
             inventory_value: string | null;
             current_goal: components["schemas"]["GoalRead"] | null;
+        };
+        /** FunnelRead */
+        FunnelRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            range: components["schemas"]["RangeRead"];
+            /** Stages */
+            stages: components["schemas"]["FunnelStage"][];
+        };
+        /** FunnelStage */
+        FunnelStage: {
+            /** Metric */
+            metric: string;
+            /** Value */
+            value?: number | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            conversion_rate?: components["schemas"]["MeasureRead"] | null;
+            dropoff_rate?: components["schemas"]["MeasureRead"] | null;
         };
         /** GoalCreate */
         GoalCreate: {
@@ -1402,6 +1818,18 @@ export interface components {
             /** Memberships */
             memberships: components["schemas"]["MembershipRead"][];
         };
+        /** MeasureRead */
+        MeasureRead: {
+            /** Value */
+            value?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+        };
         /** MembershipRead */
         MembershipRead: {
             organization: components["schemas"]["OrganizationRead"];
@@ -1462,6 +1890,22 @@ export interface components {
         MetaConnectResponse: {
             /** Auth Url */
             auth_url: string;
+        };
+        /** MoneyMeasureRead */
+        MoneyMeasureRead: {
+            /** Value */
+            value?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Source */
+            source?: string | null;
         };
         /** OrganizationRead */
         OrganizationRead: {
@@ -1685,6 +2129,27 @@ export interface components {
             /** Target Cpa Reason */
             target_cpa_reason: string | null;
         };
+        /** ProductMetrics */
+        ProductMetrics: {
+            /** Product Id */
+            product_id?: string | null;
+            /** Name */
+            name?: string | null;
+            /** Sku */
+            sku?: string | null;
+            /** Units */
+            units?: number | null;
+            /** Revenue */
+            revenue?: string | null;
+            /** Refunds */
+            refunds?: string | null;
+            /** Cogs */
+            cogs?: string | null;
+            /** Contribution Profit */
+            contribution_profit?: string | null;
+            contribution_margin?: components["schemas"]["MeasureRead"] | null;
+            aov?: components["schemas"]["MoneyMeasureRead"] | null;
+        };
         /** ProductPriceCreate */
         ProductPriceCreate: {
             /** Price */
@@ -1773,6 +2238,66 @@ export interface components {
             status?: string | null;
             /** Currency */
             currency?: string | null;
+        };
+        /** ProductsRead */
+        ProductsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Products */
+            products: components["schemas"]["ProductMetrics"][];
+        };
+        /** ProviderQuality */
+        ProviderQuality: {
+            /** Provider */
+            provider: string;
+            /** Connected */
+            connected: boolean;
+            /** Last Synced At */
+            last_synced_at?: string | null;
+            /** Last Successful Sync At */
+            last_successful_sync_at?: string | null;
+            /** Coverage Start */
+            coverage_start?: string | null;
+            /** Coverage End */
+            coverage_end?: string | null;
+            /** Covered Days */
+            covered_days?: number | null;
+            /** Missing Days */
+            missing_days?: number | null;
+            /**
+             * Freshness Status
+             * @default unavailable
+             */
+            freshness_status: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** RangeRead */
+        RangeRead: {
+            /** Kind */
+            kind: string;
+            /**
+             * Start
+             * Format: date
+             */
+            start: string;
+            /**
+             * End
+             * Format: date
+             */
+            end: string;
+            /** Previous Start */
+            previous_start?: string | null;
+            /** Previous End */
+            previous_end?: string | null;
         };
         /** RefreshResponse */
         RefreshResponse: {
@@ -1948,6 +2473,41 @@ export interface components {
              */
             organization_type: "agency" | "business";
         };
+        /** SummaryRead */
+        SummaryRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            revenue: components["schemas"]["MoneyMeasureRead"];
+            spend: components["schemas"]["MoneyMeasureRead"];
+            purchases: components["schemas"]["CountMeasureRead"];
+            refunds: components["schemas"]["MoneyMeasureRead"];
+            impressions: components["schemas"]["CountMeasureRead"];
+            reach: components["schemas"]["CountMeasureRead"];
+            clicks: components["schemas"]["CountMeasureRead"];
+            link_clicks: components["schemas"]["CountMeasureRead"];
+            landing_page_views: components["schemas"]["CountMeasureRead"];
+            conversions: components["schemas"]["CountMeasureRead"];
+            ctr: components["schemas"]["MeasureRead"];
+            cpc: components["schemas"]["MoneyMeasureRead"];
+            cpm: components["schemas"]["MoneyMeasureRead"];
+            cvr: components["schemas"]["MeasureRead"];
+            cpa: components["schemas"]["MoneyMeasureRead"];
+            aov: components["schemas"]["MoneyMeasureRead"];
+            roas: components["schemas"]["MeasureRead"];
+            mer: components["schemas"]["MeasureRead"];
+            contribution_profit: components["schemas"]["MoneyMeasureRead"];
+            contribution_margin: components["schemas"]["MeasureRead"];
+            break_even_cpa: components["schemas"]["MoneyMeasureRead"];
+            break_even_roas: components["schemas"]["MeasureRead"];
+        };
         /**
          * SyncRequest
          * @description Optional resource filter. Empty/absent syncs the incremental set.
@@ -1992,6 +2552,53 @@ export interface components {
             records_processed: number;
             /** Error Summary */
             error_summary?: string | null;
+        };
+        /** TimeseriesPoint */
+        TimeseriesPoint: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Spend */
+            spend?: string | null;
+            /** Revenue */
+            revenue?: string | null;
+            /** Purchases */
+            purchases?: number | null;
+            /** Clicks */
+            clicks?: number | null;
+            /** Impressions */
+            impressions?: number | null;
+            /** Conversions */
+            conversions?: number | null;
+            /** Conversion Value */
+            conversion_value?: string | null;
+            /** Ctr */
+            ctr?: string | null;
+            /** Cpa */
+            cpa?: string | null;
+            /** Roas */
+            roas?: string | null;
+            /** Mer */
+            mer?: string | null;
+            /** Contribution Profit */
+            contribution_profit?: string | null;
+        };
+        /** TimeseriesRead */
+        TimeseriesRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Points */
+            points: components["schemas"]["TimeseriesPoint"][];
         };
         /** UserRead */
         UserRead: {
@@ -3622,6 +4229,336 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["WebhookAck"];
+                };
+            };
+        };
+    };
+    metrics_summary_api_v1_businesses__business_id__metrics_summary_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SummaryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_timeseries_api_v1_businesses__business_id__metrics_timeseries_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeseriesRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_funnel_api_v1_businesses__business_id__metrics_funnel_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FunnelRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_campaigns_api_v1_businesses__business_id__metrics_campaigns_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_ad_sets_api_v1_businesses__business_id__metrics_adsets_get: {
+        parameters: {
+            query?: {
+                /** @description Filter ad sets to one campaign. */
+                campaign_id?: string | null;
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdSetsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_ads_api_v1_businesses__business_id__metrics_ads_get: {
+        parameters: {
+            query?: {
+                /** @description Filter ads to one campaign. */
+                campaign_id?: string | null;
+                /** @description Filter ads to one ad set. */
+                ad_set_id?: string | null;
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_products_api_v1_businesses__business_id__metrics_products_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProductsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_data_quality_api_v1_businesses__business_id__metrics_data_quality_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DataQualityRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    metrics_comparison_api_v1_businesses__business_id__metrics_comparison_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date, custom). */
+                range_kind?: string;
+                /** @description Custom range start (required for custom). */
+                start?: string | null;
+                /** @description Custom range end (required for custom). */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComparisonReadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

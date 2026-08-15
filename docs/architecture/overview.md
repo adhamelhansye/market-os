@@ -20,11 +20,11 @@ Infrastructure lives in `docker-compose.yml`; services are built with
 
 There is exactly one backend service and one frontend service. Feature code
 inside the API is organized in `src/modules/*` (auth, organizations,
-businesses, health) sharing `src/core` primitives (config, security, RBAC,
-tenancy, dependencies, middleware). This is a deliberate choice: a modular
-monolith keeps Phase 0 and 1 fast to ship while retaining clear seams for
-later extraction. **Microservices are not introduced unless explicitly
-requested.**
+businesses, health, integrations, sync, metrics) sharing `src/core`
+primitives (config, security, RBAC, tenancy, dependencies, middleware). This
+is a deliberate choice: a modular monolith keeps Phase 0 and 1 fast to ship
+while retaining clear seams for later extraction. **Microservices are not
+introduced unless explicitly requested.**
 
 ## The product loop
 
@@ -32,7 +32,9 @@ Understand → Research → Strategize → Simulate → Forecast → Launch → 
 Diagnose → Optimize → Scale → Retain → Learn
 
 Phase 0 implements only the foundation of this loop. None of the loop's
-data-gathering or analysis features exist yet.
+data-gathering or analysis features exist yet. Phase 3A ships the first
+**Measure** brick: unified metrics and a deterministic KPI engine (see
+`docs/architecture/metrics.md`).
 
 ## Layering (backend)
 
@@ -95,6 +97,15 @@ See `docs/architecture/tenancy.md` for the tenancy model and
 | GET | `/api/v1/organizations/{id}` | bearer | detail gated by membership |
 | GET | `/api/v1/businesses` | bearer | org-owned + managed businesses |
 | GET | `/api/v1/businesses/{id}` | bearer | detail gated by business access |
+| GET | `/api/v1/businesses/{id}/metrics/summary` | bearer | period KPIs (see `metrics.md`) |
+| GET | `/api/v1/businesses/{id}/metrics/timeseries` | bearer | daily facts-only points |
+| GET | `/api/v1/businesses/{id}/metrics/funnel` | bearer | funnel stages + rates |
+| GET | `/api/v1/businesses/{id}/metrics/campaigns` | bearer | campaign rollups (ad grain) |
+| GET | `/api/v1/businesses/{id}/metrics/adsets` | bearer | ad set rollups (ad grain) |
+| GET | `/api/v1/businesses/{id}/metrics/ads` | bearer | ad rollups (ad grain) |
+| GET | `/api/v1/businesses/{id}/metrics/products` | bearer | per-product units/revenue/AOV |
+| GET | `/api/v1/businesses/{id}/metrics/data-quality` | bearer | provider freshness |
+| GET | `/api/v1/businesses/{id}/metrics/comparison` | bearer | current vs previous period |
 
 Schema: `/openapi.json` (served by FastAPI). Client types are generated from
 this live schema into `packages/shared-types` by
@@ -107,26 +118,46 @@ this live schema into `packages/shared-types` by
 - `html lang` and `dir` are set from the resolved locale (Inter for Latin,
   Noto Sans Arabic for Arabic) in `src/app/[locale]/layout.tsx`.
 - All user-facing strings live in `apps/web/messages/{en,ar}/*.json`
-  (namespaces: `common`, `auth`, `dashboard`) and are reached through next-intl
-  keys. No strings are hardcoded in components.
+  (namespaces: `common`, `auth`, `dashboard`, `metrics`) and are reached
+  through next-intl keys. No strings are hardcoded in components.
 - UI components in `src/components/ui/*` (button, input, label, card, select)
   are shadcn-style primitives; no component is a "giant" file.
 - State: `AuthProvider` + `BusinessProvider` (React context) in
   `src/context`; API calls go through `src/features/*/api.ts` using the
   shared `api-client` (silent refresh-token rotation). Phase 0 pages are
   read-only views of the auth/organization/business foundation.
+- The metrics dashboard (`/business/[business_id]/metrics`) renders the
+  analytics API: KPI cards, Recharts trend charts, funnel and campaigns
+  tables, data-quality cards. Money is displayed only through
+  `src/lib/money.ts` formatters; no arithmetic happens in the browser.
 
 ## Testing strategy
 
 - Backend (`apps/api/tests`): auth flows, Argon2id hashing, RBAC matrices,
-  tenant isolation, agency-managed business access, rate limiting, health.
+  tenant isolation, agency-managed business access, rate limiting, health,
+  integrations, sync, and metrics (KPI engine unit tests + analytics API
+  integration tests with a seeded data contract).
   Tenant isolation tests assert that an organization can never read another
   organization's records even with a valid token.
 - Frontend (`apps/web/src/test`): locale helpers, `html lang`/`dir` for LTR
   and RTL, login/signup rendering in both locales, zod validation messages,
-  dashboard empty states.
+  dashboard empty states, and metrics dashboard rendering in both locales.
 - CI (`.github/workflows/ci.yml`) runs lint, typechecks, backend tests,
   frontend tests and the production build on every push/PR.
+
+## Financial-data guardrails (Phase 3A enforced)
+
+- Money, revenue, cost, profit, spend and price are only ever handled as
+  `Decimal`/`NUMERIC`; floats are prohibited for monetary values.
+- KPI calculations (CPA, ROAS, MER, CTR, ...) are deterministic server-side
+  code computed by the KPI engine; LLMs never produce or invent numerical
+  marketing metrics.
+- Measures are `available` | `unavailable` (with reason) |
+  `insufficient_data` | `invalid`; zeros are never fabricated and ratios are
+  never invented for missing denominators.
+- Period KPIs are always computed from aggregated totals, never by averaging
+  daily or per-campaign ratios. API responses serialize money as strings and
+  counts as integers.
 
 ## Environment & configuration
 
@@ -140,12 +171,11 @@ this live schema into `packages/shared-types` by
 
 ## Financial-data guardrails (future phases)
 
-- Money, revenue, cost, profit, spend and price are only ever handled as
-  `Decimal`/`NUMERIC`; floats are prohibited for monetary values.
 - KPI calculations (CPA, ROAS, ...) are deterministic server-side code; LLMs
   never produce or invent numerical marketing metrics.
-- Phase 0 contains no monetary data yet, but the convention is already
-  documented here because it shapes schema decisions from the start.
+- Future phases (LLM research, forecasting, recommendations) receive metrics
+  as **inputs** from the deterministic pipeline only; they never compute or
+  override them.
 
 ## Related documents
 
@@ -153,6 +183,7 @@ this live schema into `packages/shared-types` by
 - `docs/architecture/authentication.md` — auth flows and security
 - `docs/architecture/integrations.md` — adapter core, credentials, sync/webhooks
 - `docs/architecture/shopify.md` — Shopify provider specifics
+- `docs/architecture/metrics.md` — unified metrics, KPI engine, analytics API
 - `docs/adr/0001-monolith.md` — monolith decision
 - `docs/adr/0002-multi-tenancy.md` — tenancy decision (incl. why no RLS yet)
 - `AGENTS.md` — permanent engineering rules
