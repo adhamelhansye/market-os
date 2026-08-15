@@ -104,7 +104,12 @@ class OAuthStateService:
         self._ttl = settings.oauth_state_ttl_seconds
 
     async def create(
-        self, *, user_id: uuid.UUID, business_id: uuid.UUID, locale: str
+        self,
+        *,
+        user_id: uuid.UUID,
+        business_id: uuid.UUID,
+        locale: str,
+        provider: str | None = None,
     ) -> str:
         state = secrets.token_urlsafe(32)
         payload = json.dumps(
@@ -112,6 +117,7 @@ class OAuthStateService:
                 "user_id": str(user_id),
                 "business_id": str(business_id),
                 "locale": locale,
+                "provider": provider,
             }
         )
         await self._redis.set(
@@ -119,13 +125,16 @@ class OAuthStateService:
         )
         return state
 
-    async def consume(self, state: str, *, user_id: uuid.UUID) -> dict:
+    async def consume(
+        self, state: str, *, user_id: uuid.UUID, provider: str | None = None
+    ) -> dict:
         """Validates and atomically consumes the state.
 
         Returns the state payload (business_id, locale) on success. Raises
         OAuthStateMissingError/ExpiredError/MismatchError on every failure
         path. GETDEL makes the consume single-use even under concurrent
-        callbacks, so reused states are rejected.
+        callbacks, so reused states are rejected. When the state was created
+        for a specific provider, only that provider may consume it.
         """
         if not state:
             raise OAuthStateMissingError("Missing OAuth state")
@@ -142,6 +151,9 @@ class OAuthStateService:
             raise OAuthStateMissingError("Invalid OAuth state") from None
         if stored_user != user_id:
             raise OAuthStateMismatchError("OAuth state does not match the session")
+        stored_provider = payload.get("provider")
+        if provider is not None and stored_provider is not None and stored_provider != provider:
+            raise OAuthStateMismatchError("OAuth state does not match the provider")
         return {
             "user_id": stored_user,
             "business_id": stored_business,

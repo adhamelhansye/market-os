@@ -38,6 +38,10 @@ from src.modules.integrations.jobs import enqueue_webhook_processing
 from src.modules.integrations.registry import get_registry
 from src.modules.integrations.schemas import (
     ConnectionRead,
+    MetaAccountSelectRequest,
+    MetaAccountsResponse,
+    MetaConnectRequest,
+    MetaConnectResponse,
     ShopifyConnectRequest,
     ShopifyConnectResponse,
     SyncRequest,
@@ -160,6 +164,125 @@ async def shopify_callback(
         samesite="lax",
     )
     return response
+
+
+# -- Meta (Facebook) -----------------------------------------------------------
+
+
+@router.post(
+    "/businesses/{business_id}/integrations/meta/connect",
+    response_model=MetaConnectResponse,
+)
+async def connect_meta(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    user: CurrentUser,
+    session: DbSession,
+    redis: RedisClient,
+    settings: SettingsDep,
+    response: Response,
+    payload: MetaConnectRequest,
+) -> MetaConnectResponse:
+    auth_url, session_token = await service.start_meta_connect(
+        session,
+        redis,
+        settings,
+        user_id=user.id,
+        business_id=business_id,
+        locale=payload.locale,
+    )
+    response.set_cookie(
+        key=settings.callback_session_cookie_name,
+        value=session_token,
+        max_age=settings.callback_session_ttl_seconds,
+        httponly=True,
+        secure=settings.cookie_secure,
+        samesite="lax",
+        path="/",
+    )
+    return MetaConnectResponse(auth_url=auth_url)
+
+
+@router.get("/integrations/meta/callback", include_in_schema=True)
+async def meta_callback(
+    request: Request,
+    session: DbSession,
+    redis: RedisClient,
+    settings: SettingsDep,
+    code: str | None = None,
+    state: str | None = None,
+) -> RedirectResponse:
+    """Completes the Meta OAuth exchange for the browser that started it.
+
+    The business is resolved ONLY from the validated single-use state (bound
+    to the user via the httpOnly callback session cookie); any rejection
+    redirects to the frontend with a safe generic error.
+    """
+    session_token = request.cookies.get(settings.callback_session_cookie_name)
+    try:
+        result = await service.handle_meta_callback(
+            session,
+            redis,
+            settings,
+            callback_session_token=session_token,
+            code=code,
+            state=state,
+        )
+    except IntegrationError as exc:
+        logger.warning("meta callback rejected: %s", exc.code)
+        return _error_redirect(settings, "en")
+    except Exception:  # noqa: BLE001
+        logger.exception("meta callback failed")
+        return _error_redirect(settings, "en")
+
+    response = RedirectResponse(
+        url=_success_url(settings, result), status_code=302
+    )
+    response.delete_cookie(
+        key=settings.callback_session_cookie_name,
+        path="/",
+        secure=settings.cookie_secure,
+        samesite="lax",
+    )
+    return response
+
+
+@router.get(
+    "/businesses/{business_id}/integrations/meta/accounts",
+    response_model=MetaAccountsResponse,
+)
+async def meta_accounts(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> MetaAccountsResponse:
+    """Ad accounts the pending authorization can see (server-side list)."""
+    view = await service.meta_accounts_view(session, business_id)
+    return MetaAccountsResponse(
+        connection_id=view["connection_id"], accounts=view["accounts"]
+    )
+
+
+@router.post(
+    "/businesses/{business_id}/integrations/meta/accounts/select",
+    response_model=ConnectionRead,
+)
+async def select_meta_account(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    settings: SettingsDep,
+    payload: MetaAccountSelectRequest,
+) -> ConnectionRead:
+    """Connects exactly one explicitly chosen ad account and starts its
+    initial sync. The account must be in the server-side discovered list."""
+    connection = await service.select_meta_account(
+        session,
+        settings,
+        business_id=business_id,
+        external_account_id=payload.external_account_id,
+    )
+    return ConnectionRead(**await service.connection_view(session, connection))
 
 
 def _success_url(settings, result: dict) -> str:

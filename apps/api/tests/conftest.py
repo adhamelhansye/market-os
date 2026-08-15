@@ -20,6 +20,9 @@ os.environ["WEB_URL"] = os.environ.get("WEB_URL", "http://localhost:3000")
 os.environ.setdefault("SHOPIFY_CLIENT_ID", "test-shopify-client")
 os.environ.setdefault("SHOPIFY_CLIENT_SECRET", "test-shopify-secret")
 os.environ.setdefault("SHOPIFY_REDIRECT_URI", "http://test/api/v1/integrations/shopify/callback")
+os.environ.setdefault("META_APP_ID", "test-meta-app")
+os.environ.setdefault("META_APP_SECRET", "test-meta-secret")
+os.environ.setdefault("META_REDIRECT_URI", "http://test/api/v1/integrations/meta/callback")
 os.environ.setdefault("FRONTEND_BASE_URL", "http://test")
 
 TEST_DATABASE_URL = os.environ.get(
@@ -115,6 +118,12 @@ async def clean_tables(session: AsyncSession) -> AsyncIterator[None]:
     """Wipes all rows between tests (children first)."""
     yield
     for table in (
+        "ad_insights",
+        "ads",
+        "ad_sets",
+        "campaigns",
+        "creatives",
+        "ad_accounts",
         "order_items",
         "orders",
         "customers",

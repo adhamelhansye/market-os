@@ -14,6 +14,12 @@ from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
 from src.db.models.user import User
 from src.modules.integrations.models import (
+    Ad,
+    AdAccount,
+    AdInsight,
+    AdSet,
+    Campaign,
+    Creative,
     Customer,
     IntegrationConnection,
     IntegrationCredential,
@@ -24,11 +30,17 @@ from src.modules.integrations.models import (
 )
 
 __all__ = [
+    "Ad",
+    "AdAccount",
+    "AdInsight",
+    "AdSet",
     "Bundle",
     "BundleItem",
     "Business",
     "BusinessGoal",
     "BusinessProfile",
+    "Campaign",
+    "Creative",
     "Customer",
     "Discount",
     "IntegrationConnection",

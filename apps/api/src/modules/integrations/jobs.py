@@ -16,6 +16,8 @@ logger = get_logger(__name__)
 JOB_INITIAL_SYNC = "shopify_initial_sync"
 JOB_INCREMENTAL_SYNC = "shopify_incremental_sync"
 JOB_WEBHOOK_PROCESSING = "shopify_webhook_processing"
+JOB_META_INITIAL_SYNC = "meta_initial_sync"
+JOB_META_INCREMENTAL_SYNC = "meta_incremental_sync"
 
 
 async def _enqueue(job_name: str, *args) -> None:
@@ -37,3 +39,11 @@ async def enqueue_incremental_sync(connection_id: str, resources: list[str]) -> 
 
 async def enqueue_webhook_processing(event_id: str) -> None:
     await _enqueue(JOB_WEBHOOK_PROCESSING, event_id)
+
+
+async def enqueue_meta_initial_sync(connection_id: str) -> None:
+    await _enqueue(JOB_META_INITIAL_SYNC, connection_id)
+
+
+async def enqueue_meta_incremental_sync(connection_id: str, resources: list[str]) -> None:
+    await _enqueue(JOB_META_INCREMENTAL_SYNC, connection_id, resources)

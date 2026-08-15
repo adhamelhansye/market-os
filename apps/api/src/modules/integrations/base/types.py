@@ -7,7 +7,7 @@ never exposed directly as API responses.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 
@@ -74,12 +74,117 @@ class CanonicalInventory:
 
 
 @dataclass(frozen=True)
+class CanonicalAdAccount:
+    """One Meta ad account (external_id is the numeric id, no `act_`)."""
+
+    external_id: str
+    name: str | None
+    currency: str
+    timezone: str | None
+    timezone_offset_hours_utc: Decimal | None
+    status: str  # ACTIVE / DISABLED / CLOSED / ...
+
+
+@dataclass(frozen=True)
+class CanonicalCampaign:
+    external_id: str
+    name: str
+    status: str
+    objective: str | None
+    buying_type: str | None
+    created_time: datetime | None
+    updated_at: datetime | None
+    ad_account_external_id: str | None = None
+
+
+@dataclass(frozen=True)
+class CanonicalAdSet:
+    external_id: str
+    campaign_external_id: str | None
+    name: str
+    status: str
+    optimization_goal: str | None
+    billing_event: str | None
+    created_time: datetime | None
+    updated_at: datetime | None
+    ad_account_external_id: str | None = None
+
+
+@dataclass(frozen=True)
+class CanonicalCreative:
+    external_id: str
+    name: str | None
+    type: str | None
+    title: str | None
+    body: str | None
+    call_to_action: str | None
+    thumbnail_url: str | None
+    created_time: datetime | None
+    updated_at: datetime | None
+
+
+@dataclass(frozen=True)
+class CanonicalAd:
+    external_id: str
+    campaign_external_id: str | None
+    ad_set_external_id: str | None
+    name: str
+    status: str
+    created_time: datetime | None
+    updated_at: datetime | None
+    creative: CanonicalCreative | None = None
+    ad_account_external_id: str | None = None
+
+
+@dataclass(frozen=True)
+class CanonicalAdInsight:
+    """One (account, day, hierarchy-level) raw facts record.
+
+    Conversions/conversion_value are provider-reported totals of ALL
+    attributed actions (not purchases); KPI semantics are a Phase 3 concern.
+    `currency` is filled by persistence from the ad account record (the
+    single source of truth) — it is never part of provider payloads.
+    """
+
+    date: date
+    currency: str
+    impressions: int
+    spend: Decimal
+    clicks: int
+    reach: int | None = None
+    frequency: Decimal | None = None
+    link_clicks: int | None = None
+    landing_page_views: int | None = None
+    conversions: int | None = None
+    conversion_value: Decimal | None = None
+    campaign_external_id: str | None = None
+    ad_set_external_id: str | None = None
+    ad_external_id: str | None = None
+    ad_account_external_id: str | None = None
+    grain: str = "daily"
+
+
+@dataclass(frozen=True)
 class ProviderExchangeResult:
     """Result of exchanging an OAuth authorization code for tokens."""
 
     access_token: str
     scope: list[str]
     expires_at: datetime | None = None
+
+
+_CanonicalRecord = (
+    CanonicalProduct
+    | CanonicalOrder
+    | CanonicalCustomer
+    | CanonicalInventory
+    | CanonicalAdAccount
+    | CanonicalCampaign
+    | CanonicalAdSet
+    | CanonicalAd
+    | CanonicalCreative
+    | CanonicalAdInsight
+)
 
 
 @dataclass(frozen=True)
@@ -90,7 +195,7 @@ class SyncPage:
     (e.g. a Shopify updated_at_min timestamp for the next page).
     """
 
-    records: list[CanonicalProduct | CanonicalOrder | CanonicalCustomer | CanonicalInventory]
+    records: list[_CanonicalRecord]
     next_cursor: str | None
 
 

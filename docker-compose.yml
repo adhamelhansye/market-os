@@ -42,6 +42,16 @@ services:
       WEB_URL: ${WEB_URL:-http://localhost:3000}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
       FRONTEND_BASE_URL: ${FRONTEND_BASE_URL:-http://localhost:3000}
+      SHOPIFY_CLIENT_ID: ${SHOPIFY_CLIENT_ID:-}
+      SHOPIFY_CLIENT_SECRET: ${SHOPIFY_CLIENT_SECRET:-}
+      SHOPIFY_REDIRECT_URI: ${SHOPIFY_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/shopify/callback}
+      META_APP_ID: ${META_APP_ID:-}
+      META_APP_SECRET: ${META_APP_SECRET:-}
+      META_REDIRECT_URI: ${META_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/meta/callback}
+      META_GRAPH_API_VERSION: ${META_GRAPH_API_VERSION:-v26.0}
+      META_SCOPES: ${META_SCOPES:-ads_read}
+      META_INITIAL_SYNC_DAYS: ${META_INITIAL_SYNC_DAYS:-90}
+      META_INCREMENTAL_LOOKBACK_DAYS: ${META_INCREMENTAL_LOOKBACK_DAYS:-2}
       PYTHONPATH: /app:/
     depends_on:
       postgres:
@@ -64,6 +74,16 @@ services:
       JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret-change-me-please-123456}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-refresh-secret-change-me-please-98765}
       ENCRYPTION_KEY: ${ENCRYPTION_KEY:-dev-encryption-key-placeholder-value}
+      SHOPIFY_CLIENT_ID: ${SHOPIFY_CLIENT_ID:-}
+      SHOPIFY_CLIENT_SECRET: ${SHOPIFY_CLIENT_SECRET:-}
+      SHOPIFY_REDIRECT_URI: ${SHOPIFY_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/shopify/callback}
+      META_APP_ID: ${META_APP_ID:-}
+      META_APP_SECRET: ${META_APP_SECRET:-}
+      META_REDIRECT_URI: ${META_REDIRECT_URI:-http://localhost:8000/api/v1/integrations/meta/callback}
+      META_GRAPH_API_VERSION: ${META_GRAPH_API_VERSION:-v26.0}
+      META_SCOPES: ${META_SCOPES:-ads_read}
+      META_INITIAL_SYNC_DAYS: ${META_INITIAL_SYNC_DAYS:-90}
+      META_INCREMENTAL_LOOKBACK_DAYS: ${META_INCREMENTAL_LOOKBACK_DAYS:-2}
       PYTHONPATH: /app:/
     depends_on:
       postgres:

@@ -11,13 +11,21 @@ canonical record, with a single IntegrityError retry for races).
 """
 
 import uuid
+from dataclasses import replace
 from datetime import UTC, datetime
 
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models import (
+    Ad,
+    AdAccount,
+    AdInsight,
+    AdSet,
+    Campaign,
+    Creative,
     Customer,
+    IntegrationConnection,
     InventorySnapshot,
     Order,
     OrderItem,
@@ -26,12 +34,21 @@ from src.db.models import (
 )
 from src.modules.economics.service import resolve_active_price
 from src.modules.integrations.base.types import (
+    CanonicalAd,
+    CanonicalAdAccount,
+    CanonicalAdInsight,
+    CanonicalAdSet,
+    CanonicalCampaign,
+    CanonicalCreative,
     CanonicalCustomer,
     CanonicalInventory,
     CanonicalOrder,
     CanonicalOrderItem,
     CanonicalProduct,
 )
+
+_META_PROVIDER = "meta"
+_META_ACCOUNT_PREFIX = "act_"
 
 
 def _now() -> datetime:
@@ -286,3 +303,300 @@ async def _insert_order_items(
                 line_total=item.line_total,
             )
         )
+
+
+# -- Meta Ads ----------------------------------------------------------------
+
+
+async def _meta_connection(
+    session: AsyncSession, business_id, external_account_id: str
+) -> IntegrationConnection | None:
+    return await session.scalar(
+        select(IntegrationConnection).where(
+            IntegrationConnection.business_id == business_id,
+            IntegrationConnection.provider == _META_PROVIDER,
+            IntegrationConnection.external_account_id
+            == f"{_META_ACCOUNT_PREFIX}{external_account_id}",
+            IntegrationConnection.status == "connected",
+        )
+    )
+
+
+async def _ad_account_id(session: AsyncSession, business_id, external_id: str | None) -> uuid.UUID:
+    if not external_id:
+        raise ValueError("Meta record missing ad account id")
+    account_id = await session.scalar(
+        select(AdAccount.id).where(
+            AdAccount.business_id == business_id,
+            AdAccount.external_id == external_id,
+        )
+    )
+    if account_id is None:
+        raise ValueError(f"Meta ad account {external_id} is not connected")
+    return account_id
+
+
+async def upsert_ad_account(
+    session: AsyncSession, business_id, canonical: CanonicalAdAccount
+) -> uuid.UUID:
+    """Upserts the ad account metadata row (match by business + external id)
+    and binds it to the connection row for the same account."""
+    connection = await _meta_connection(session, business_id, canonical.external_id)
+    if connection is None:
+        raise ValueError(f"Meta ad account {canonical.external_id} has no connection")
+    account = await session.scalar(
+        select(AdAccount).where(
+            AdAccount.business_id == business_id,
+            AdAccount.external_id == canonical.external_id,
+        )
+    )
+    if account is None:
+        account = AdAccount(
+            business_id=business_id,
+            integration_connection_id=connection.id,
+            external_id=canonical.external_id,
+        )
+        session.add(account)
+    account.integration_connection_id = connection.id
+    account.name = canonical.name
+    account.currency = canonical.currency
+    account.timezone = canonical.timezone
+    account.timezone_offset_hours_utc = canonical.timezone_offset_hours_utc
+    account.status = canonical.status
+    await session.flush()
+    return account.id
+
+
+async def upsert_campaign(
+    session: AsyncSession, business_id, canonical: CanonicalCampaign
+) -> uuid.UUID:
+    ad_account_id = await _ad_account_id(
+        session, business_id, canonical.ad_account_external_id
+    )
+    campaign = await session.scalar(
+        select(Campaign).where(
+            Campaign.business_id == business_id,
+            Campaign.ad_account_id == ad_account_id,
+            Campaign.external_id == canonical.external_id,
+        )
+    )
+    if campaign is None:
+        campaign = Campaign(
+            business_id=business_id,
+            ad_account_id=ad_account_id,
+            external_id=canonical.external_id,
+        )
+        session.add(campaign)
+    campaign.name = canonical.name
+    campaign.status = canonical.status
+    campaign.objective = canonical.objective
+    campaign.buying_type = canonical.buying_type
+    campaign.created_time = canonical.created_time
+    campaign.updated_time = canonical.updated_at
+    await session.flush()
+    return campaign.id
+
+
+async def upsert_ad_set(
+    session: AsyncSession, business_id, canonical: CanonicalAdSet
+) -> uuid.UUID:
+    ad_account_id = await _ad_account_id(
+        session, business_id, canonical.ad_account_external_id
+    )
+    campaign_id = None
+    if canonical.campaign_external_id:
+        campaign_id = await session.scalar(
+            select(Campaign.id).where(
+                Campaign.business_id == business_id,
+                Campaign.ad_account_id == ad_account_id,
+                Campaign.external_id == canonical.campaign_external_id,
+            )
+        )
+    ad_set = await session.scalar(
+        select(AdSet).where(
+            AdSet.business_id == business_id,
+            AdSet.ad_account_id == ad_account_id,
+            AdSet.external_id == canonical.external_id,
+        )
+    )
+    if ad_set is None:
+        ad_set = AdSet(
+            business_id=business_id,
+            ad_account_id=ad_account_id,
+            external_id=canonical.external_id,
+        )
+        session.add(ad_set)
+    ad_set.campaign_id = campaign_id
+    ad_set.name = canonical.name
+    ad_set.status = canonical.status
+    ad_set.optimization_goal = canonical.optimization_goal
+    ad_set.billing_event = canonical.billing_event
+    ad_set.created_time = canonical.created_time
+    ad_set.updated_time = canonical.updated_at
+    await session.flush()
+    return ad_set.id
+
+
+async def upsert_creative(
+    session: AsyncSession, business_id, canonical: CanonicalCreative
+) -> uuid.UUID:
+    creative = await session.scalar(
+        select(Creative).where(
+            Creative.business_id == business_id,
+            Creative.provider == _META_PROVIDER,
+            Creative.external_id == canonical.external_id,
+        )
+    )
+    if creative is None:
+        creative = Creative(
+            business_id=business_id,
+            provider=_META_PROVIDER,
+            external_id=canonical.external_id,
+        )
+        session.add(creative)
+    creative.name = canonical.name
+    creative.type = canonical.type
+    creative.title = canonical.title
+    creative.body = canonical.body
+    creative.call_to_action = canonical.call_to_action
+    creative.thumbnail_url = canonical.thumbnail_url
+    creative.created_time = canonical.created_time
+    creative.updated_time = canonical.updated_at
+    await session.flush()
+    return creative.id
+
+
+async def upsert_ad(session: AsyncSession, business_id, canonical: CanonicalAd) -> uuid.UUID:
+    ad_account_id = await _ad_account_id(
+        session, business_id, canonical.ad_account_external_id
+    )
+    campaign_id = None
+    if canonical.campaign_external_id:
+        campaign_id = await session.scalar(
+            select(Campaign.id).where(
+                Campaign.business_id == business_id,
+                Campaign.ad_account_id == ad_account_id,
+                Campaign.external_id == canonical.campaign_external_id,
+            )
+        )
+    ad_set_id = None
+    if canonical.ad_set_external_id:
+        ad_set_id = await session.scalar(
+            select(AdSet.id).where(
+                AdSet.business_id == business_id,
+                AdSet.ad_account_id == ad_account_id,
+                AdSet.external_id == canonical.ad_set_external_id,
+            )
+        )
+    creative_id = None
+    if canonical.creative is not None:
+        creative_id = await upsert_creative(session, business_id, canonical.creative)
+    ad = await session.scalar(
+        select(Ad).where(
+            Ad.business_id == business_id,
+            Ad.ad_account_id == ad_account_id,
+            Ad.external_id == canonical.external_id,
+        )
+    )
+    if ad is None:
+        ad = Ad(
+            business_id=business_id,
+            ad_account_id=ad_account_id,
+            external_id=canonical.external_id,
+        )
+        session.add(ad)
+    ad.campaign_id = campaign_id
+    ad.ad_set_id = ad_set_id
+    ad.creative_id = creative_id
+    ad.name = canonical.name
+    ad.status = canonical.status
+    ad.created_time = canonical.created_time
+    ad.updated_time = canonical.updated_at
+    await session.flush()
+    return ad.id
+
+
+async def _resolve_insight_hierarchy(
+    session: AsyncSession, business_id, ad_account_id, canonical: CanonicalAdInsight
+) -> tuple[uuid.UUID | None, uuid.UUID | None, uuid.UUID | None]:
+    campaign_id = None
+    if canonical.campaign_external_id:
+        campaign_id = await session.scalar(
+            select(Campaign.id).where(
+                Campaign.business_id == business_id,
+                Campaign.ad_account_id == ad_account_id,
+                Campaign.external_id == canonical.campaign_external_id,
+            )
+        )
+    ad_set_id = None
+    if canonical.ad_set_external_id:
+        ad_set_id = await session.scalar(
+            select(AdSet.id).where(
+                AdSet.business_id == business_id,
+                AdSet.ad_account_id == ad_account_id,
+                AdSet.external_id == canonical.ad_set_external_id,
+            )
+        )
+    ad_id = None
+    if canonical.ad_external_id:
+        ad_id = await session.scalar(
+            select(Ad.id).where(
+                Ad.business_id == business_id,
+                Ad.ad_account_id == ad_account_id,
+                Ad.external_id == canonical.ad_external_id,
+            )
+        )
+    return campaign_id, ad_set_id, ad_id
+
+
+async def upsert_ad_insight(
+    session: AsyncSession, business_id, canonical: CanonicalAdInsight
+) -> uuid.UUID:
+    ad_account_id = await _ad_account_id(
+        session, business_id, canonical.ad_account_external_id
+    )
+    account_row = await session.get(AdAccount, ad_account_id)
+    if account_row is None:  # pragma: no cover - just looked it up
+        raise ValueError("Meta ad account row is missing")
+    # Currency is the account's own currency — never converted, never
+    # guessed: the canonical carries it empty and persistence fills it.
+    canonical = replace(canonical, currency=account_row.currency)
+    campaign_id, ad_set_id, ad_id = await _resolve_insight_hierarchy(
+        session, business_id, ad_account_id, canonical
+    )
+    existing = await session.scalar(
+        select(AdInsight).where(
+            AdInsight.business_id == business_id,
+            AdInsight.ad_account_id == ad_account_id,
+            AdInsight.provider == _META_PROVIDER,
+            AdInsight.date == canonical.date,
+            AdInsight.grain == canonical.grain,
+            AdInsight.campaign_id == campaign_id,
+            AdInsight.ad_set_id == ad_set_id,
+            AdInsight.ad_id == ad_id,
+        )
+    )
+    if existing is None:
+        existing = AdInsight(
+            business_id=business_id,
+            ad_account_id=ad_account_id,
+            provider=_META_PROVIDER,
+            date=canonical.date,
+            grain=canonical.grain,
+        )
+        session.add(existing)
+    existing.campaign_id = campaign_id
+    existing.ad_set_id = ad_set_id
+    existing.ad_id = ad_id
+    existing.currency = canonical.currency
+    existing.impressions = canonical.impressions
+    existing.reach = canonical.reach
+    existing.frequency = canonical.frequency
+    existing.clicks = canonical.clicks
+    existing.link_clicks = canonical.link_clicks
+    existing.landing_page_views = canonical.landing_page_views
+    existing.spend = canonical.spend
+    existing.conversions = canonical.conversions
+    existing.conversion_value = canonical.conversion_value
+    await session.flush()
+    return existing.id

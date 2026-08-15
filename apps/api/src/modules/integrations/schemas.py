@@ -17,6 +17,38 @@ class ShopifyConnectResponse(BaseModel):
     auth_url: str
 
 
+class MetaConnectRequest(BaseModel):
+    """Meta connect needs no user input (no shop domain): the user always
+    authorizes via the official Facebook dialog."""
+
+    locale: Literal["en", "ar"] = "en"
+
+
+class MetaConnectResponse(BaseModel):
+    auth_url: str
+
+
+class MetaAccountRead(BaseModel):
+    external_account_id: str
+    name: str | None = None
+    currency: str | None = None
+    status: str | None = None
+    timezone: str | None = None
+
+
+class MetaAccountsResponse(BaseModel):
+    connection_id: uuid.UUID | None = None
+    accounts: list[MetaAccountRead] = Field(default_factory=list)
+
+
+class MetaAccountSelectRequest(BaseModel):
+    """The account must exist in the server-side discovered list — the
+    client can only choose among what the authorization actually granted."""
+
+    external_account_id: str = Field(min_length=1, max_length=50)
+    locale: Literal["en", "ar"] = "en"
+
+
 class SyncRunRead(BaseModel):
     id: uuid.UUID
     resource_type: str
@@ -44,6 +76,10 @@ class ConnectionRead(BaseModel):
     orders_count: int = 0
     customers_count: int = 0
     inventory_count: int = 0
+    campaigns_count: int = 0
+    ad_sets_count: int = 0
+    ads_count: int = 0
+    daily_records_count: int = 0
     latest_sync: SyncRunRead | None = None
 
 

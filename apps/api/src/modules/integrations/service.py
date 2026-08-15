@@ -19,7 +19,8 @@ import hashlib
 import json
 import uuid
 from collections.abc import Sequence
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
+from decimal import Decimal
 
 from redis.asyncio import Redis
 from sqlalchemy import delete, func, select, update
@@ -31,7 +32,13 @@ from src.core.exceptions import ConflictError, NotFoundError
 from src.core.logging import get_logger
 from src.core.tenancy import can_access_business, resolve_tenant
 from src.db.models import (
+    Ad,
+    AdAccount,
+    AdInsight,
+    AdSet,
     Business,
+    Campaign,
+    Creative,
     Customer,
     IntegrationConnection,
     IntegrationCredential,
@@ -51,6 +58,12 @@ from src.modules.integrations.base.errors import (
 )
 from src.modules.integrations.base.protocol import IntegrationAdapter, ProviderCredentials
 from src.modules.integrations.base.types import (
+    CanonicalAd,
+    CanonicalAdAccount,
+    CanonicalAdInsight,
+    CanonicalAdSet,
+    CanonicalCampaign,
+    CanonicalCreative,
     CanonicalCustomer,
     CanonicalInventory,
     CanonicalOrder,
@@ -61,8 +74,15 @@ from src.modules.integrations.credentials import OAuthStateService, TokenCipher
 from src.modules.integrations.jobs import (
     enqueue_incremental_sync,
     enqueue_initial_sync,
+    enqueue_meta_initial_sync,
 )
 from src.modules.integrations.persistence import (
+    upsert_ad,
+    upsert_ad_account,
+    upsert_ad_insight,
+    upsert_ad_set,
+    upsert_campaign,
+    upsert_creative,
     upsert_customer,
     upsert_order,
     upsert_product,
@@ -301,6 +321,235 @@ async def handle_shopify_callback(
     return {"business_id": str(business_id), "locale": locale, "success": True}
 
 
+# -- Meta (Facebook) connect --------------------------------------------------
+
+
+async def get_pending_meta_connection(
+    session: AsyncSession, business_id
+) -> IntegrationConnection | None:
+    """The most recent pending Meta connection awaiting account selection."""
+    return await session.scalar(
+        select(IntegrationConnection)
+        .where(
+            IntegrationConnection.business_id == business_id,
+            IntegrationConnection.provider == "meta",
+            IntegrationConnection.status == "pending",
+            IntegrationConnection.external_account_id.is_(None),
+        )
+        .order_by(IntegrationConnection.created_at.desc())
+        .limit(1)
+    )
+
+
+async def get_meta_connection_by_account(
+    session: AsyncSession, business_id, account_ref: str
+) -> IntegrationConnection | None:
+    return await session.scalar(
+        select(IntegrationConnection).where(
+            IntegrationConnection.business_id == business_id,
+            IntegrationConnection.provider == "meta",
+            IntegrationConnection.external_account_id == account_ref,
+        )
+    )
+
+
+async def start_meta_connect(
+    session: AsyncSession,
+    redis: Redis,
+    settings: Settings,
+    *,
+    user_id,
+    business_id,
+    locale: str,
+) -> tuple[str, str]:
+    """Begins the Meta OAuth dance. Meta needs no user input: the connection
+    stays `pending` until the user explicitly selects an account, so one
+    OAuth completion can cover several ad accounts."""
+    if locale not in ALLOWED_LOCALES:
+        raise IntegrationError("Unsupported locale")
+
+    connection = await get_pending_meta_connection(session, business_id)
+    if connection is None:
+        connection = IntegrationConnection(
+            business_id=business_id, provider="meta", status="pending"
+        )
+        session.add(connection)
+        await session.commit()
+    else:
+        # Re-connect after an abandoned flow: drop any stale token and
+        # discovered accounts so the new authorization is authoritative.
+        await session.execute(
+            delete(IntegrationCredential).where(
+                IntegrationCredential.connection_id == connection.id
+            )
+        )
+        connection.provider_metadata = None
+        connection.external_account_name = None
+        connection.scopes = []
+        await session.commit()
+
+    state = await OAuthStateService(redis, settings).create(
+        user_id=user_id, business_id=business_id, locale=locale, provider="meta"
+    )
+    session_token = await CallbackSessionService(redis, settings).create(user_id=user_id)
+    auth_url = _adapter("meta").build_authorize_url("", state)
+    logger.info("meta connect started for business (business_id=%s)", business_id)
+    return auth_url, session_token
+
+
+async def handle_meta_callback(
+    session: AsyncSession,
+    redis: Redis,
+    settings: Settings,
+    *,
+    callback_session_token: str | None,
+    code: str | None,
+    state: str | None,
+) -> dict:
+    """Completes the Meta OAuth exchange: stores the token and the list of
+    accessible ad accounts on the pending connection. NO account is
+    auto-connected — the user picks one explicitly (POST /accounts/select),
+    which is what triggers the initial sync."""
+    user_id = await CallbackSessionService(redis, settings).resolve(callback_session_token)
+    if user_id is None:
+        raise OAuthStateExpiredError("OAuth callback session is invalid or expired")
+    if not code or not state:
+        raise OAuthStateExpiredError("OAuth callback is missing required parameters")
+
+    state_payload = await OAuthStateService(redis, settings).consume(
+        state, user_id=user_id, provider="meta"
+    )
+    business_id = state_payload["business_id"]
+    locale = state_payload["locale"] if state_payload["locale"] in ALLOWED_LOCALES else "en"
+
+    business = await session.get(Business, business_id)
+    if business is None:
+        raise OAuthStateExpiredError("OAuth callback is invalid")
+    tenant = await resolve_tenant(session, user_id, business.organization_id)
+    if await can_access_business(session, tenant.organization_id, business_id) is None:
+        raise OAuthStateExpiredError("OAuth callback is invalid")
+
+    adapter = _adapter("meta")
+    connection = await get_pending_meta_connection(session, business_id)
+    if connection is None:
+        raise ConnectionStateError("No pending Meta connection for this business")
+
+    exchange = await adapter.exchange_code("", code)
+    credentials = ProviderCredentials(
+        shop_domain="",
+        access_token=exchange.access_token,
+        expires_at=exchange.expires_at,
+    )
+    user_info = await adapter.validate_connection(credentials)
+    accounts = await adapter.list_accounts(credentials)
+
+    await _upsert_credential(
+        session, settings, connection, exchange.access_token, exchange.expires_at, None
+    )
+    connection.scopes = exchange.scope
+    connection.external_account_name = user_info.get("name")
+    connection.provider_metadata = {
+        "user_id": user_info.get("user_id"),
+        "version": 1,
+        "accounts": [
+            {
+                "external_account_id": account.external_id,
+                "name": account.name,
+                "currency": account.currency,
+                "status": account.status,
+                "timezone": account.timezone,
+            }
+            for account in accounts
+        ],
+    }
+    await session.commit()
+    logger.info("meta oauth completed for business (business_id=%s)", business_id)
+    return {"business_id": str(business_id), "locale": locale, "success": True}
+
+
+async def meta_accounts_view(session: AsyncSession, business_id) -> dict:
+    """Discovered (not yet selected) accounts for the pending connection."""
+    connection = await get_pending_meta_connection(session, business_id)
+    if connection is None:
+        return {"connection_id": None, "accounts": []}
+    accounts = (connection.provider_metadata or {}).get("accounts") or []
+    return {"connection_id": str(connection.id), "accounts": accounts}
+
+
+async def select_meta_account(
+    session: AsyncSession,
+    settings: Settings,
+    *,
+    business_id,
+    external_account_id: str,
+) -> IntegrationConnection:
+    """Connects ONE explicitly chosen ad account (never an implicit bulk
+    connect) and triggers its initial sync. The account must come from the
+    server-side discovered list — anything else is rejected."""
+    connection = await get_pending_meta_connection(session, business_id)
+    if connection is None:
+        raise ConnectionStateError("No pending Meta connection for this business")
+    discovered = (connection.provider_metadata or {}).get("accounts") or []
+    selected = next(
+        (a for a in discovered if a.get("external_account_id") == external_account_id),
+        None,
+    )
+    if selected is None:
+        raise IntegrationError("This Meta ad account was not part of the authorization")
+
+    credentials = await _decrypt_credentials(session, settings, connection)
+    account_info = await _adapter("meta").validate_ad_account(
+        credentials, external_account_id
+    )
+
+    account_ref = f"act_{external_account_id}"
+    connection.external_account_id = account_ref
+    connection.external_account_name = account_info.get("name") or selected.get("name")
+    metadata = dict(connection.provider_metadata or {})
+    metadata["currency"] = account_info.get("currency")
+    connection.provider_metadata = metadata
+    connection.status = "connected"
+    connection.connected_at = _now()
+
+    existing = await get_meta_connection_by_account(session, business_id, account_ref)
+    if existing is not None and existing.id != connection.id:
+        raise ConnectionStateError("This Meta ad account is already connected to this business")
+
+    await upsert_ad_account(
+        session,
+        business_id,
+        CanonicalAdAccount(
+            external_id=external_account_id,
+            name=account_info.get("name") or selected.get("name"),
+            currency=account_info.get("currency") or "USD",
+            timezone=account_info.get("timezone") or selected.get("timezone"),
+            timezone_offset_hours_utc=(
+                Decimal(account_info["timezone_offset_hours_utc"])
+                if account_info.get("timezone_offset_hours_utc")
+                else None
+            ),
+            status=account_info.get("status") or "UNKNOWN",
+        ),
+    )
+    try:
+        await session.commit()
+    except IntegrityError:
+        # Same ad account connected in this or another business: never
+        # share a provider account silently.
+        await session.rollback()
+        raise ConflictError(
+            "This Meta ad account is already connected to another business"
+        ) from None
+
+    await enqueue_meta_initial_sync(str(connection.id))
+    logger.info(
+        "meta account connected for business (business_id=%s, account=%s)",
+        business_id,
+        account_ref,
+    )
+    return connection
+
+
 # -- sync ---------------------------------------------------------------------
 
 
@@ -315,10 +564,20 @@ async def request_sync(
         unknown = [r for r in resources if r not in adapter.resource_types]
         if unknown:
             raise IntegrationError("Unsupported sync resources")
-    if resources is None and connection.last_sync_at is None:
-        chosen = list(INITIAL_RESOURCES)
+    if resources is None:
+        # Provider-specific defaults: Shopify ingests commerce resources;
+        # Meta ingests its own hierarchy + daily insights. Adapters may
+        # declare their own sets; Shopify keeps the Phase 2A defaults.
+        if connection.last_sync_at is None:
+            chosen = list(
+                getattr(adapter, "initial_resources", None) or INITIAL_RESOURCES
+            )
+        else:
+            chosen = list(
+                getattr(adapter, "incremental_resources", None) or INCREMENTAL_RESOURCES
+            )
     else:
-        chosen = list(resources or INCREMENTAL_RESOURCES)
+        chosen = list(resources)
     await enqueue_incremental_sync(str(connection.id), chosen)
     return chosen
 
@@ -434,15 +693,28 @@ async def _previous_cursor(session: AsyncSession, connection_id, resource: str) 
 
 
 def _watermark(records) -> str | None:
-    """Incremental watermark: the newest record update time in a page."""
+    """Incremental watermark: the newest record update time in a page.
+
+    Records without an `updated_at` fall back to their `date` (Meta daily
+    insights): the watermark is then the latest covered day, which bounds
+    the next incremental window (with a 1-day overlap for latency).
+    """
     best: datetime | None = None
+    best_date: date | None = None
     for record in records:
         updated_at = getattr(record, "updated_at", None)
-        if updated_at is None:
+        if updated_at is not None:
+            if best is None or updated_at > best:
+                best = updated_at
             continue
-        if best is None or updated_at > best:
-            best = updated_at
-    return best.isoformat() if best else None
+        fact_date = getattr(record, "date", None)
+        if hasattr(fact_date, "isoformat") and (
+            best_date is None or fact_date > best_date
+        ):
+            best_date = fact_date
+    if best is not None:
+        return best.isoformat()
+    return best_date.isoformat() if best_date else None
 
 
 async def _persist_with_retry(
@@ -484,6 +756,18 @@ async def _persist_record(
         await upsert_customer(session, business_id, record)
     elif isinstance(record, CanonicalInventory):
         await write_inventory_snapshot(session, business_id, record)
+    elif isinstance(record, CanonicalAdAccount):
+        await upsert_ad_account(session, business_id, record)
+    elif isinstance(record, CanonicalCampaign):
+        await upsert_campaign(session, business_id, record)
+    elif isinstance(record, CanonicalAdSet):
+        await upsert_ad_set(session, business_id, record)
+    elif isinstance(record, CanonicalCreative):
+        await upsert_creative(session, business_id, record)
+    elif isinstance(record, CanonicalAd):
+        await upsert_ad(session, business_id, record)
+    elif isinstance(record, CanonicalAdInsight):
+        await upsert_ad_insight(session, business_id, record)
     else:  # pragma: no cover - protocol guarantees the canonical types
         raise TypeError(f"Unknown canonical record type: {type(record).__name__}")
 
@@ -608,6 +892,24 @@ async def _finish_webhook(
 # -- disconnect ---------------------------------------------------------------
 
 
+async def mark_meta_reconnect_required(session: AsyncSession, connection_id) -> None:
+    """Flips a Meta connection to `error` after the provider rejected its
+    token: retrying would burn rate limits, so the connection stays dead
+    until the user re-authorizes."""
+    try:
+        connection_id_parsed = uuid.UUID(str(connection_id))
+    except ValueError:
+        return
+    connection = await session.get(IntegrationConnection, connection_id_parsed)
+    if connection is None or connection.provider != "meta":
+        return
+    metadata = dict(connection.provider_metadata or {})
+    metadata["auth_error"] = True
+    connection.provider_metadata = metadata
+    connection.status = "error"
+    await session.commit()
+
+
 async def disconnect_connection(
     session: AsyncSession, settings: Settings, business_id, connection_id
 ) -> IntegrationConnection:
@@ -623,6 +925,36 @@ async def disconnect_connection(
             IntegrationCredential.connection_id == connection.id
         )
     )
+    if connection.provider == "meta":
+        # The account hierarchy cascades from ad_accounts; orphaned
+        # creatives (not referenced by any remaining ad) are removed too.
+        ad_account = await session.scalar(
+            select(AdAccount.id).where(
+                AdAccount.integration_connection_id == connection.id
+            )
+        )
+        if ad_account is not None:
+            await session.execute(
+                delete(AdInsight).where(AdInsight.ad_account_id == ad_account)
+            )
+            await session.execute(delete(Ad).where(Ad.ad_account_id == ad_account))
+            await session.execute(delete(AdSet).where(AdSet.ad_account_id == ad_account))
+            await session.execute(
+                delete(Campaign).where(Campaign.ad_account_id == ad_account)
+            )
+            await session.execute(delete(AdAccount).where(AdAccount.id == ad_account))
+            await session.execute(
+                delete(Creative)
+                .where(
+                    Creative.business_id == business_id,
+                    Creative.provider == "meta",
+                )
+                .where(
+                    Creative.id.notin_(
+                        select(Ad.creative_id).where(Ad.creative_id.isnot(None))
+                    )
+                )
+            )
     connection.status = "disconnected"
     connection.connected_at = None
     connection.last_sync_at = None
@@ -671,6 +1003,28 @@ async def connection_view(session: AsyncSession, connection: IntegrationConnecti
         .order_by(SyncRun.started_at.desc())
         .limit(1)
     )
+    campaigns_count = ad_sets_count = ads_count = daily_records_count = 0
+    if connection.provider == "meta":
+        ad_account = await session.scalar(
+            select(AdAccount.id).where(
+                AdAccount.integration_connection_id == connection.id
+            )
+        )
+        if ad_account is not None:
+            campaigns_count = await session.scalar(
+                select(func.count(Campaign.id)).where(Campaign.ad_account_id == ad_account)
+            )
+            ad_sets_count = await session.scalar(
+                select(func.count(AdSet.id)).where(AdSet.ad_account_id == ad_account)
+            )
+            ads_count = await session.scalar(
+                select(func.count(Ad.id)).where(Ad.ad_account_id == ad_account)
+            )
+            daily_records_count = await session.scalar(
+                select(func.count(AdInsight.id)).where(
+                    AdInsight.ad_account_id == ad_account
+                )
+            )
     return {
         "id": connection.id,
         "business_id": business_id,
@@ -688,6 +1042,10 @@ async def connection_view(session: AsyncSession, connection: IntegrationConnecti
         "orders_count": orders_count,
         "customers_count": customers_count,
         "inventory_count": inventory_count,
+        "campaigns_count": campaigns_count,
+        "ad_sets_count": ad_sets_count,
+        "ads_count": ads_count,
+        "daily_records_count": daily_records_count,
         "latest_sync": (
             {
                 "id": latest_run.id,

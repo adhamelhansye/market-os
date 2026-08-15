@@ -4,12 +4,15 @@ Required environment variables are validated at startup by pydantic-settings.
 Missing required values abort boot with a clear error.
 """
 
+import re
 from functools import lru_cache
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 APP_ENVIRONMENTS = {"development", "test", "staging", "production"}
+
+_META_VERSION_PATTERN = re.compile(r"^v\d+(\.\d+)?$")
 
 
 class Settings(BaseSettings):
@@ -34,6 +37,23 @@ class Settings(BaseSettings):
     shopify_redirect_uri: str = ""
     shopify_api_version: str = "2026-04"
     shopify_scopes: str = "read_products,read_orders,read_customers,read_inventory,read_locations"
+
+    # Meta Marketing API (Facebook Login app). Read-only: the ONLY requested
+    # permission is ads_read (no mutation capabilities). The Graph API
+    # version is pinned exactly — there is no silent fallback to older
+    # versions; bump META_GRAPH_API_VERSION deliberately when upgrading.
+    meta_app_id: str = ""
+    meta_app_secret: str = ""
+    meta_redirect_uri: str = ""
+    meta_graph_api_version: str = "v26.0"
+    meta_scopes: str = "ads_read"
+
+    # Meta sync windows. Initial sync is a bounded historical window (Meta
+    # rejects time ranges over 37 months); incremental sync re-fetches a
+    # short recent window that absorbs reporting latency, and upsert
+    # idempotency makes the overlap safe to reprocess.
+    meta_initial_sync_days: int = 90
+    meta_incremental_lookback_days: int = 2
 
     # OAuth state: how long a connect state token stays valid (single-use).
     oauth_state_ttl_seconds: int = 600
@@ -76,6 +96,14 @@ class Settings(BaseSettings):
         # would make the derivation trivially brute-forceable.
         if len(value) < 16:
             raise ValueError("ENCRYPTION_KEY must be at least 16 characters")
+        return value
+
+    @field_validator("meta_graph_api_version")
+    @classmethod
+    def validate_meta_api_version(cls, value: str) -> str:
+        value = value.strip()
+        if not _META_VERSION_PATTERN.match(value) or value == "v0":
+            raise ValueError("META_GRAPH_API_VERSION must look like v26.0")
         return value
 
     @property

@@ -1,9 +1,8 @@
 """Provider adapter registry.
 
 New providers register themselves here without touching any core service:
-    registry.register("meta", MetaAdapter)   # future
-    registry.register("ga4", GA4Adapter)     # future
-Only existing providers are registered today (shopify).
+    registry.register("ga4", GA4Adapter)   # future
+Only existing providers are registered today (shopify, meta).
 """
 
 from collections.abc import Callable
@@ -41,11 +40,14 @@ _registry = IntegrationRegistry()
 
 
 def get_registry() -> IntegrationRegistry:
-    """Global registry. Importing the Shopify adapter registers it."""
+    """Global registry. Importing the adapters registers them."""
+    from src.modules.integrations.meta.adapter import MetaAdapter  # noqa: PLC0415
     from src.modules.integrations.shopify.adapter import ShopifyAdapter  # noqa: PLC0415
 
     if not _registry.has(ShopifyAdapter.provider):
         _registry.register(ShopifyAdapter.provider, ShopifyAdapter)
+    if not _registry.has(MetaAdapter.provider):
+        _registry.register(MetaAdapter.provider, MetaAdapter)
     return _registry
 
 

@@ -644,6 +644,88 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/integrations/meta/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect Meta */
+        post: operations["connect_meta_api_v1_businesses__business_id__integrations_meta_connect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/integrations/meta/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Meta Callback
+         * @description Completes the Meta OAuth exchange for the browser that started it.
+         *
+         *     The business is resolved ONLY from the validated single-use state (bound
+         *     to the user via the httpOnly callback session cookie); any rejection
+         *     redirects to the frontend with a safe generic error.
+         */
+        get: operations["meta_callback_api_v1_integrations_meta_callback_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations/meta/accounts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Meta Accounts
+         * @description Ad accounts the pending authorization can see (server-side list).
+         */
+        get: operations["meta_accounts_api_v1_businesses__business_id__integrations_meta_accounts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/integrations/meta/accounts/select": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Select Meta Account
+         * @description Connects exactly one explicitly chosen ad account and starts its
+         *     initial sync. The account must be in the server-side discovered list.
+         */
+        post: operations["select_meta_account_api_v1_businesses__business_id__integrations_meta_accounts_select_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/businesses/{business_id}/integrations/{connection_id}/sync": {
         parameters: {
             query?: never;
@@ -1026,6 +1108,26 @@ export interface components {
              * @default 0
              */
             inventory_count: number;
+            /**
+             * Campaigns Count
+             * @default 0
+             */
+            campaigns_count: number;
+            /**
+             * Ad Sets Count
+             * @default 0
+             */
+            ad_sets_count: number;
+            /**
+             * Ads Count
+             * @default 0
+             */
+            ads_count: number;
+            /**
+             * Daily Records Count
+             * @default 0
+             */
+            daily_records_count: number;
             latest_sync?: components["schemas"]["SyncRunRead"] | null;
         };
         /** DiscountCreate */
@@ -1307,6 +1409,59 @@ export interface components {
             role_name: string;
             /** Permissions */
             permissions: string[];
+        };
+        /** MetaAccountRead */
+        MetaAccountRead: {
+            /** External Account Id */
+            external_account_id: string;
+            /** Name */
+            name?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+        };
+        /**
+         * MetaAccountSelectRequest
+         * @description The account must exist in the server-side discovered list — the
+         *     client can only choose among what the authorization actually granted.
+         */
+        MetaAccountSelectRequest: {
+            /** External Account Id */
+            external_account_id: string;
+            /**
+             * Locale
+             * @default en
+             * @enum {string}
+             */
+            locale: "en" | "ar";
+        };
+        /** MetaAccountsResponse */
+        MetaAccountsResponse: {
+            /** Connection Id */
+            connection_id?: string | null;
+            /** Accounts */
+            accounts?: components["schemas"]["MetaAccountRead"][];
+        };
+        /**
+         * MetaConnectRequest
+         * @description Meta connect needs no user input (no shop domain): the user always
+         *     authorizes via the official Facebook dialog.
+         */
+        MetaConnectRequest: {
+            /**
+             * Locale
+             * @default en
+             * @enum {string}
+             */
+            locale: "en" | "ar";
+        };
+        /** MetaConnectResponse */
+        MetaConnectResponse: {
+            /** Auth Url */
+            auth_url: string;
         };
         /** OrganizationRead */
         OrganizationRead: {
@@ -3254,6 +3409,124 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connect_meta_api_v1_businesses__business_id__integrations_meta_connect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetaConnectRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetaConnectResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    meta_callback_api_v1_integrations_meta_callback_get: {
+        parameters: {
+            query?: {
+                code?: string | null;
+                state?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    meta_accounts_api_v1_businesses__business_id__integrations_meta_accounts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MetaAccountsResponse"];
+                };
+            };
+        };
+    };
+    select_meta_account_api_v1_businesses__business_id__integrations_meta_accounts_select_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MetaAccountSelectRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionRead"];
                 };
             };
             /** @description Validation Error */

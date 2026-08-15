@@ -19,6 +19,15 @@ POST   /businesses/{business_id}/integrations/{connection_id}/disconnect  → re
 POST   /integrations/shopify/webhook                              → HMAC-verified event intake
 ```
 
+Meta Ads endpoints (see `meta.md` for the full provider doc):
+
+```
+POST   /businesses/{business_id}/integrations/meta/connect        → { auth_url } (OAuth start)
+GET    /integrations/meta/callback                                → 302 to frontend
+GET    /businesses/{business_id}/integrations/meta/accounts       → discovered ad accounts
+POST   /businesses/{business_id}/integrations/meta/accounts/select → connect one account
+```
+
 Reads require `business:read`, mutations require `business:write`.
 
 ## Adapter protocol
