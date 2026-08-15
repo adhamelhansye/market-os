@@ -1,0 +1,229 @@
+{
+  "title": "Diagnostics",
+  "subtitle": "Deterministic analytics findings for this business",
+  "overview": "Overview",
+  "findings": "Findings",
+  "filters": "Filters",
+  "entityType": "Entity",
+  "severity": "Severity",
+  "category": "Category",
+  "status": "Status",
+  "all": "All",
+  "clearFilters": "Clear filters",
+  "noFindings": "No findings for the selected filters.",
+  "noFindingsBody": "Adjust the filters or choose another period.",
+  "loading": "Loading diagnostics…",
+  "error": "Could not load diagnostics.",
+  "retry": "Retry",
+  "affectedEntities": "Affected entities",
+  "totalFindings": "Total findings",
+  "insufficientData": "Insufficient data",
+  "severityInfo": "Info",
+  "severityLow": "Low",
+  "severityMedium": "Medium",
+  "severityHigh": "High",
+  "severityCritical": "Critical",
+  "statusDetected": "Detected",
+  "statusResolved": "Resolved",
+  "statusInsufficientData": "Insufficient data",
+  "categoryTraffic": "Traffic",
+  "categoryCreative": "Creative",
+  "categoryConversion": "Conversion",
+  "categoryOffer": "Offer",
+  "categoryFunnel": "Funnel",
+  "categoryEconomics": "Economics",
+  "categoryTracking": "Tracking",
+  "categoryDataQuality": "Data quality",
+  "categoryPerformance": "Performance",
+  "categoryScalingReadiness": "Scaling readiness",
+  "current": "Current",
+  "previous": "Previous",
+  "threshold": "Threshold",
+  "metric": "Metric",
+  "comparison": "Comparison",
+  "facts": "Facts",
+  "affectedStage": "Affected stage",
+  "fromStage": "From",
+  "toStage": "To",
+  "conversionRate": "Conversion",
+  "previousRate": "Previous conversion",
+  "changePercent": "Change",
+  "reviewReady": "Ready for review",
+  "reviewRequired": "Review required",
+  "campaignStates": "Campaign performance",
+  "stateInsufficientData": "Insufficient data",
+  "stateLearning": "Learning",
+  "stateHealthy": "Healthy",
+  "stateAttention": "Attention",
+  "stateInefficient": "Inefficient",
+  "stateProfitable": "Profitable",
+  "stateUnprofitable": "Unprofitable",
+  "stateStaleData": "Stale data",
+  "scalingStatus": "Scaling readiness",
+  "scalingInsufficientData": "Insufficient data",
+  "scalingLearning": "Learning",
+  "scalingStable": "Stable",
+  "scalingPerformancePositive": "Positive",
+  "scalingPerformanceNegative": "Negative",
+  "findingCount": "Findings",
+  "highestSeverity": "Highest severity",
+  "noCampaignStates": "No campaign data for this period.",
+  "funnelBottleneck": "Funnel bottleneck",
+  "funnelBottleneckBody": "Largest drop-off between observed funnel stages.",
+  "dataQualityWarnings": "Data quality",
+  "noDataQualityWarnings": "No data quality warnings.",
+  "perStages": "per funnel stage",
+  "meta": "Meta Ads",
+  "shopify": "Shopify",
+  "currentThreshold": "Current vs threshold",
+  "stageAwareness": "Awareness",
+  "stageTraffic": "Traffic",
+  "stageIntent": "Intent",
+  "stagePurchase": "Purchase",
+  "entityBusiness": "Business",
+  "entityCampaign": "Campaign",
+  "entityAdSet": "Ad set",
+  "entityAd": "Ad",
+  "diagnostics": {
+    "low_ctr": {
+      "title": "Click-through rate below 0.7%",
+      "description": "The campaign is getting impressions but relatively few clicks. Review ad relevance, targeting and creative."
+    },
+    "ctr_decline": {
+      "title": "CTR declined vs previous period",
+      "description": "Click-through rate dropped by 30% or more compared with the previous period."
+    },
+    "high_cpc": {
+      "title": "Cost per click above 10.00",
+      "description": "The average click cost exceeds the baseline, reducing the number of clicks per dollar spent."
+    },
+    "high_cpm": {
+      "title": "Cost per mille above 800.00",
+      "description": "For every thousand impressions the ad costs more than the baseline."
+    },
+    "creative_low_ctr": {
+      "title": "Creative CTR below 0.7%",
+      "description": "This creative under-performs on engagement; consider testing new angles."
+    },
+    "possible_creative_fatigue": {
+      "title": "Possible creative fatigue",
+      "description": "High frequency combined with a CTR decline while spend is active — a fatigue signal, not a certainty."
+    },
+    "low_cvr": {
+      "title": "Conversion rate below 3%",
+      "description": "Clicks are not converting into purchases at the expected rate."
+    },
+    "cvr_decline": {
+      "title": "CVR declined vs previous period",
+      "description": "The purchase conversion rate dropped by 30% or more compared with the previous period."
+    },
+    "high_cpa": {
+      "title": "Cost per acquisition above target",
+      "description": "The purchase cost is above the business goal or break-even CPA."
+    },
+    "below_break_even_roas": {
+      "title": "ROAS below break-even",
+      "description": "Revenue attributed to ads is below the unit-economics break-even ROAS, meaning the activity is not profitable."
+    },
+    "below_target_roas": {
+      "title": "ROAS below target",
+      "description": "Revenue per ad spend is below the target set in the business goal."
+    },
+    "negative_contribution_profit": {
+      "title": "Negative contribution profit",
+      "description": "Average unit economics produce a negative contribution profit per sale."
+    },
+    "declining_contribution_margin": {
+      "title": "Margin declined vs previous period",
+      "description": "The average contribution margin dropped by 15% or more while revenue grew."
+    },
+    "revenue_profit_divergence": {
+      "title": "Revenue growth with profit decline",
+      "description": "Revenue grew at least 20% while contribution profit fell at least 15% — growth is not profitable."
+    },
+    "negative_unit_margin": {
+      "title": "Negative unit margin",
+      "description": "At least one product sells below contribution break-even."
+    },
+    "break_even_unavailable": {
+      "title": "Break-even not available",
+      "description": "Purchases exist but unit economics do not — profitability cannot be assessed."
+    },
+    "target_cpa_above_viable": {
+      "title": "CPA target above viable level",
+      "description": "The goal CPA exceeds the break-even CPA for the business."
+    },
+    "funnel_bottleneck": {
+      "title": "Funnel bottleneck detected",
+      "description": "A stage transition converts below 5% of the previous stage, the largest observed drop-off."
+    },
+    "low_click_to_purchase_rate": {
+      "title": "Low click-to-purchase rate",
+      "description": "Intermediate funnel stages are unavailable; purchases are low compared with clicks."
+    },
+    "spend_without_purchase": {
+      "title": "Spend without purchases",
+      "description": "Spend exceeds 100.00 with no purchases in the period."
+    },
+    "purchase_revenue_mismatch": {
+      "title": "Purchases without revenue",
+      "description": "Commerce orders exist but no revenue is recorded."
+    },
+    "revenue_purchase_mismatch": {
+      "title": "Revenue without purchases",
+      "description": "Revenue is recorded but no purchases are counted."
+    },
+    "provider_conversion_mismatch": {
+      "title": "Provider conversions vs purchases",
+      "description": "Meta-reported conversions differ from commerce purchases by 50% or more."
+    },
+    "stale_meta_data": {
+      "title": "Meta data is stale",
+      "description": "The last Meta sync is older than the freshness window."
+    },
+    "stale_shopify_data": {
+      "title": "Shopify data is stale",
+      "description": "The last Shopify sync is older than the freshness window."
+    },
+    "delayed_meta_data": {
+      "title": "Meta data is delayed",
+      "description": "The last Meta sync is delayed; figures may be incomplete."
+    },
+    "delayed_shopify_data": {
+      "title": "Shopify data is delayed",
+      "description": "The last Shopify sync is delayed; figures may be incomplete."
+    },
+    "meta_not_connected": {
+      "title": "Meta is not connected",
+      "description": "No connected Meta Ads account; ad metrics are not available."
+    },
+    "shopify_not_connected": {
+      "title": "Shopify is not connected",
+      "description": "No connected Shopify store; commerce metrics are not available."
+    },
+    "missing_meta_reporting_period": {
+      "title": "Meta reporting period missing",
+      "description": "No Meta fact table covers the requested period."
+    },
+    "missing_shopify_reporting_period": {
+      "title": "Shopify reporting period missing",
+      "description": "No Shopify fact table covers the requested period."
+    },
+    "incomplete_reporting_period": {
+      "title": "Incomplete reporting period",
+      "description": "Two or more days are missing from the requested range."
+    },
+    "unobserved_funnel_stages": {
+      "title": "Funnel stages not observed",
+      "description": "Product, cart and checkout stages are not reported by the connected providers."
+    },
+    "recent_sync_failures": {
+      "title": "Recent sync failures",
+      "description": "A provider sync failed within the last 24 hours."
+    },
+    "persistent_unprofitable_performance": {
+      "title": "Persistently unprofitable",
+      "description": "Performance stayed below break-even across consecutive periods; review is recommended."
+    }
+  }
+}

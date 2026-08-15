@@ -934,6 +934,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/diagnostics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Deterministic diagnostic findings for a business */
+        get: operations["diagnostics_list_api_v1_businesses__business_id__diagnostics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/diagnostics/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Diagnostics summary counters */
+        get: operations["diagnostics_summary_api_v1_businesses__business_id__diagnostics_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/campaigns/{campaign_id}/diagnostics": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per-campaign diagnostics with performance state */
+        get: operations["campaign_diagnostics_api_v1_businesses__business_id__campaigns__campaign_id__diagnostics_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1318,6 +1369,26 @@ export interface components {
             /** Onboarding Status */
             onboarding_status?: string | null;
         };
+        /** CampaignDiagnosticsRead */
+        CampaignDiagnosticsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            campaign: components["schemas"]["CampaignMetrics"];
+            /** Performance State */
+            performance_state: string;
+            scaling_readiness: components["schemas"]["ScalingReadinessRead"];
+            /** Findings */
+            findings: components["schemas"]["FindingRead"][];
+            data_quality?: components["schemas"]["ProviderQuality"] | null;
+        };
         /** CampaignMetrics */
         CampaignMetrics: {
             /**
@@ -1359,6 +1430,26 @@ export interface components {
             /** Ad Account Id */
             ad_account_id?: string | null;
         };
+        /** CampaignStateRead */
+        CampaignStateRead: {
+            /**
+             * Campaign Id
+             * Format: uuid
+             */
+            campaign_id: string;
+            /** Name */
+            name?: string | null;
+            /** Performance State */
+            performance_state: string;
+            scaling_readiness?: components["schemas"]["ScalingReadinessRead"] | null;
+            /**
+             * Finding Count
+             * @default 0
+             */
+            finding_count: number;
+            /** Highest Severity */
+            highest_severity?: string | null;
+        };
         /** CampaignsRead */
         CampaignsRead: {
             /**
@@ -1373,6 +1464,18 @@ export interface components {
             range: components["schemas"]["RangeRead"];
             /** Campaigns */
             campaigns: components["schemas"]["CampaignMetrics"][];
+        };
+        /** ComparisonEvidenceRead */
+        ComparisonEvidenceRead: {
+            /** Change Percent */
+            change_percent?: string | null;
+            /**
+             * Status
+             * @default available
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
         };
         /** ComparisonRead */
         ComparisonRead: {
@@ -1519,6 +1622,43 @@ export interface components {
             /** Providers */
             providers: components["schemas"]["ProviderQuality"][];
         };
+        /** DiagnosticsRead */
+        DiagnosticsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            range: components["schemas"]["RangeRead"];
+            /** Findings */
+            findings: components["schemas"]["FindingRead"][];
+            /** Campaign States */
+            campaign_states: components["schemas"]["CampaignStateRead"][];
+            summary: components["schemas"]["DiagnosticsSummaryRead"];
+        };
+        /** DiagnosticsSummaryRead */
+        DiagnosticsSummaryRead: {
+            /** Total Findings */
+            total_findings: number;
+            /** Critical */
+            critical: number;
+            /** High */
+            high: number;
+            /** Medium */
+            medium: number;
+            /** Low */
+            low: number;
+            /** Info */
+            info: number;
+            /** Insufficient Data */
+            insufficient_data: number;
+            /** Affected Entities */
+            affected_entities: number;
+        };
         /** DiscountCreate */
         DiscountCreate: {
             /** Name */
@@ -1645,6 +1785,78 @@ export interface components {
             /** Inventory Value */
             inventory_value: string | null;
             current_goal: components["schemas"]["GoalRead"] | null;
+        };
+        /** EvidenceRead */
+        EvidenceRead: {
+            metric?: components["schemas"]["MetricEvidenceRead"] | null;
+            threshold?: components["schemas"]["ThresholdEvidenceRead"] | null;
+            comparison?: components["schemas"]["ComparisonEvidenceRead"] | null;
+            funnel?: components["schemas"]["FunnelEvidenceRead"] | null;
+            /** Facts */
+            facts?: components["schemas"]["FactRead"][];
+        };
+        /** FactRead */
+        FactRead: {
+            /** Code */
+            code: string;
+            /** Value */
+            value?: string | null;
+            /**
+             * Unit
+             * @default count
+             */
+            unit: string;
+        };
+        /** FindingRead */
+        FindingRead: {
+            /** Id */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Business Name */
+            business_name: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Entity Name */
+            entity_name?: string | null;
+            /** Category */
+            category: string;
+            /** Code */
+            code: string;
+            /** Severity */
+            severity: string;
+            /** Status */
+            status: string;
+            /** Title Key */
+            title_key: string;
+            /** Description Key */
+            description_key: string;
+            /** Reason */
+            reason?: string | null;
+            evidence: components["schemas"]["EvidenceRead"];
+            /** Affected Stage */
+            affected_stage?: string | null;
+            range: components["schemas"]["RangeRead"];
+            /** Currency */
+            currency: string;
+            /** Review Status */
+            review_status?: string | null;
+        };
+        /** FunnelEvidenceRead */
+        FunnelEvidenceRead: {
+            /** From Stage */
+            from_stage?: string | null;
+            /** To Stage */
+            to_stage?: string | null;
+            /** Conversion Rate */
+            conversion_rate?: string | null;
+            /** Previous Rate */
+            previous_rate?: string | null;
         };
         /** FunnelRead */
         FunnelRead: {
@@ -1890,6 +2102,15 @@ export interface components {
         MetaConnectResponse: {
             /** Auth Url */
             auth_url: string;
+        };
+        /** MetricEvidenceRead */
+        MetricEvidenceRead: {
+            /** Code */
+            code?: string | null;
+            /** Current */
+            current?: string | null;
+            /** Previous */
+            previous?: string | null;
         };
         /** MoneyMeasureRead */
         MoneyMeasureRead: {
@@ -2342,6 +2563,18 @@ export interface components {
              */
             last_30d_window_start: string;
         };
+        /** ScalingReadinessRead */
+        ScalingReadinessRead: {
+            /** Status */
+            status: string;
+            /**
+             * Ready For Review
+             * @default false
+             */
+            ready_for_review: boolean;
+            /** Gates */
+            gates?: components["schemas"]["FactRead"][];
+        };
         /** ShippingRuleCreate */
         ShippingRuleCreate: {
             /** Name */
@@ -2552,6 +2785,20 @@ export interface components {
             records_processed: number;
             /** Error Summary */
             error_summary?: string | null;
+        };
+        /** ThresholdEvidenceRead */
+        ThresholdEvidenceRead: {
+            /** Code */
+            code?: string | null;
+            /** Operator */
+            operator?: string | null;
+            /** Value */
+            value?: string | null;
+            /**
+             * Unit
+             * @default ratio
+             */
+            unit: string;
         };
         /** TimeseriesPoint */
         TimeseriesPoint: {
@@ -4550,6 +4797,136 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ComparisonReadResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    diagnostics_list_api_v1_businesses__business_id__diagnostics_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date). */
+                range_kind?: string;
+                /** @description Custom range start (alternative to range_kind). */
+                date_from?: string | null;
+                /** @description Custom range end (alternative to range_kind). */
+                date_to?: string | null;
+                /** @description Filter findings by entity type. */
+                entity_type?: string | null;
+                /** @description Filter findings to one entity (must belong to the business). */
+                entity_id?: string | null;
+                /** @description Filter findings by severity. */
+                severity?: string | null;
+                /** @description Filter findings by category. */
+                category?: string | null;
+                /** @description Filter findings by lifecycle status. */
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    diagnostics_summary_api_v1_businesses__business_id__diagnostics_summary_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window. */
+                range_kind?: string;
+                /** @description Custom range start (alternative to range_kind). */
+                date_from?: string | null;
+                /** @description Custom range end (alternative to range_kind). */
+                date_to?: string | null;
+                /** @description Filter findings by entity type. */
+                entity_type?: string | null;
+                /** @description Filter findings to one entity (must belong to the business). */
+                entity_id?: string | null;
+                /** @description Filter findings by severity. */
+                severity?: string | null;
+                /** @description Filter findings by category. */
+                category?: string | null;
+                /** @description Filter findings by lifecycle status. */
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiagnosticsSummaryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    campaign_diagnostics_api_v1_businesses__business_id__campaigns__campaign_id__diagnostics_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window. */
+                range_kind?: string;
+                /** @description Custom range start (alternative to range_kind). */
+                date_from?: string | null;
+                /** @description Custom range end (alternative to range_kind). */
+                date_to?: string | null;
+            };
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignDiagnosticsRead"];
                 };
             };
             /** @description Validation Error */

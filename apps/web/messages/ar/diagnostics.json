@@ -1,0 +1,229 @@
+{
+  "title": "التشخيصات",
+  "subtitle": "نتائج تحليلية حتمية لهذا النشاط التجاري",
+  "overview": "نظرة عامة",
+  "findings": "النتائج",
+  "filters": "التصفية",
+  "entityType": "الكيان",
+  "severity": "الأهمية",
+  "category": "الفئة",
+  "status": "الحالة",
+  "all": "الكل",
+  "clearFilters": "مسح التصفية",
+  "noFindings": "لا توجد نتائج للتصفية المحددة.",
+  "noFindingsBody": "عدّل التصفية أو اختر فترة أخرى.",
+  "loading": "جارٍ تحميل التشخيصات…",
+  "error": "تعذّر تحميل التشخيصات.",
+  "retry": "إعادة المحاولة",
+  "affectedEntities": "الكيانات المتأثرة",
+  "totalFindings": "إجمالي النتائج",
+  "insufficientData": "بيانات غير كافية",
+  "severityInfo": "معلومة",
+  "severityLow": "منخفضة",
+  "severityMedium": "متوسطة",
+  "severityHigh": "عالية",
+  "severityCritical": "حرجة",
+  "statusDetected": "مكتشفة",
+  "statusResolved": "تمت معالجتها",
+  "statusInsufficientData": "بيانات غير كافية",
+  "categoryTraffic": "الترافيك",
+  "categoryCreative": "الإبداع",
+  "categoryConversion": "التحويل",
+  "categoryOffer": "العرض",
+  "categoryFunnel": "القمع",
+  "categoryEconomics": "الاقتصاديات",
+  "categoryTracking": "التتبع",
+  "categoryDataQuality": "جودة البيانات",
+  "categoryPerformance": "الأداء",
+  "categoryScalingReadiness": "جاهزية التوسع",
+  "current": "الحالي",
+  "previous": "السابق",
+  "threshold": "الحد",
+  "metric": "المقياس",
+  "comparison": "المقارنة",
+  "facts": "الحقائق",
+  "affectedStage": "المرحلة المتأثرة",
+  "fromStage": "من",
+  "toStage": "إلى",
+  "conversionRate": "التحويل",
+  "previousRate": "التحويل السابق",
+  "changePercent": "التغير",
+  "reviewReady": "جاهز للمراجعة",
+  "reviewRequired": "يتطلب مراجعة",
+  "campaignStates": "أداء الحملات",
+  "stateInsufficientData": "بيانات غير كافية",
+  "stateLearning": "في مرحلة التعلم",
+  "stateHealthy": "سليم",
+  "stateAttention": "يحتاج انتباه",
+  "stateInefficient": "غير فعّال",
+  "stateProfitable": "مربح",
+  "stateUnprofitable": "غير مربح",
+  "stateStaleData": "بيانات قديمة",
+  "scalingStatus": "جاهزية التوسع",
+  "scalingInsufficientData": "بيانات غير كافية",
+  "scalingLearning": "في مرحلة التعلم",
+  "scalingStable": "مستقر",
+  "scalingPerformancePositive": "إيجابي",
+  "scalingPerformanceNegative": "سلبي",
+  "findingCount": "النتائج",
+  "highestSeverity": "أعلى أهمية",
+  "noCampaignStates": "لا توجد بيانات حملات لهذه الفترة.",
+  "funnelBottleneck": "عنق زجاجة في القمع",
+  "funnelBottleneckBody": "أكبر انخفاض بين مراحل القمع المرصودة.",
+  "dataQualityWarnings": "جودة البيانات",
+  "noDataQualityWarnings": "لا توجد تحذيرات حول جودة البيانات.",
+  "perStages": "لكل مرحلة من القمع",
+  "meta": "إعلانات ميتا",
+  "shopify": "شوبيفاي",
+  "currentThreshold": "الحالي مقابل الحد",
+  "stageAwareness": "الوعي",
+  "stageTraffic": "الترافيك",
+  "stageIntent": "النية",
+  "stagePurchase": "الشراء",
+  "entityBusiness": "النشاط التجاري",
+  "entityCampaign": "الحملة",
+  "entityAdSet": "مجموعة إعلانية",
+  "entityAd": "الإعلان",
+  "diagnostics": {
+    "low_ctr": {
+      "title": "نسبة النقر أقل من 0.7%",
+      "description": "الحملة تحصل على ظهور لكن نقرات قليلة نسبياً. راجع ملاءمة الإعلان والاستهداف والإبداع."
+    },
+    "ctr_decline": {
+      "title": "انخفاض في نسبة النقر مقارنة بالفترة السابقة",
+      "description": "انخفضت نسبة النقر 30% أو أكثر مقارنة بالفترة السابقة."
+    },
+    "high_cpc": {
+      "title": "تكلفة النقرة أعلى من 10.00",
+      "description": "متوسط تكلفة النقرة يتجاوز الحد الأساسي مما يقلل عدد النقرات لكل دولار منفق."
+    },
+    "high_cpm": {
+      "title": "التكلفة لكل ألف ظهور أعلى من 800.00",
+      "description": "الإعلان يكلف أكثر من الحد الأساسي لكل ألف ظهور."
+    },
+    "creative_low_ctr": {
+      "title": "نسبة نقر الإبداع أقل من 0.7%",
+      "description": "هذا الإبداع أداؤه أقل من المتوقع في التفاعل؛ فكّر في تجربة زوايا جديدة."
+    },
+    "possible_creative_fatigue": {
+      "title": "احتمال إجهاد الإبداع",
+      "description": "تكرار مرتفع مع انخفاض في نسبة النقر بينما الإنفاق مستمر — إشارة إجهاد وليست حكماً قاطعاً."
+    },
+    "low_cvr": {
+      "title": "نسبة التحويل أقل من 3%",
+      "description": "النقرات لا تتحول إلى مشتريات بالمعدل المتوقع."
+    },
+    "cvr_decline": {
+      "title": "انخفاض في نسبة التحويل مقارنة بالفترة السابقة",
+      "description": "انخفضت نسبة تحويل المشتريات 30% أو أكثر مقارنة بالفترة السابقة."
+    },
+    "high_cpa": {
+      "title": "تكلفة الاكتساب أعلى من الهدف",
+      "description": "تكلفة الشراء أعلى من هدف النشاط التجاري أو حد التعادل."
+    },
+    "below_break_even_roas": {
+      "title": "عائد الإنفاق أدنى من نقطة التعادل",
+      "description": "الإيرادات المنسوبة للإعلانات أدنى من عائد التعادل، أي أن النشاط غير مربح."
+    },
+    "below_target_roas": {
+      "title": "عائد الإنفاق أدنى من الهدف",
+      "description": "الإيراد لكل وحدة إنفاق أقل من الهدف المحدد في هدف النشاط التجاري."
+    },
+    "negative_contribution_profit": {
+      "title": "ربح مساهم سلبي",
+      "description": "اقتصاديات الوحدة المتوسطة تنتج ربحاً مساهماً سلبياً لكل عملية بيع."
+    },
+    "declining_contribution_margin": {
+      "title": "انخفاض الهامش مقارنة بالفترة السابقة",
+      "description": "انخفض متوسط هامش المساهمة 15% أو أكثر بينما نمت الإيرادات."
+    },
+    "revenue_profit_divergence": {
+      "title": "نمو الإيرادات مع انخفاض الربح",
+      "description": "نمت الإيرادات 20% على الأقل بينما انخفض ربح المساهمة 15% على الأقل — النمو غير مربح."
+    },
+    "negative_unit_margin": {
+      "title": "هامش وحدة سلبي",
+      "description": "منتج واحد على الأقل يُباع دون حد تعادل المساهمة."
+    },
+    "break_even_unavailable": {
+      "title": "نقطة التعادل غير متاحة",
+      "description": "توجد مشتريات لكن اقتصاديات الوحدة غير متاحة — لا يمكن تقييم الربحية."
+    },
+    "target_cpa_above_viable": {
+      "title": "هدف تكلفة الاكتساب أعلى من الحد المجدي",
+      "description": "هدف التكلفة يتجاوز حد التعادل للنشاط التجاري."
+    },
+    "funnel_bottleneck": {
+      "title": "عنق زجاجة في القمع",
+      "description": "انتقال بين المراحل يتحول بأقل من 5% وهو أكبر انخفاض مرصود."
+    },
+    "low_click_to_purchase_rate": {
+      "title": "معدل نقر-شراء منخفض",
+      "description": "مراحل القمع الوسيطة غير متاحة؛ المشتريات منخفضة مقارنة بالنقرات."
+    },
+    "spend_without_purchase": {
+      "title": "إنفاق دون مشتريات",
+      "description": "يتجاوز الإنفاق 100.00 دون أي مشتريات في الفترة."
+    },
+    "purchase_revenue_mismatch": {
+      "title": "مشتريات دون إيرادات",
+      "description": "توجد طلبات تجارة لكن لا إيرادات مسجلة."
+    },
+    "revenue_purchase_mismatch": {
+      "title": "إيرادات دون مشتريات",
+      "description": "إيرادات مسجلة دون احتساب مشتريات."
+    },
+    "provider_conversion_mismatch": {
+      "title": "تحويلات المزوّد مقابل المشتريات",
+      "description": "تحويلات ميتا المبلّغ عنها تختلف عن مشتريات التجارة بنسبة 50% أو أكثر."
+    },
+    "stale_meta_data": {
+      "title": "بيانات ميتا قديمة",
+      "description": "آخر مزامنة لميتا أقدم من نافذة الحداثة."
+    },
+    "stale_shopify_data": {
+      "title": "بيانات شوبيفاي قديمة",
+      "description": "آخر مزامنة لشوبيفاي أقدم من نافذة الحداثة."
+    },
+    "delayed_meta_data": {
+      "title": "بيانات ميتا متأخرة",
+      "description": "آخر مزامنة لميتا متأخرة؛ الأرقام قد تكون غير مكتملة."
+    },
+    "delayed_shopify_data": {
+      "title": "بيانات شوبيفاي متأخرة",
+      "description": "آخر مزامنة لشوبيفاي متأخرة؛ الأرقام قد تكون غير مكتملة."
+    },
+    "meta_not_connected": {
+      "title": "ميتا غير متصلة",
+      "description": "لا يوجد حساب إعلانات ميتا متصل؛ مقاييس الإعلانات غير متاحة."
+    },
+    "shopify_not_connected": {
+      "title": "شوبيفاي غير متصلة",
+      "description": "لا يوجد متجر شوبيفاي متصل؛ مقاييس التجارة غير متاحة."
+    },
+    "missing_meta_reporting_period": {
+      "title": "فترة إبلاغ ميتا مفقودة",
+      "description": "لا يغطي جدول حقائق ميتا الفترة المطلوبة."
+    },
+    "missing_shopify_reporting_period": {
+      "title": "فترة إبلاغ شوبيفاي مفقودة",
+      "description": "لا يغطي جدول حقائق شوبيفاي الفترة المطلوبة."
+    },
+    "incomplete_reporting_period": {
+      "title": "فترة إبلاغ غير مكتملة",
+      "description": "يوجد يومان أو أكثر مفقودان من النطاق المطلوب."
+    },
+    "unobserved_funnel_stages": {
+      "title": "مراحل قمع غير مرصودة",
+      "description": "مراحل المنتج والسلة والدفع غير مبلّغ عنها من المزوّدات المتصلة."
+    },
+    "recent_sync_failures": {
+      "title": "فشل مزامنة مؤخراً",
+      "description": "فشلت مزامنة أحد المزوّدين خلال آخر 24 ساعة."
+    },
+    "persistent_unprofitable_performance": {
+      "title": "أداء غير مربح مستمر",
+      "description": "بقي الأداء أدنى من نقطة التعادل عبر فترات متتالية؛ يُنصح بالمراجعة."
+    }
+  }
+}

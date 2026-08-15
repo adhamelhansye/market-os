@@ -512,6 +512,11 @@ def row_names_label(id_label: str) -> str:
     }[id_label]
 
 
+# Public alias for the diagnostics engine: entity views stay assembled by THIS
+# module so KPI formulas live in exactly one place.
+entity_metrics_view = _entity_metrics
+
+
 async def campaigns(session: AsyncSession, business: Business, range: Range) -> dict:
     rows = await aggregation.campaign_rollups(
         session, business.id, range, currency=business.currency

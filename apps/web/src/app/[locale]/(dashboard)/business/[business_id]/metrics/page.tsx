@@ -33,6 +33,7 @@ import {
   type RangeKind,
   type SummaryRead,
 } from "@/features/metrics/api";
+import { DiagnosticsSection } from "@/features/diagnostics/diagnostics-section";
 import { formatMoney, formatRatio } from "@/lib/money";
 
 const RANGE_OPTIONS: { value: RangeKind; labelKey: string }[] = [
@@ -478,6 +479,8 @@ export default function MetricsPage() {
           ))}
         </CardContent>
       </Card>
+
+      <DiagnosticsSection businessId={businessId as string} rangeKind={rangeKind} />
     </div>
   );
 }
