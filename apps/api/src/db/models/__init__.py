@@ -11,6 +11,7 @@ from src.db.models.organization import Organization
 from src.db.models.product import Product
 from src.db.models.product_cost import ProductCost
 from src.db.models.product_price import ProductPrice
+from src.db.models.recommendation import Recommendation
 from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
 from src.db.models.user import User
@@ -57,6 +58,7 @@ __all__ = [
     "Product",
     "ProductCost",
     "ProductPrice",
+    "Recommendation",
     "Role",
     "ShippingRule",
     "SyncRun",

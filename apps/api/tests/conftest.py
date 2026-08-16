@@ -141,6 +141,7 @@ async def clean_tables(session: AsyncSession) -> AsyncIterator[None]:
         "products",
         "business_profiles",
         "business_goals",
+        "recommendations",
         "memberships",
         "invitations",
         "businesses",

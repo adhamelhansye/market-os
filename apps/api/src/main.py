@@ -24,6 +24,7 @@ from src.modules.integrations.router import router as integrations_router
 from src.modules.metrics.router import router as metrics_router
 from src.modules.organizations.router import router as organizations_router
 from src.modules.products.router import router as products_router
+from src.modules.recommendations.router import router as recommendations_router
 from src.modules.shipping.router import router as shipping_router
 
 logger = get_logger(__name__)
@@ -77,6 +78,7 @@ def create_app() -> FastAPI:
     app.include_router(metrics_router, prefix=API_PREFIX)
     app.include_router(diagnostics_router, prefix=API_PREFIX)
     app.include_router(forecasting_router, prefix=API_PREFIX)
+    app.include_router(recommendations_router, prefix=API_PREFIX)
 
     return app
 

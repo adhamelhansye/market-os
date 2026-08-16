@@ -1053,6 +1053,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Deterministic review decisions for a business */
+        get: operations["recommendations_list_api_v1_businesses__business_id__recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/recommendations/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Decision summary counters */
+        get: operations["recommendations_summary_api_v1_businesses__business_id__recommendations_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/campaigns/{campaign_id}/recommendation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Deterministic review decision for one campaign */
+        get: operations["campaign_recommendation_api_v1_businesses__business_id__campaigns__campaign_id__recommendation_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/recommendations/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recompute and persist deterministic decisions (idempotent) */
+        post: operations["recommendations_generate_api_v1_businesses__business_id__recommendations_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1769,6 +1837,155 @@ export interface components {
             /** Providers */
             providers: components["schemas"]["ProviderQuality"][];
         };
+        /** DecisionEvidenceRead */
+        DecisionEvidenceRead: {
+            /** Primary Reason */
+            primary_reason: string;
+            /** Evidence Strength */
+            evidence_strength: string;
+            /** Evidence Items */
+            evidence_items?: components["schemas"]["EvidenceItemRead"][];
+            /** Diagnostics Refs */
+            diagnostics_refs?: string[];
+            /** Forecast Refs */
+            forecast_refs?: string[];
+            /** Goal Refs */
+            goal_refs?: string[];
+        };
+        /** DecisionRead */
+        DecisionRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Entity Name */
+            entity_name?: string | null;
+            /** Decision */
+            decision: string;
+            /** Evidence Strength */
+            evidence_strength: string;
+            /** Primary Reason */
+            primary_reason: string;
+            /** Diagnostics */
+            diagnostics?: components["schemas"]["DiagnosticReferenceRead"][];
+            evidence: components["schemas"]["DecisionEvidenceRead"];
+            /** Review Suggestions */
+            review_suggestions?: string[];
+            /** Metrics Snapshot */
+            metrics_snapshot?: {
+                [key: string]: unknown;
+            };
+            /** Forecast Snapshot */
+            forecast_snapshot?: {
+                [key: string]: unknown;
+            } | null;
+            range: components["schemas"]["RangeRead"];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Rules Version */
+            rules_version: string;
+        };
+        /** DecisionSummaryRead */
+        DecisionSummaryRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Total */
+            total: number;
+            /**
+             * Scale Review
+             * @default 0
+             */
+            scale_review: number;
+            /**
+             * Optimize
+             * @default 0
+             */
+            optimize: number;
+            /**
+             * Maintain
+             * @default 0
+             */
+            maintain: number;
+            /**
+             * Kill Review
+             * @default 0
+             */
+            kill_review: number;
+            /**
+             * Learning
+             * @default 0
+             */
+            learning: number;
+            /**
+             * Insufficient Data
+             * @default 0
+             */
+            insufficient_data: number;
+            /**
+             * Tracking Issue
+             * @default 0
+             */
+            tracking_issue: number;
+            /**
+             * Data Quality Issue
+             * @default 0
+             */
+            data_quality_issue: number;
+            /** By Decision */
+            by_decision?: {
+                [key: string]: number;
+            };
+            /** By Entity Type */
+            by_entity_type?: {
+                [key: string]: number;
+            };
+        };
+        /** DecisionsRead */
+        DecisionsRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            range: components["schemas"]["RangeRead"];
+            /** Decisions */
+            decisions?: components["schemas"]["DecisionRead"][];
+            summary: components["schemas"]["DecisionSummaryRead"];
+        };
+        /**
+         * DiagnosticReferenceRead
+         * @description A diagnostic finding referenced by the decision (never re-computed).
+         */
+        DiagnosticReferenceRead: {
+            /** Id */
+            id: string;
+            /** Code */
+            code: string;
+            /** Category */
+            category: string;
+            /** Severity */
+            severity: string;
+            /** Status */
+            status: string;
+        };
         /** DiagnosticsRead */
         DiagnosticsRead: {
             /**
@@ -1933,6 +2150,69 @@ export interface components {
             inventory_value: string | null;
             current_goal: components["schemas"]["GoalRead"] | null;
         };
+        /** EvidenceComparisonRead */
+        EvidenceComparisonRead: {
+            /** Change Percent */
+            change_percent?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** EvidenceFactRead */
+        EvidenceFactRead: {
+            /** Code */
+            code: string;
+            /** Value */
+            value: string;
+            /** Unit */
+            unit?: string | null;
+        };
+        /** EvidenceFunnelRead */
+        EvidenceFunnelRead: {
+            /** From Stage */
+            from_stage?: string | null;
+            /** To Stage */
+            to_stage?: string | null;
+            /** Conversion Rate */
+            conversion_rate?: string | null;
+            /** Previous Rate */
+            previous_rate?: string | null;
+        };
+        /** EvidenceItemRead */
+        EvidenceItemRead: {
+            metric?: components["schemas"]["EvidenceMetricRead"] | null;
+            threshold?: components["schemas"]["EvidenceThresholdRead"] | null;
+            comparison?: components["schemas"]["EvidenceComparisonRead"] | null;
+            funnel?: components["schemas"]["EvidenceFunnelRead"] | null;
+            /** Facts */
+            facts?: components["schemas"]["EvidenceFactRead"][];
+            /** Rule */
+            rule?: string | null;
+            /** Source */
+            source?: string | null;
+        };
+        /** EvidenceMetricRead */
+        EvidenceMetricRead: {
+            /** Code */
+            code: string;
+            /** Current */
+            current?: string | null;
+            /** Previous */
+            previous?: string | null;
+            /** Unit */
+            unit?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+        };
         /** EvidenceRead */
         EvidenceRead: {
             metric?: components["schemas"]["MetricEvidenceRead"] | null;
@@ -1941,6 +2221,17 @@ export interface components {
             funnel?: components["schemas"]["FunnelEvidenceRead"] | null;
             /** Facts */
             facts?: components["schemas"]["FactRead"][];
+        };
+        /** EvidenceThresholdRead */
+        EvidenceThresholdRead: {
+            /** Code */
+            code: string;
+            /** Operator */
+            operator: string;
+            /** Value */
+            value: string;
+            /** Unit */
+            unit?: string | null;
         };
         /** FactRead */
         FactRead: {
@@ -2316,6 +2607,24 @@ export interface components {
             reason?: string | null;
             conversion_rate?: components["schemas"]["MeasureRead"] | null;
             dropoff_rate?: components["schemas"]["MeasureRead"] | null;
+        };
+        /**
+         * GenerateRequest
+         * @description Generate (recompute and persist) recommendations.
+         *
+         *     POST only calculates and stores decisions; it never executes any
+         *     action on providers or budgets.
+         */
+        GenerateRequest: {
+            /**
+             * Range Kind
+             * @default last_30_days
+             */
+            range_kind: string;
+            /** Date From */
+            date_from?: string | null;
+            /** Date To */
+            date_to?: string | null;
         };
         /** GoalComparisonRead */
         GoalComparisonRead: {
@@ -5523,6 +5832,165 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CampaignForecastRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommendations_list_api_v1_businesses__business_id__recommendations_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window (today, yesterday, last_7_days, last_14_days, last_30_days, month_to_date). */
+                range_kind?: string;
+                /** @description Custom range start (alternative to range_kind). */
+                date_from?: string | null;
+                /** @description Custom range end (alternative to range_kind). */
+                date_to?: string | null;
+                /** @description Filter decisions by entity type (business, campaign). */
+                entity_type?: string | null;
+                /** @description Filter decisions to one entity (must belong to the business). */
+                entity_id?: string | null;
+                /** @description Filter by decision type (scale_review, optimize, maintain, kill_review, learning, insufficient_data, tracking_issue, data_quality_issue). */
+                decision?: string | null;
+                /** @description Filter decisions by severity. */
+                severity?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommendations_summary_api_v1_businesses__business_id__recommendations_summary_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window. */
+                range_kind?: string;
+                /** @description Custom range start (alternative to range_kind). */
+                date_from?: string | null;
+                /** @description Custom range end (alternative to range_kind). */
+                date_to?: string | null;
+                /** @description Filter decisions by entity type. */
+                entity_type?: string | null;
+                /** @description Filter decisions to one entity (must belong to the business). */
+                entity_id?: string | null;
+                /** @description Filter by decision type. */
+                decision?: string | null;
+                /** @description Filter decisions by severity. */
+                severity?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionSummaryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    campaign_recommendation_api_v1_businesses__business_id__campaigns__campaign_id__recommendation_get: {
+        parameters: {
+            query?: {
+                /** @description Named reporting window. */
+                range_kind?: string;
+                /** @description Custom range start (alternative to range_kind). */
+                date_from?: string | null;
+                /** @description Custom range end (alternative to range_kind). */
+                date_to?: string | null;
+            };
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommendations_generate_api_v1_businesses__business_id__recommendations_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionsRead"];
                 };
             };
             /** @description Validation Error */

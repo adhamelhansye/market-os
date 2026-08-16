@@ -39,6 +39,10 @@ data-gathering or analysis features exist yet. Phase 3A ships the first
 Phase 4A adds a deterministic **Forecast** engine: statistical forecasts with
 scenarios, confidence intervals, derived KPIs, goal/budget comparison, and
 campaign-level attribution constraints (see `docs/architecture/forecasting.md`).
+Phase 4B adds a deterministic **Decision** engine: review-only structured
+recommendations consuming metrics/diagnostics/forecast/economics/goals,
+with explicit precedence, evidence strength, idempotent persistence and
+strict no-execution safety (see `docs/architecture/recommendations.md`).
 
 ## Layering (backend)
 
@@ -117,6 +121,10 @@ See `docs/architecture/tenancy.md` for the tenancy model and
 | GET | `/api/v1/businesses/{id}/forecast` | bearer | latest persisted forecasts with daily points |
 | POST | `/api/v1/businesses/{id}/forecast/generate` | bearer | generate/refresh forecast idempotently |
 | GET | `/api/v1/businesses/{id}/campaigns/{cid}/forecast` | bearer | per-campaign forecast with CPA/ROAS |
+| GET | `/api/v1/businesses/{id}/recommendations` | bearer | deterministic review decisions + summary + filters (see `recommendations.md`) |
+| GET | `/api/v1/businesses/{id}/recommendations/summary` | bearer | decision counters only |
+| GET | `/api/v1/businesses/{id}/campaigns/{cid}/recommendation` | bearer | one campaign decision |
+| POST | `/api/v1/businesses/{id}/recommendations/generate` | bearer | recompute + persist decisions idempotently (never executes anything) |
 
 Schema: `/openapi.json` (served by FastAPI). Client types are generated from
 this live schema into `packages/shared-types` by
@@ -197,6 +205,7 @@ this live schema into `packages/shared-types` by
 - `docs/architecture/metrics.md` — unified metrics, KPI engine, analytics API
 - `docs/architecture/diagnostics.md` — deterministic findings, evidence-backed diagnostics layer
 - `docs/architecture/forecasting.md` — deterministic forecasting engine, scenarios, confidence, campaign attribution
+- `docs/architecture/recommendations.md` — deterministic decision engine, review-only structured decisions, evidence, safety
 - `docs/adr/0001-monolith.md` — monolith decision
 - `docs/adr/0002-multi-tenancy.md` — tenancy decision (incl. why no RLS yet)
 - `AGENTS.md` — permanent engineering rules
