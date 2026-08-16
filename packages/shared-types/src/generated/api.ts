@@ -985,6 +985,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/forecast/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Deterministic business forecast snapshot */
+        get: operations["forecast_summary_api_v1_businesses__business_id__forecast_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/forecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Latest persisted forecasts with daily points */
+        get: operations["forecast_list_api_v1_businesses__business_id__forecast_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/forecast/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate (or refresh) the deterministic forecast */
+        post: operations["forecast_generate_api_v1_businesses__business_id__forecast_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/campaigns/{campaign_id}/forecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per-campaign deterministic forecast */
+        get: operations["campaign_forecast_api_v1_businesses__business_id__campaigns__campaign_id__forecast_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1120,6 +1188,29 @@ export interface components {
              */
             token_type: "bearer";
             user: components["schemas"]["UserRead"];
+        };
+        /** BudgetComparisonRead */
+        BudgetComparisonRead: {
+            /** Budget */
+            budget?: string | null;
+            /** Forecast Spend */
+            forecast_spend?: string | null;
+            /** Utilization Percent */
+            utilization_percent?: string | null;
+            /** Remaining */
+            remaining?: string | null;
+            /**
+             * Overrun
+             * @default false
+             */
+            overrun: boolean;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
         };
         /** BundleCreate */
         BundleCreate: {
@@ -1388,6 +1479,62 @@ export interface components {
             /** Findings */
             findings: components["schemas"]["FindingRead"][];
             data_quality?: components["schemas"]["ProviderQuality"] | null;
+        };
+        /** CampaignForecastRead */
+        CampaignForecastRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            /**
+             * Campaign Id
+             * Format: uuid
+             */
+            campaign_id: string;
+            /** Horizon Days */
+            horizon_days: number;
+            /**
+             * Forecast Start
+             * Format: date
+             */
+            forecast_start: string;
+            /**
+             * Forecast End
+             * Format: date
+             */
+            forecast_end: string;
+            /**
+             * Training Start
+             * Format: date
+             */
+            training_start: string;
+            /**
+             * Training End
+             * Format: date
+             */
+            training_end: string;
+            /** Confidence Level */
+            confidence_level: string;
+            spend?: components["schemas"]["ForecastRead"] | null;
+            purchases?: components["schemas"]["ForecastRead"] | null;
+            revenue?: components["schemas"]["ForecastRead"] | null;
+            cpa?: components["schemas"]["ForecastValueMoneyRead"] | null;
+            roas?: components["schemas"]["ForecastValueRead"] | null;
+            /**
+             * Data Sufficiency
+             * @default insufficient_data
+             */
+            data_sufficiency: string;
+            break_even_roas?: components["schemas"]["ForecastValueRead"] | null;
+            /** Scenarios */
+            scenarios?: {
+                [key: string]: components["schemas"]["ScenarioTotalsRead"];
+            };
         };
         /** CampaignMetrics */
         CampaignMetrics: {
@@ -1847,6 +1994,291 @@ export interface components {
             /** Review Status */
             review_status?: string | null;
         };
+        /** ForecastGenerateRequest */
+        ForecastGenerateRequest: {
+            /**
+             * Horizon Days
+             * @description One of 7, 14, 30, 60 or 90 days.
+             * @default 30
+             */
+            horizon_days: number;
+            /**
+             * Entity Type
+             * @default business
+             */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Metric Code */
+            metric_code?: string | null;
+            /**
+             * Confidence Level
+             * @default 0.80
+             */
+            confidence_level: number | string;
+            /**
+             * Training Window Days
+             * @description Override the auto-sized training window. Capped at 180.
+             */
+            training_window_days?: number | null;
+        };
+        /** ForecastPointRead */
+        ForecastPointRead: {
+            /**
+             * Date
+             * Format: date
+             */
+            date: string;
+            /** Expected Value */
+            expected_value: string;
+            /** Lower Value */
+            lower_value: string;
+            /** Upper Value */
+            upper_value: string;
+        };
+        /** ForecastRead */
+        ForecastRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Metric Code */
+            metric_code: string;
+            /** Horizon Days */
+            horizon_days: number;
+            /**
+             * Forecast Start
+             * Format: date
+             */
+            forecast_start: string;
+            /**
+             * Forecast End
+             * Format: date
+             */
+            forecast_end: string;
+            /**
+             * Training Start
+             * Format: date
+             */
+            training_start: string;
+            /**
+             * Training End
+             * Format: date
+             */
+            training_end: string;
+            /** Model */
+            model: string;
+            /** Model Version */
+            model_version: string;
+            /** Confidence Level */
+            confidence_level: string;
+            /** Expected Value */
+            expected_value?: string | null;
+            /** Lower Value */
+            lower_value?: string | null;
+            /** Upper Value */
+            upper_value?: string | null;
+            /** Observations Used */
+            observations_used: number;
+            /** Missing Observations */
+            missing_observations: number;
+            /** Backtest Mae */
+            backtest_mae?: string | null;
+            /** Backtest Smape */
+            backtest_smape?: string | null;
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Currency */
+            currency: string;
+            /** Source */
+            source: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ForecastSummaryRead */
+        ForecastSummaryRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Timezone */
+            timezone: string;
+            /** Horizon Days */
+            horizon_days: number;
+            /**
+             * Forecast Start
+             * Format: date
+             */
+            forecast_start: string;
+            /**
+             * Forecast End
+             * Format: date
+             */
+            forecast_end: string;
+            /**
+             * Training Start
+             * Format: date
+             */
+            training_start: string;
+            /**
+             * Training End
+             * Format: date
+             */
+            training_end: string;
+            /** Confidence Level */
+            confidence_level: string;
+            /** Metrics */
+            metrics: components["schemas"]["ForecastRead"][];
+            /** Goals */
+            goals?: components["schemas"]["GoalComparisonRead"][];
+            budget?: components["schemas"]["BudgetComparisonRead"] | null;
+            /** Scenario Totals */
+            scenario_totals?: {
+                [key: string]: components["schemas"]["ScenarioTotalsRead"];
+            };
+        };
+        /** ForecastValueMoneyRead */
+        ForecastValueMoneyRead: {
+            /** Value */
+            value?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Currency */
+            currency?: string | null;
+            /** Source */
+            source?: string | null;
+        };
+        /** ForecastValueRead */
+        ForecastValueRead: {
+            /** Value */
+            value?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+        };
+        /** ForecastWithPointsRead */
+        ForecastWithPointsRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Metric Code */
+            metric_code: string;
+            /** Horizon Days */
+            horizon_days: number;
+            /**
+             * Forecast Start
+             * Format: date
+             */
+            forecast_start: string;
+            /**
+             * Forecast End
+             * Format: date
+             */
+            forecast_end: string;
+            /**
+             * Training Start
+             * Format: date
+             */
+            training_start: string;
+            /**
+             * Training End
+             * Format: date
+             */
+            training_end: string;
+            /** Model */
+            model: string;
+            /** Model Version */
+            model_version: string;
+            /** Confidence Level */
+            confidence_level: string;
+            /** Expected Value */
+            expected_value?: string | null;
+            /** Lower Value */
+            lower_value?: string | null;
+            /** Upper Value */
+            upper_value?: string | null;
+            /** Observations Used */
+            observations_used: number;
+            /** Missing Observations */
+            missing_observations: number;
+            /** Backtest Mae */
+            backtest_mae?: string | null;
+            /** Backtest Smape */
+            backtest_smape?: string | null;
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Currency */
+            currency: string;
+            /** Source */
+            source: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Points */
+            points?: components["schemas"]["ForecastPointRead"][];
+        };
         /** FunnelEvidenceRead */
         FunnelEvidenceRead: {
             /** From Stage */
@@ -1884,6 +2316,26 @@ export interface components {
             reason?: string | null;
             conversion_rate?: components["schemas"]["MeasureRead"] | null;
             dropoff_rate?: components["schemas"]["MeasureRead"] | null;
+        };
+        /** GoalComparisonRead */
+        GoalComparisonRead: {
+            /** Metric Code */
+            metric_code: string;
+            /** Target Value */
+            target_value?: string | null;
+            /** Forecast Value */
+            forecast_value?: string | null;
+            /** Gap */
+            gap?: string | null;
+            /** Gap Percent */
+            gap_percent?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
         };
         /** GoalCreate */
         GoalCreate: {
@@ -2574,6 +3026,17 @@ export interface components {
             ready_for_review: boolean;
             /** Gates */
             gates?: components["schemas"]["FactRead"][];
+        };
+        /** ScenarioTotalsRead */
+        ScenarioTotalsRead: {
+            /** Metric Code */
+            metric_code: string;
+            /** Expected */
+            expected: string;
+            /** Lower */
+            lower: string;
+            /** Upper */
+            upper: string;
         };
         /** ShippingRuleCreate */
         ShippingRuleCreate: {
@@ -4927,6 +5390,139 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CampaignDiagnosticsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    forecast_summary_api_v1_businesses__business_id__forecast_summary_get: {
+        parameters: {
+            query?: {
+                /** @description Forecast horizon (7, 14, 30, 60 or 90 days). */
+                horizon_days?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ForecastSummaryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    forecast_list_api_v1_businesses__business_id__forecast_get: {
+        parameters: {
+            query?: {
+                /** @description Forecast horizon (7, 14, 30, 60 or 90 days). */
+                horizon_days?: number;
+                /** @description Restrict to one metric. */
+                metric_code?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ForecastWithPointsRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    forecast_generate_api_v1_businesses__business_id__forecast_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForecastGenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ForecastWithPointsRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    campaign_forecast_api_v1_businesses__business_id__campaigns__campaign_id__forecast_get: {
+        parameters: {
+            query?: {
+                /** @description Forecast horizon (7, 14, 30, 60 or 90 days). */
+                horizon_days?: number;
+            };
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CampaignForecastRead"];
                 };
             };
             /** @description Validation Error */

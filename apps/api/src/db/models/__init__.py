@@ -3,6 +3,7 @@ from src.db.models.business import Business
 from src.db.models.business_goal import BusinessGoal
 from src.db.models.business_profile import BusinessProfile
 from src.db.models.discount import Discount
+from src.db.models.forecast import Forecast, ForecastPoint
 from src.db.models.inventory_snapshot import InventorySnapshot
 from src.db.models.invitation import Invitation
 from src.db.models.membership import Membership
@@ -43,10 +44,12 @@ __all__ = [
     "Creative",
     "Customer",
     "Discount",
+    "Forecast",
+    "ForecastPoint",
     "IntegrationConnection",
     "IntegrationCredential",
-    "InventorySnapshot",
     "Invitation",
+    "InventorySnapshot",
     "Membership",
     "Order",
     "OrderItem",

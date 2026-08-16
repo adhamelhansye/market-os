@@ -141,6 +141,32 @@ async def ad_timeseries(
     return [dict(row._mapping) for row in await session.execute(stmt)]
 
 
+async def campaign_timeseries(
+    session: AsyncSession,
+    business_id,
+    range: Range,
+    *,
+    currency: str,
+    campaign_id,
+) -> list[dict[str, Any]]:
+    """Daily advertising totals for a single campaign — one row per date with facts."""
+    stmt = (
+        select(F["date"], *_sums(_AD_FACT_COLUMNS))
+        .select_from(metric_facts)
+        .where(
+            F["business_id"] == business_id,
+            F["grain"] == "ad",
+            F["campaign_id"] == campaign_id,
+            F["date"] >= range.start,
+            F["date"] <= range.end,
+            F["currency"] == currency,
+        )
+        .group_by(F["date"])
+        .order_by(F["date"])
+    )
+    return [dict(row._mapping) for row in await session.execute(stmt)]
+
+
 async def commerce_timeseries(
     session: AsyncSession, business_id, range: Range, *, currency: str
 ) -> list[dict[str, Any]]:
@@ -349,5 +375,6 @@ __all__ = [
     "product_totals",
     "provider_coverage",
     "resolve_entity",
+    "campaign_timeseries",
     "EntityKind",
 ]

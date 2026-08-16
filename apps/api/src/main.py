@@ -17,6 +17,7 @@ from src.modules.businesses.router import router as businesses_router
 from src.modules.diagnostics.router import router as diagnostics_router
 from src.modules.discounts.router import router as discounts_router
 from src.modules.economics.router import router as economics_router
+from src.modules.forecasting.router import router as forecasting_router
 from src.modules.goals.router import router as goals_router
 from src.modules.health.router import router as health_router
 from src.modules.integrations.router import router as integrations_router
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
     app.include_router(integrations_router, prefix=API_PREFIX)
     app.include_router(metrics_router, prefix=API_PREFIX)
     app.include_router(diagnostics_router, prefix=API_PREFIX)
+    app.include_router(forecasting_router, prefix=API_PREFIX)
 
     return app
 
