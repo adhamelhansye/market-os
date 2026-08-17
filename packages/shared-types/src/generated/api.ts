@@ -1319,7 +1319,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Search evidence across statements, excerpts and source titles */
+        /** Search research content across evidence, sources, findings and competitors */
         get: operations["research_evidence_search_api_v1_businesses__business_id__research_search_get"];
         put?: never;
         post?: never;
@@ -3708,10 +3708,10 @@ export interface components {
             /** Captured At */
             captured_at?: string | null;
             /**
-             * Confidence
+             * Classification
              * @default observed
              */
-            confidence: string;
+            classification: string;
             /**
              * Provenance
              * @default collected
@@ -3754,8 +3754,8 @@ export interface components {
              * Format: date-time
              */
             captured_at: string;
-            /** Confidence */
-            confidence: string;
+            /** Classification */
+            classification: string;
             /** Provenance */
             provenance: string;
             /**
@@ -3776,12 +3776,17 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Source Id
+             * Format: uuid
+             */
+            source_id: string;
             /** Evidence Type */
             evidence_type: string;
             /** Statement */
             statement: string;
-            /** Confidence */
-            confidence: string;
+            /** Classification */
+            classification: string;
             /** Provenance */
             provenance: string;
             /** Raw Excerpt */
@@ -3985,6 +3990,39 @@ export interface components {
         ResearchProjectStatusRequest: {
             /** Status */
             status: string;
+        };
+        /** ResearchSearchHitResponse */
+        ResearchSearchHitResponse: {
+            /** Entity Type */
+            entity_type: string;
+            /**
+             * Entity Id
+             * Format: uuid
+             */
+            entity_id: string;
+            /** Title */
+            title: string;
+            /** Statement */
+            statement?: string | null;
+            /** Source Id */
+            source_id?: string | null;
+            /** Source Title */
+            source_title?: string | null;
+            /** Source Domain */
+            source_domain?: string | null;
+            /** Evidence Type */
+            evidence_type?: string | null;
+            /** Classification */
+            classification?: string | null;
+            /** Captured At */
+            captured_at?: string | null;
+        };
+        /** ResearchSearchResponse */
+        ResearchSearchResponse: {
+            /** Hits */
+            hits: components["schemas"]["ResearchSearchHitResponse"][];
+            /** Total */
+            total: number;
         };
         /** ResearchSnapshotResponse */
         ResearchSnapshotResponse: {
@@ -7604,7 +7642,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResearchEvidenceListResponse"];
+                    "application/json": components["schemas"]["ResearchSearchResponse"];
                 };
             };
             /** @description Validation Error */
@@ -7623,6 +7661,7 @@ export interface operations {
             query?: {
                 evidence_type?: string | null;
                 source_id?: string | null;
+                classification?: string | null;
                 confidence?: string | null;
                 provenance?: string | null;
                 limit?: number;

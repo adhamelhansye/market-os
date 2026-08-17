@@ -16,7 +16,7 @@ import uuid
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 from src.modules.research.constants import (
     CLASSIFICATION_VALUES,
@@ -134,7 +134,7 @@ class ResearchEvidenceResponse(BaseModel):
     structured_value: dict[str, Any] | None = None
     unit: str | None = None
     captured_at: datetime
-    confidence: str
+    classification: str
     provenance: str
     created_at: datetime
     updated_at: datetime
@@ -162,9 +162,10 @@ class ResearchFindingResponse(BaseModel):
 
 class ResearchEvidenceSummary(BaseModel):
     id: uuid.UUID
+    source_id: uuid.UUID
     evidence_type: str
     statement: str
-    confidence: str
+    classification: str
     provenance: str
     raw_excerpt: str | None = None
 
@@ -175,6 +176,24 @@ class ResearchFindingDetailResponse(ResearchFindingResponse):
 
 class ResearchFindingListResponse(BaseModel):
     findings: list[ResearchFindingResponse]
+    total: int
+
+
+class ResearchSearchHitResponse(BaseModel):
+    entity_type: str
+    entity_id: uuid.UUID
+    title: str
+    statement: str | None = None
+    source_id: uuid.UUID | None = None
+    source_title: str | None = None
+    source_domain: str | None = None
+    evidence_type: str | None = None
+    classification: str | None = None
+    captured_at: datetime | None = None
+
+
+class ResearchSearchResponse(BaseModel):
+    hits: list[ResearchSearchHitResponse]
     total: int
 
 
@@ -223,7 +242,10 @@ class ResearchEvidenceCreateRequest(BaseModel):
     structured_value: dict[str, Any] | None = None
     unit: str | None = Field(default=None, max_length=20)
     captured_at: datetime | None = None
-    confidence: str = "observed"
+    classification: str = Field(
+        default="observed",
+        validation_alias=AliasChoices("classification", "confidence"),
+    )
     provenance: str = "collected"
 
 

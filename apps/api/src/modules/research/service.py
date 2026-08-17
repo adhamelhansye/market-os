@@ -67,9 +67,9 @@ from src.modules.research.schemas import (
     ResearchFindingCreateRequest,
     ResearchProjectCreateRequest,
     ResearchProjectStatusRequest,
+    ResearchSearchHitResponse,
     ResearchSourceCreateRequest,
     validate_classification,
-    validate_confidence,
     validate_evidence_type,
     validate_finding_category,
     validate_importance,
@@ -292,11 +292,15 @@ class ResearchStore:
                 select(ResearchFinding.category).where(*where_finding)
             )
     )
-        coverage = (
-            round(100 * len(covered) / len(FINDING_CATEGORIES), 1)
-            if FINDING_CATEGORIES
-            else 0.0
-    )
+        total_categories = len(FINDING_CATEGORIES)
+        coverage = {
+            "status": "available" if total_categories > 0 else "unavailable",
+            "covered_categories": len(covered),
+            "total_categories": total_categories,
+            "missing_areas": sorted(FINDING_CATEGORIES.difference(covered)),
+        }
+        if total_categories == 0:
+            coverage["reason"] = "no finding categories configured"
         latest = list(
             await session.scalars(
                 select(ResearchEvidence.captured_at)
@@ -547,7 +551,7 @@ class ResearchStore:
         created_by: uuid.UUID | None,
     ) -> ResearchEvidence:
         validate_evidence_type(request.evidence_type)
-        validate_confidence(request.confidence)
+        classification = validate_classification(request.classification)
         validate_provenance(request.provenance)
         session = self._session_factory
         source = await session.scalar(
@@ -560,22 +564,19 @@ class ResearchStore:
         if source is None:
             raise ResearchNotFoundError("source", str(request.source_id))
 
-        classification = request.confidence or "observed"
         # Deterministic quality rule: explicit reasoning applied
         # (raw excerpt + structured value) is no longer pure
         # observation — reject unless the submitter explicitly
         # classifies it inferred or weaker.
-        if request.raw_excerpt and request.structured_value:
-            if request.confidence in ("observed", "supported"):
-                raise ResearchConfirmationError(
-                    classification="inferred",
-                    reasons=["excerpt_and_structured_value"],
-                    details=[
-                        "Evidence with both a raw excerpt and a structured value "
-                        "implies reasoning; re-submit with confidence=inferred."
-                    ],
-                )
-            classification = request.confidence or "inferred"
+        if request.raw_excerpt and request.structured_value and classification == "observed":
+            raise ResearchConfirmationError(
+                classification="inferred",
+                reasons=["excerpt_and_structured_value"],
+                details=[
+                    "Evidence with both a raw excerpt and a structured value "
+                    "implies reasoning; re-submit with classification=inferred."
+                ],
+            )
 
         evidence = ResearchEvidence(
             organization_id=business.organization_id,
@@ -602,6 +603,7 @@ class ResearchStore:
         *,
         evidence_type: str | None = None,
         source_id: uuid.UUID | None = None,
+        classification: str | None = None,
         confidence: str | None = None,
         provenance: str | None = None,
         limit: int = 100,
@@ -615,8 +617,8 @@ class ResearchStore:
             where.append(ResearchEvidence.evidence_type == evidence_type)
         if source_id is not None:
             where.append(ResearchEvidence.source_id == source_id)
-        if confidence:
-            where.append(ResearchEvidence.confidence == confidence)
+        if classification or confidence:
+            where.append(ResearchEvidence.confidence == (classification or confidence))
         if provenance:
             where.append(ResearchEvidence.provenance == provenance)
         total = int(
@@ -676,28 +678,24 @@ class ResearchStore:
             missing = [str(eid) for eid in evidence_ids if eid not in set(valid_ids)]
             if missing:
                 raise ResearchNotFoundError("evidence", missing[0])
+        if not valid_ids:
+            raise ResearchConfirmationError(
+                classification=request.classification or "inferred",
+                reasons=["finding_requires_evidence"],
+                details=["A finding must reference at least one evidence record."],
+            )
 
         # Deterministic default classification ladder:
         #   evidence attached -> inferred
-        #   no evidence       -> hypothesis
         #   explicit observed -> only with supporting evidence
         classification = request.classification
         if classification is None:
-            classification = "inferred" if valid_ids else "hypothesis"
+            classification = "inferred"
         if classification not in ("observed", "inferred", "hypothesis"):
             raise ResearchClassificationError(
                 "finding.classification",
                 classification,
                 frozenset({"observed", "inferred", "hypothesis"}),
-            )
-        if classification == "hypothesis" and valid_ids:
-            raise ResearchConfirmationError(
-                classification="hypothesis",
-                reasons=["hypothesis_cannot_have_evidence"],
-                details=[
-                    "A hypothesis must not be created with supporting evidence; "
-                    "attach evidence first, then re-classify."
-                ],
             )
         if classification == "observed" and not valid_ids:
             raise ResearchConfirmationError(
@@ -815,36 +813,133 @@ class ResearchStore:
     # ------------------------------------------------------------------
     # Search (deterministic LIKE over text columns; no vector store)
     # ------------------------------------------------------------------
-    async def search_evidence(
+    async def search_research(
         self, business: Business, query: str, *, limit: int = 20
-    ) -> list[ResearchEvidence]:
+    ) -> list[ResearchSearchHitResponse]:
         pattern = f"%{query.strip()}%"
         session = self._session_factory
-        return list(
+        hits: list[ResearchSearchHitResponse] = []
+
+        evidence_rows = list(
             await session.scalars(
                 select(ResearchEvidence)
+                .join(ResearchSource, ResearchSource.id == ResearchEvidence.source_id)
                 .where(
                     ResearchEvidence.organization_id == business.organization_id,
                     ResearchEvidence.business_id == business.id,
                     or_(
                         ResearchEvidence.statement.ilike(pattern),
                         ResearchEvidence.raw_excerpt.ilike(pattern),
-                        ResearchEvidence.source_id.in_(
-                            select(ResearchSource.id).where(
-                                ResearchSource.organization_id == business.organization_id,
-                                ResearchSource.business_id == business.id,
-                                or_(
-                                    ResearchSource.title.ilike(pattern),
-                                    ResearchSource.url.ilike(pattern),
-                                ),
-                            )
-                        ),
+                        ResearchSource.title.ilike(pattern),
+                        ResearchSource.domain.ilike(pattern),
                     ),
                 )
                 .order_by(desc(ResearchEvidence.created_at))
                 .limit(limit)
             )
-    )
+        )
+        for evidence in evidence_rows:
+            source = await session.get(ResearchSource, evidence.source_id)
+            hits.append(
+                ResearchSearchHitResponse(
+                    entity_type="evidence",
+                    entity_id=evidence.id,
+                    title=evidence.evidence_type,
+                    statement=evidence.statement,
+                    source_id=evidence.source_id,
+                    source_title=source.title if source else None,
+                    source_domain=source.domain if source else None,
+                    evidence_type=evidence.evidence_type,
+                    classification=evidence.confidence,
+                    captured_at=evidence.captured_at,
+                )
+            )
+
+        source_rows = list(
+            await session.scalars(
+                select(ResearchSource)
+                .where(
+                    ResearchSource.organization_id == business.organization_id,
+                    ResearchSource.business_id == business.id,
+                    or_(
+                        ResearchSource.title.ilike(pattern),
+                        ResearchSource.domain.ilike(pattern),
+                    ),
+                )
+                .order_by(desc(ResearchSource.created_at))
+                .limit(limit)
+            )
+        )
+        for source in source_rows:
+            hits.append(
+                ResearchSearchHitResponse(
+                    entity_type="source",
+                    entity_id=source.id,
+                    title=source.title,
+                    statement=source.url or source.domain,
+                    source_id=source.id,
+                    source_title=source.title,
+                    source_domain=source.domain,
+                    captured_at=source.captured_at,
+                )
+            )
+
+        finding_rows = list(
+            await session.scalars(
+                select(ResearchFinding)
+                .where(
+                    ResearchFinding.organization_id == business.organization_id,
+                    ResearchFinding.business_id == business.id,
+                    or_(
+                        ResearchFinding.title.ilike(pattern),
+                        ResearchFinding.statement.ilike(pattern),
+                    ),
+                )
+                .order_by(desc(ResearchFinding.created_at))
+                .limit(limit)
+            )
+        )
+        for finding in finding_rows:
+            hits.append(
+                ResearchSearchHitResponse(
+                    entity_type="finding",
+                    entity_id=finding.id,
+                    title=finding.title,
+                    statement=finding.statement,
+                    classification=finding.classification,
+                    captured_at=finding.created_at,
+                )
+            )
+
+        competitor_rows = list(
+            await session.scalars(
+                select(ResearchCompetitor)
+                .where(
+                    ResearchCompetitor.organization_id == business.organization_id,
+                    ResearchCompetitor.business_id == business.id,
+                    ResearchCompetitor.name.ilike(pattern),
+                )
+                .order_by(desc(ResearchCompetitor.created_at))
+                .limit(limit)
+            )
+        )
+        for competitor in competitor_rows:
+            hits.append(
+                ResearchSearchHitResponse(
+                    entity_type="competitor",
+                    entity_id=competitor.id,
+                    title=competitor.name,
+                    statement=competitor.description or competitor.market,
+                    source_domain=competitor.domain,
+                    captured_at=competitor.created_at,
+                )
+            )
+
+        hits.sort(
+            key=lambda item: item.captured_at or datetime.min.replace(tzinfo=UTC),
+            reverse=True,
+        )
+        return hits[:limit]
 
 
 __all__ = ["ResearchStore"]

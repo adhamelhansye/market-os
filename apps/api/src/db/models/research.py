@@ -224,6 +224,14 @@ class ResearchEvidence(Base):
         onupdate=func.now(),
     )
 
+    @property
+    def classification(self) -> str:
+        return self.confidence
+
+    @classification.setter
+    def classification(self, value: str) -> None:
+        self.confidence = value
+
 
 class ResearchFinding(Base):
     __tablename__ = "research_findings"

@@ -53,6 +53,7 @@ from src.modules.research.schemas import (
     ResearchProjectListResponse,
     ResearchProjectResponse,
     ResearchProjectStatusRequest,
+    ResearchSearchResponse,
     ResearchSnapshotResponse,
     ResearchSourceCreateRequest,
     ResearchSourceDetailResponse,
@@ -324,8 +325,8 @@ async def research_source_get(
 # ---------------------------------------------------------------------------
 @router.get(
     "/businesses/{business_id}/research/search",
-    response_model=ResearchEvidenceListResponse,
-    summary="Search evidence across statements, excerpts and source titles",
+    response_model=ResearchSearchResponse,
+    summary="Search research content across evidence, sources, findings and competitors",
 )
 async def research_evidence_search(
     business_id: CurrentBusinessId,
@@ -333,12 +334,10 @@ async def research_evidence_search(
     session: DbSession,
     q: Annotated[str, Query(min_length=1, max_length=200, description="Search text.")],
     limit: Annotated[int, Query(ge=1, le=200)] = 20,
-) -> ResearchEvidenceListResponse:
+) -> ResearchSearchResponse:
     business = await get_business(session, business_id)
-    rows = await _get_store(session).search_evidence(business, q, limit=limit)
-    return ResearchEvidenceListResponse(
-        evidence=[_to_evidence_response(e) for e in rows], total=len(rows)
-    )
+    rows = await _get_store(session).search_research(business, q, limit=limit)
+    return ResearchSearchResponse(hits=rows, total=len(rows))
 
 
 @router.get(
@@ -352,6 +351,7 @@ async def research_evidence_list(
     session: DbSession,
     evidence_type: Annotated[str | None, Query()] = None,
     source_id: Annotated[uuid.UUID | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
     confidence: Annotated[str | None, Query()] = None,
     provenance: Annotated[str | None, Query()] = None,
     limit: Annotated[int, Query(ge=1, le=200)] = 100,
@@ -361,6 +361,7 @@ async def research_evidence_list(
         business,
         evidence_type=evidence_type,
         source_id=source_id,
+        classification=classification,
         confidence=confidence,
         provenance=provenance,
         limit=limit,
@@ -462,9 +463,10 @@ async def research_finding_get(
     response.evidence = [
         ResearchEvidenceSummary(
             id=e.id,
+            source_id=e.source_id,
             evidence_type=e.evidence_type,
             statement=e.statement,
-            confidence=e.confidence,
+            classification=e.classification,
             provenance=e.provenance,
             raw_excerpt=e.raw_excerpt,
         )

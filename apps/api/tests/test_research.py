@@ -11,11 +11,8 @@ from __future__ import annotations
 
 import uuid
 
+from conftest import create_tenant
 from httpx import AsyncClient
-
-from tests.conftest import (
-    create_tenant,
-)
 
 
 def _url(business_id, *parts) -> str:
@@ -130,7 +127,9 @@ async def test_project_detail_includes_data_quality(tenant, client: AsyncClient)
     assert body["source_count"] == 0
     assert body["evidence_count"] == 0
     assert body["finding_count"] == 0
-    assert body["data_quality"]["coverage"] == 0.0
+    assert body["data_quality"]["coverage"]["status"] == "available"
+    assert body["data_quality"]["coverage"]["covered_categories"] == 0
+    assert body["data_quality"]["coverage"]["total_categories"] > 0
     assert body["data_quality"]["missing_areas"]
 
 
@@ -259,7 +258,7 @@ async def test_create_evidence_defaults_observed(tenant, client: AsyncClient):
     )
     assert response.status_code == 201
     body = response.json()
-    assert body["confidence"] == "observed"
+    assert body["classification"] == "observed"
     assert body["provenance"] == "collected"
 
 
@@ -285,10 +284,10 @@ async def test_evidence_excerpt_plus_structured_requires_confirmation(tenant, cl
         uuid.UUID(source["id"]),
         raw_excerpt='"30-day returns"',
         structured_value={"return_days": 30},
-        confidence="inferred",
+        classification="inferred",
     )
     assert response.status_code == 201
-    assert response.json()["confidence"] == "inferred"
+    assert response.json()["classification"] == "inferred"
 
 
 async def test_evidence_money_never_float(tenant, client: AsyncClient):
@@ -320,7 +319,7 @@ async def test_evidence_invalid_confidence(tenant, client: AsyncClient):
         tenant["headers"],
         tenant["business"].id,
         uuid.UUID(source["id"]),
-        confidence="certain",
+        classification="certain",
     )
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "invalid_classification"
@@ -362,7 +361,7 @@ async def test_finding_defaults_inferred_with_evidence(tenant, client: AsyncClie
     assert body["evidence_strength"] == "weak"  # 1 evidence
 
 
-async def test_finding_defaults_hypothesis_without_evidence(tenant, client: AsyncClient):
+async def test_finding_requires_evidence(tenant, client: AsyncClient):
     project = (await _create_project(client, tenant["headers"], tenant["business"].id)).json()
     response = await client.post(
         _url(tenant["business"].id, "findings"),
@@ -374,12 +373,12 @@ async def test_finding_defaults_hypothesis_without_evidence(tenant, client: Asyn
         },
         headers=tenant["headers"],
     )
-    assert response.status_code == 201
-    assert response.json()["classification"] == "hypothesis"
-    assert response.json()["evidence_strength"] == "insufficient"
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "requires_confirmation"
+    assert response.json()["error"]["details"]["reasons"] == ["finding_requires_evidence"]
 
 
-async def test_hypothesis_with_evidence_rejected(tenant, client: AsyncClient):
+async def test_hypothesis_with_evidence_allowed(tenant, client: AsyncClient):
     project = (await _create_project(client, tenant["headers"], tenant["business"].id)).json()
     source = (await _create_source(client, tenant["headers"], tenant["business"].id)).json()
     evidence = (
@@ -399,8 +398,8 @@ async def test_hypothesis_with_evidence_rejected(tenant, client: AsyncClient):
         },
         headers=tenant["headers"],
     )
-    assert response.status_code == 422
-    assert response.json()["error"]["code"] == "requires_confirmation"
+    assert response.status_code == 201
+    assert response.json()["classification"] == "hypothesis"
 
 
 async def test_observed_without_evidence_rejected(tenant, client: AsyncClient):
@@ -432,7 +431,7 @@ async def test_finding_evidence_strength_ladder(tenant, client: AsyncClient):
                 tenant["business"].id,
                 uuid.UUID(source["id"]),
                 statement=f"Claim {i}",
-                confidence="observed",
+                classification="observed",
             )
         ).json()
         evidence_ids.append(row["id"])
@@ -511,7 +510,7 @@ async def test_evidence_filters(tenant, client: AsyncClient):
         uuid.UUID(source["id"]),
         evidence_type="pricing",
         statement="Priced at 99",
-        confidence="inferred",
+        classification="inferred",
     )
     response = await client.get(
         _url(tenant["business"].id, "evidence"),
@@ -522,7 +521,7 @@ async def test_evidence_filters(tenant, client: AsyncClient):
     assert response.json()["total"] == 1
     response = await client.get(
         _url(tenant["business"].id, "evidence"),
-        params={"confidence": "observed"},
+        params={"classification": "observed"},
         headers=tenant["headers"],
     )
     assert response.json()["total"] == 1
@@ -530,6 +529,12 @@ async def test_evidence_filters(tenant, client: AsyncClient):
 
 async def test_finding_filters(tenant, client: AsyncClient):
     project = (await _create_project(client, tenant["headers"], tenant["business"].id)).json()
+    source = (await _create_source(client, tenant["headers"], tenant["business"].id)).json()
+    evidence = (
+        await _create_evidence(
+            client, tenant["headers"], tenant["business"].id, uuid.UUID(source["id"])
+        )
+    ).json()
     await client.post(
         _url(tenant["business"].id, "findings"),
         json={
@@ -537,6 +542,7 @@ async def test_finding_filters(tenant, client: AsyncClient):
             "category": "customer",
             "title": "One",
             "statement": "S",
+            "evidence_ids": [evidence["id"]],
         },
         headers=tenant["headers"],
     )
@@ -547,12 +553,13 @@ async def test_finding_filters(tenant, client: AsyncClient):
             "category": "pricing",
             "title": "Two",
             "statement": "S",
+            "evidence_ids": [evidence["id"]],
         },
         headers=tenant["headers"],
     )
     response = await client.get(
         _url(tenant["business"].id, "findings"),
-        params={"category": "pricing", "classification": "hypothesis"},
+        params={"category": "pricing", "classification": "inferred"},
         headers=tenant["headers"],
     )
     assert response.status_code == 200
@@ -574,25 +581,42 @@ async def test_source_filters(tenant, client: AsyncClient):
     assert response.json()["total"] == 1
 
 
-async def test_search_evidence_by_statement(tenant, client: AsyncClient):
+async def test_search_research_spans_content_types(tenant, client: AsyncClient):
+    await _create_competitor(client, tenant["headers"], tenant["business"].id)
     source = (await _create_source(client, tenant["headers"], tenant["business"].id)).json()
-    await _create_evidence(
-        client,
-        tenant["headers"],
-        tenant["business"].id,
-        uuid.UUID(source["id"]),
-        statement="Customers mention free shipping often",
+    project = (await _create_project(client, tenant["headers"], tenant["business"].id)).json()
+    evidence = (
+        await _create_evidence(
+            client,
+            tenant["headers"],
+            tenant["business"].id,
+            uuid.UUID(source["id"]),
+            statement="Customers mention free shipping often",
+        )
+    ).json()
+    await client.post(
+        _url(tenant["business"].id, "findings"),
+        json={
+            "research_project_id": project["id"],
+            "category": "messaging",
+            "title": "Free shipping",
+            "statement": "Customers talk about free shipping a lot.",
+            "evidence_ids": [evidence["id"]],
+        },
+        headers=tenant["headers"],
     )
     response = await client.get(
-        _url(tenant["business"].id, "evidence"),
+        _url(tenant["business"].id, "search"),
         params={"q": "free shipping"},
         headers=tenant["headers"],
     )
     assert response.status_code == 200
-    assert response.json()["total"] == 1
+    assert any(hit["entity_type"] == "evidence" for hit in response.json()["hits"])
+    assert any(hit["entity_type"] == "finding" for hit in response.json()["hits"])
 
 
-async def test_search_evidence_by_source_title(tenant, client: AsyncClient):
+async def test_search_research_finds_source_and_competitor(tenant, client: AsyncClient):
+    competitor = (await _create_competitor(client, tenant["headers"], tenant["business"].id)).json()
     source = (
         await _create_source(
             client,
@@ -602,20 +626,18 @@ async def test_search_evidence_by_source_title(tenant, client: AsyncClient):
             content="Review body.",
         )
     ).json()
-    await _create_evidence(
-        client,
-        tenant["headers"],
-        tenant["business"].id,
-        uuid.UUID(source["id"]),
-        statement="Neutral claim",
-    )
     response = await client.get(
-        _url(tenant["business"].id, "evidence"),
-        params={"q": "deep review"},
+        _url(tenant["business"].id, "search"),
+        params={"q": "acme"},
         headers=tenant["headers"],
     )
     assert response.status_code == 200
-    assert response.json()["total"] == 1
+    hits = response.json()["hits"]
+    assert any(hit["entity_type"] == "source" and hit["entity_id"] == source["id"] for hit in hits)
+    assert any(
+        hit["entity_type"] == "competitor" and hit["entity_id"] == competitor["id"]
+        for hit in hits
+    )
 
 
 # ---------------------------------------------------------------------------
