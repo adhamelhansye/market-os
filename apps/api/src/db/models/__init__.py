@@ -12,6 +12,15 @@ from src.db.models.product import Product
 from src.db.models.product_cost import ProductCost
 from src.db.models.product_price import ProductPrice
 from src.db.models.recommendation import Recommendation
+from src.db.models.research import (
+    ResearchCompetitor,
+    ResearchEvidence,
+    ResearchFinding,
+    ResearchProject,
+    ResearchSource,
+    ResearchSourceSnapshot,
+    research_finding_evidence,
+)
 from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
 from src.db.models.simulation import Simulation, SimulationAssumption, SimulationResult
@@ -60,6 +69,13 @@ __all__ = [
     "ProductCost",
     "ProductPrice",
     "Recommendation",
+    "ResearchCompetitor",
+    "ResearchEvidence",
+    "ResearchFinding",
+    "ResearchProject",
+    "ResearchSource",
+    "ResearchSourceSnapshot",
+    "research_finding_evidence",
     "Role",
     "ShippingRule",
     "Simulation",

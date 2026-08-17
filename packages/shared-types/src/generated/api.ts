@@ -1190,6 +1190,198 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/research/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List research projects */
+        get: operations["research_project_list_api_v1_businesses__business_id__research_projects_get"];
+        put?: never;
+        /** Create a research project */
+        post: operations["research_project_create_api_v1_businesses__business_id__research_projects_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a research project with data-quality summary */
+        get: operations["research_project_get_api_v1_businesses__business_id__research_projects__project_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/projects/{project_id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Update research project status */
+        patch: operations["research_project_status_api_v1_businesses__business_id__research_projects__project_id__status_patch"];
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/competitors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List competitors */
+        get: operations["research_competitor_list_api_v1_businesses__business_id__research_competitors_get"];
+        put?: never;
+        /** Create a competitor */
+        post: operations["research_competitor_create_api_v1_businesses__business_id__research_competitors_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/competitors/{competitor_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one competitor */
+        get: operations["research_competitor_get_api_v1_businesses__business_id__research_competitors__competitor_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/sources": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List research sources */
+        get: operations["research_source_list_api_v1_businesses__business_id__research_sources_get"];
+        put?: never;
+        /** Create a research source (deduplicated by content hash) */
+        post: operations["research_source_create_api_v1_businesses__business_id__research_sources_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/sources/{source_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a research source with its snapshots */
+        get: operations["research_source_get_api_v1_businesses__business_id__research_sources__source_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search evidence across statements, excerpts and source titles */
+        get: operations["research_evidence_search_api_v1_businesses__business_id__research_search_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List evidence */
+        get: operations["research_evidence_list_api_v1_businesses__business_id__research_evidence_get"];
+        put?: never;
+        /** Create evidence from an existing source */
+        post: operations["research_evidence_create_api_v1_businesses__business_id__research_evidence_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/findings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List findings */
+        get: operations["research_finding_list_api_v1_businesses__business_id__research_findings_get"];
+        put?: never;
+        /** Create a finding linked to evidence */
+        post: operations["research_finding_create_api_v1_businesses__business_id__research_findings_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/findings/{finding_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a finding with its evidence chain */
+        get: operations["research_finding_get_api_v1_businesses__business_id__research_findings__finding_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3434,6 +3626,508 @@ export interface components {
              * @constant
              */
             token_type: "bearer";
+        };
+        /** ResearchCompetitorCreateRequest */
+        ResearchCompetitorCreateRequest: {
+            /** Name */
+            name: string;
+            /** Domain */
+            domain?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Market */
+            market?: string | null;
+            /**
+             * Status
+             * @default active
+             */
+            status: string;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ResearchCompetitorListResponse */
+        ResearchCompetitorListResponse: {
+            /** Competitors */
+            competitors: components["schemas"]["ResearchCompetitorResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ResearchCompetitorResponse */
+        ResearchCompetitorResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Domain */
+            domain?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Market */
+            market?: string | null;
+            /** Status */
+            status: string;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ResearchEvidenceCreateRequest */
+        ResearchEvidenceCreateRequest: {
+            /**
+             * Source Id
+             * Format: uuid
+             */
+            source_id: string;
+            /** Evidence Type */
+            evidence_type: string;
+            /** Statement */
+            statement: string;
+            /** Raw Excerpt */
+            raw_excerpt?: string | null;
+            /** Structured Value */
+            structured_value?: {
+                [key: string]: unknown;
+            } | null;
+            /** Unit */
+            unit?: string | null;
+            /** Captured At */
+            captured_at?: string | null;
+            /**
+             * Confidence
+             * @default observed
+             */
+            confidence: string;
+            /**
+             * Provenance
+             * @default collected
+             */
+            provenance: string;
+        };
+        /** ResearchEvidenceListResponse */
+        ResearchEvidenceListResponse: {
+            /** Evidence */
+            evidence: components["schemas"]["ResearchEvidenceResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ResearchEvidenceResponse */
+        ResearchEvidenceResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Source Id
+             * Format: uuid
+             */
+            source_id: string;
+            /** Evidence Type */
+            evidence_type: string;
+            /** Statement */
+            statement: string;
+            /** Raw Excerpt */
+            raw_excerpt?: string | null;
+            /** Structured Value */
+            structured_value?: {
+                [key: string]: unknown;
+            } | null;
+            /** Unit */
+            unit?: string | null;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Confidence */
+            confidence: string;
+            /** Provenance */
+            provenance: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ResearchEvidenceSummary */
+        ResearchEvidenceSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Evidence Type */
+            evidence_type: string;
+            /** Statement */
+            statement: string;
+            /** Confidence */
+            confidence: string;
+            /** Provenance */
+            provenance: string;
+            /** Raw Excerpt */
+            raw_excerpt?: string | null;
+        };
+        /** ResearchFindingCreateRequest */
+        ResearchFindingCreateRequest: {
+            /**
+             * Research Project Id
+             * Format: uuid
+             */
+            research_project_id: string;
+            /** Category */
+            category: string;
+            /** Title */
+            title: string;
+            /** Statement */
+            statement: string;
+            /** Classification */
+            classification?: string | null;
+            /**
+             * Importance
+             * @default medium
+             */
+            importance: string;
+            /** Evidence Ids */
+            evidence_ids?: string[];
+        };
+        /** ResearchFindingDetailResponse */
+        ResearchFindingDetailResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Research Project Id
+             * Format: uuid
+             */
+            research_project_id: string;
+            /** Category */
+            category: string;
+            /** Title */
+            title: string;
+            /** Statement */
+            statement: string;
+            /** Classification */
+            classification: string;
+            /** Importance */
+            importance: string;
+            /** Evidence Strength */
+            evidence_strength: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Evidence */
+            evidence?: components["schemas"]["ResearchEvidenceSummary"][];
+        };
+        /** ResearchFindingListResponse */
+        ResearchFindingListResponse: {
+            /** Findings */
+            findings: components["schemas"]["ResearchFindingResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ResearchFindingResponse */
+        ResearchFindingResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Research Project Id
+             * Format: uuid
+             */
+            research_project_id: string;
+            /** Category */
+            category: string;
+            /** Title */
+            title: string;
+            /** Statement */
+            statement: string;
+            /** Classification */
+            classification: string;
+            /** Importance */
+            importance: string;
+            /** Evidence Strength */
+            evidence_strength: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ResearchProjectCreateRequest */
+        ResearchProjectCreateRequest: {
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Scope */
+            scope?: string | null;
+        };
+        /** ResearchProjectDetailResponse */
+        ResearchProjectDetailResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Status */
+            status: string;
+            /** Scope */
+            scope?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Source Count
+             * @default 0
+             */
+            source_count: number;
+            /**
+             * Evidence Count
+             * @default 0
+             */
+            evidence_count: number;
+            /**
+             * Finding Count
+             * @default 0
+             */
+            finding_count: number;
+            /**
+             * Competitor Count
+             * @default 0
+             */
+            competitor_count: number;
+            /** Data Quality */
+            data_quality?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ResearchProjectListResponse */
+        ResearchProjectListResponse: {
+            /** Projects */
+            projects: components["schemas"]["ResearchProjectResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ResearchProjectResponse */
+        ResearchProjectResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Type */
+            type: string;
+            /** Status */
+            status: string;
+            /** Scope */
+            scope?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ResearchProjectStatusRequest */
+        ResearchProjectStatusRequest: {
+            /** Status */
+            status: string;
+        };
+        /** ResearchSnapshotResponse */
+        ResearchSnapshotResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Content Hash */
+            content_hash: string;
+            /** Content */
+            content: string;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ResearchSourceCreateRequest */
+        ResearchSourceCreateRequest: {
+            /** Source Type */
+            source_type: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+            /** Domain */
+            domain?: string | null;
+            /** Author */
+            author?: string | null;
+            /** Published At */
+            published_at?: string | null;
+            /** Competitor Id */
+            competitor_id?: string | null;
+            /** Content */
+            content?: string | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+        };
+        /** ResearchSourceDetailResponse */
+        ResearchSourceDetailResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Source Type */
+            source_type: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+            /** Domain */
+            domain?: string | null;
+            /** Author */
+            author?: string | null;
+            /** Published At */
+            published_at?: string | null;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Content Hash */
+            content_hash?: string | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Competitor Id */
+            competitor_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Snapshots */
+            snapshots?: components["schemas"]["ResearchSnapshotResponse"][];
+        };
+        /** ResearchSourceListResponse */
+        ResearchSourceListResponse: {
+            /** Sources */
+            sources: components["schemas"]["ResearchSourceResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ResearchSourceResponse */
+        ResearchSourceResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Source Type */
+            source_type: string;
+            /** Title */
+            title: string;
+            /** Url */
+            url?: string | null;
+            /** Domain */
+            domain?: string | null;
+            /** Author */
+            author?: string | null;
+            /** Published At */
+            published_at?: string | null;
+            /**
+             * Captured At
+             * Format: date-time
+             */
+            captured_at: string;
+            /** Content Hash */
+            content_hash?: string | null;
+            /** Metadata */
+            metadata?: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Competitor Id */
+            competitor_id?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /**
          * RevenueSummaryRead
@@ -6551,6 +7245,534 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SimulationRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_project_list_api_v1_businesses__business_id__research_projects_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchProjectListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_project_create_api_v1_businesses__business_id__research_projects_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchProjectCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchProjectResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_project_get_api_v1_businesses__business_id__research_projects__project_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Research project id. */
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchProjectDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_project_status_api_v1_businesses__business_id__research_projects__project_id__status_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Research project id. */
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchProjectStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchProjectResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_competitor_list_api_v1_businesses__business_id__research_competitors_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCompetitorListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_competitor_create_api_v1_businesses__business_id__research_competitors_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchCompetitorCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCompetitorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_competitor_get_api_v1_businesses__business_id__research_competitors__competitor_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Competitor id. */
+                competitor_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCompetitorResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_source_list_api_v1_businesses__business_id__research_sources_get: {
+        parameters: {
+            query?: {
+                source_type?: string | null;
+                competitor_id?: string | null;
+                status?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchSourceListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_source_create_api_v1_businesses__business_id__research_sources_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchSourceCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchSourceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_source_get_api_v1_businesses__business_id__research_sources__source_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Research source id. */
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchSourceDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_evidence_search_api_v1_businesses__business_id__research_search_get: {
+        parameters: {
+            query: {
+                /** @description Search text. */
+                q: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchEvidenceListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_evidence_list_api_v1_businesses__business_id__research_evidence_get: {
+        parameters: {
+            query?: {
+                evidence_type?: string | null;
+                source_id?: string | null;
+                confidence?: string | null;
+                provenance?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchEvidenceListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_evidence_create_api_v1_businesses__business_id__research_evidence_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchEvidenceCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchEvidenceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_finding_list_api_v1_businesses__business_id__research_findings_get: {
+        parameters: {
+            query?: {
+                research_project_id?: string | null;
+                category?: string | null;
+                classification?: string | null;
+                importance?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchFindingListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_finding_create_api_v1_businesses__business_id__research_findings_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchFindingCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchFindingResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_finding_get_api_v1_businesses__business_id__research_findings__finding_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Finding id. */
+                finding_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchFindingDetailResponse"];
                 };
             };
             /** @description Validation Error */
