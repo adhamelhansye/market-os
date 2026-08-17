@@ -1121,6 +1121,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/simulations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List persisted simulations for a business */
+        get: operations["simulation_list_api_v1_businesses__business_id__simulations_get"];
+        put?: never;
+        /** Run a deterministic simulation */
+        post: operations["simulation_create_api_v1_businesses__business_id__simulations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/simulations/{simulation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one persisted simulation */
+        get: operations["simulation_get_api_v1_businesses__business_id__simulations__simulation_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/simulations/{simulation_id}/rerun": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recompute one simulation against current data */
+        post: operations["simulation_rerun_api_v1_businesses__business_id__simulations__simulation_id__rerun_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/campaigns/{campaign_id}/simulate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run a deterministic simulation for one campaign */
+        post: operations["campaign_simulation_api_v1_businesses__business_id__campaigns__campaign_id__simulate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1245,6 +1314,43 @@ export interface components {
             /** Ads */
             ads: components["schemas"]["AdMetrics"][];
         };
+        /**
+         * AssumptionRead
+         * @description A single assumption with full provenance.
+         */
+        AssumptionRead: {
+            /** Name */
+            name: string;
+            /** Value */
+            value?: string | null;
+            /**
+             * Unit
+             * @default ratio
+             */
+            unit: string;
+            /**
+             * Source
+             * @default system_default
+             */
+            source: string;
+            /** Source Entity */
+            source_entity?: string | null;
+            /** Historical Value */
+            historical_value?: string | null;
+            /**
+             * Override
+             * @default false
+             */
+            override: boolean;
+            /**
+             * Confidence
+             * @default insufficient
+             */
+            confidence: string;
+            date_range?: components["schemas"]["RangeRead"] | null;
+            /** Unavailable Reason */
+            unavailable_reason?: string | null;
+        };
         /** AuthResponse */
         AuthResponse: {
             /** Access Token */
@@ -1256,6 +1362,27 @@ export interface components {
              */
             token_type: "bearer";
             user: components["schemas"]["UserRead"];
+        };
+        /** BreakEvenRead */
+        BreakEvenRead: {
+            /** Break Even Cpa */
+            break_even_cpa?: string | null;
+            /** Break Even Roas */
+            break_even_roas?: string | null;
+            /** Simulated Cpa */
+            simulated_cpa?: string | null;
+            /** Simulated Roas */
+            simulated_roas?: string | null;
+            /** Minimum Cvr */
+            minimum_cvr?: string | null;
+            /** Maximum Cpc */
+            maximum_cpc?: string | null;
+            /** Minimum Aov */
+            minimum_aov?: string | null;
+            /** Maximum Cpa */
+            maximum_cpa?: string | null;
+            /** Minimum Roas */
+            minimum_roas?: string | null;
         };
         /** BudgetComparisonRead */
         BudgetComparisonRead: {
@@ -3236,6 +3363,22 @@ export interface components {
             /** Products */
             products: components["schemas"]["ProductMetrics"][];
         };
+        /** ProfitabilityRead */
+        ProfitabilityRead: {
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Roas */
+            roas?: string | null;
+            /** Break Even Roas */
+            break_even_roas?: string | null;
+            /** Contribution Profit */
+            contribution_profit?: string | null;
+            /** Reason */
+            reason?: string | null;
+        };
         /** ProviderQuality */
         ProviderQuality: {
             /** Provider */
@@ -3336,6 +3479,61 @@ export interface components {
             /** Gates */
             gates?: components["schemas"]["FactRead"][];
         };
+        /**
+         * ScenarioMetricsRead
+         * @description Metrics for one scenario (downside / expected / upside).
+         */
+        ScenarioMetricsRead: {
+            /** Budget */
+            budget?: string | null;
+            /** Impressions */
+            impressions?: number | null;
+            /** Clicks */
+            clicks?: number | null;
+            /** Ctr */
+            ctr?: string | null;
+            /** Cpc */
+            cpc?: string | null;
+            /** Cpm */
+            cpm?: string | null;
+            /** Purchases */
+            purchases?: number | null;
+            /** Cvr */
+            cvr?: string | null;
+            /** Cpa */
+            cpa?: string | null;
+            /** Aov */
+            aov?: string | null;
+            /** Revenue */
+            revenue?: string | null;
+            /** Roas */
+            roas?: string | null;
+            /** Mer */
+            mer?: string | null;
+            /** Gross Revenue */
+            gross_revenue?: string | null;
+            /** Refund Amount */
+            refund_amount?: string | null;
+            /** Net Revenue */
+            net_revenue?: string | null;
+            /** Contribution Profit */
+            contribution_profit?: string | null;
+            /** Contribution Margin */
+            contribution_margin?: string | null;
+        };
+        /** ScenarioResultRead */
+        ScenarioResultRead: {
+            /** Label */
+            label: string;
+            metrics: components["schemas"]["ScenarioMetricsRead"];
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            /** Reason */
+            reason?: string | null;
+        };
         /** ScenarioTotalsRead */
         ScenarioTotalsRead: {
             /** Metric Code */
@@ -3346,6 +3544,32 @@ export interface components {
             lower: string;
             /** Upper */
             upper: string;
+        };
+        /** SensitivityRowRead */
+        SensitivityRowRead: {
+            /** Variable */
+            variable: string;
+            /** Change Percent */
+            change_percent: string;
+            /** New Value */
+            new_value?: string | null;
+            /** Revenue */
+            revenue?: string | null;
+            /** Profit */
+            profit?: string | null;
+            /** Cpa */
+            cpa?: string | null;
+            /** Roas */
+            roas?: string | null;
+        };
+        /** SensitivityTableRead */
+        SensitivityTableRead: {
+            /** Variable */
+            variable: string;
+            /** Rows */
+            rows?: components["schemas"]["SensitivityRowRead"][];
+            /** Baseline Profit */
+            baseline_profit?: string | null;
         };
         /** ShippingRuleCreate */
         ShippingRuleCreate: {
@@ -3478,6 +3702,162 @@ export interface components {
              */
             organization_type: "agency" | "business";
         };
+        /**
+         * SimulationCreateRequest
+         * @description Request to create a simulation.
+         */
+        SimulationCreateRequest: {
+            /**
+             * Budget
+             * @description Simulated ad spend for the period.
+             */
+            budget: number | string;
+            /**
+             * Duration Days
+             * @description Duration in days for the simulation.
+             * @default 30
+             */
+            duration_days: number;
+            /**
+             * Historical Window Days
+             * @description Historical reference window.
+             * @default 30
+             */
+            historical_window_days: number;
+            /**
+             * Entity Type
+             * @default business
+             */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Target Cpa */
+            target_cpa?: number | string | null;
+            /** Target Roas */
+            target_roas?: number | string | null;
+            /** Target Revenue */
+            target_revenue?: number | string | null;
+            /** Target Profit */
+            target_profit?: number | string | null;
+            overrides?: components["schemas"]["SimulationOverrideInput"];
+        };
+        /**
+         * SimulationOverrideInput
+         * @description User overrides for individual assumptions.
+         */
+        SimulationOverrideInput: {
+            /** Budget */
+            budget?: number | string | null;
+            /** Ctr */
+            ctr?: number | string | null;
+            /** Cpc */
+            cpc?: number | string | null;
+            /** Cpm */
+            cpm?: number | string | null;
+            /** Cvr */
+            cvr?: number | string | null;
+            /** Aov */
+            aov?: number | string | null;
+            /** Refund Rate */
+            refund_rate?: number | string | null;
+            /** Contribution Margin */
+            contribution_margin?: number | string | null;
+            /** Shipping Cost */
+            shipping_cost?: number | string | null;
+            /** Payment Fees */
+            payment_fees?: number | string | null;
+        };
+        /** SimulationRead */
+        SimulationRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id?: string | null;
+            /** Model Version */
+            model_version: string;
+            /** Assumptions Hash */
+            assumptions_hash: string;
+            /** Model Used */
+            model_used: string;
+            /** Calculation Path */
+            calculation_path: string;
+            /** Assumptions */
+            assumptions?: components["schemas"]["AssumptionRead"][];
+            reference_window?: components["schemas"]["RangeRead"] | null;
+            /** Scenarios */
+            scenarios?: {
+                [key: string]: components["schemas"]["ScenarioResultRead"];
+            };
+            break_even?: components["schemas"]["BreakEvenRead"];
+            profitability?: components["schemas"]["ProfitabilityRead"];
+            /** Sensitivity */
+            sensitivity?: components["schemas"]["SensitivityTableRead"][];
+            /** Targets */
+            targets?: components["schemas"]["TargetComparisonRead"][];
+            /**
+             * Data Quality
+             * @default insufficient
+             */
+            data_quality: string;
+            /**
+             * Evidence Strength
+             * @default insufficient
+             */
+            evidence_strength: string;
+            /**
+             * Currency
+             * @default USD
+             */
+            currency: string;
+            /** Created By */
+            created_by?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Assumptions Snapshot */
+            assumptions_snapshot?: unknown[];
+            /** Results Snapshot */
+            results_snapshot?: {
+                [key: string]: unknown;
+            };
+        };
+        /** SimulationSummaryRead */
+        SimulationSummaryRead: {
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /** Simulations */
+            simulations?: components["schemas"]["SimulationRead"][];
+        };
         /** SummaryRead */
         SummaryRead: {
             /**
@@ -3557,6 +3937,22 @@ export interface components {
             records_processed: number;
             /** Error Summary */
             error_summary?: string | null;
+        };
+        /** TargetComparisonRead */
+        TargetComparisonRead: {
+            /** Metric Code */
+            metric_code: string;
+            /** Target Value */
+            target_value?: string | null;
+            /** Simulated Value */
+            simulated_value?: string | null;
+            /**
+             * Status
+             * @default unavailable
+             */
+            status: string;
+            /** Reason */
+            reason?: string | null;
         };
         /** ThresholdEvidenceRead */
         ThresholdEvidenceRead: {
@@ -5991,6 +6387,170 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DecisionsRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulation_list_api_v1_businesses__business_id__simulations_get: {
+        parameters: {
+            query?: {
+                /** @description Maximum number of rows. */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulationSummaryRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulation_create_api_v1_businesses__business_id__simulations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulationCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulationRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulation_get_api_v1_businesses__business_id__simulations__simulation_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Simulation id. */
+                simulation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulationRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulation_rerun_api_v1_businesses__business_id__simulations__simulation_id__rerun_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Simulation id. */
+                simulation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulationRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    campaign_simulation_api_v1_businesses__business_id__campaigns__campaign_id__simulate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulationCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulationRead"];
                 };
             };
             /** @description Validation Error */

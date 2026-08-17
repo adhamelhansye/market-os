@@ -20,7 +20,7 @@ Infrastructure lives in `docker-compose.yml`; services are built with
 
 There is exactly one backend service and one frontend service. Feature code
 inside the API is organized in `src/modules/*` (auth, organizations,
-businesses, health, integrations, sync, metrics) sharing `src/core`
+businesses, health, integrations, sync, metrics, simulator) sharing `src/core`
 primitives (config, security, RBAC, tenancy, dependencies, middleware). This
 is a deliberate choice: a modular monolith keeps Phase 0 and 1 fast to ship
 while retaining clear seams for later extraction. **Microservices are not
@@ -43,6 +43,11 @@ Phase 4B adds a deterministic **Decision** engine: review-only structured
 recommendations consuming metrics/diagnostics/forecast/economics/goals,
 with explicit precedence, evidence strength, idempotent persistence and
 strict no-execution safety (see `docs/architecture/recommendations.md`).
+Phase 5A adds a deterministic **Simulate** brick: a campaign simulator
+estimating downside/expected/upside scenarios, sensitivity tables,
+break-even, target comparisons and evidence strength from stored history
+and unit economics — never touching ad accounts, never using LLM-computed
+numbers (see `docs/architecture/simulator.md`).
 
 ## Layering (backend)
 
@@ -125,6 +130,11 @@ See `docs/architecture/tenancy.md` for the tenancy model and
 | GET | `/api/v1/businesses/{id}/recommendations/summary` | bearer | decision counters only |
 | GET | `/api/v1/businesses/{id}/campaigns/{cid}/recommendation` | bearer | one campaign decision |
 | POST | `/api/v1/businesses/{id}/recommendations/generate` | bearer | recompute + persist decisions idempotently (never executes anything) |
+| POST | `/api/v1/businesses/{id}/simulations` | bearer | create + run a deterministic simulation, business scope (see `simulator.md`) |
+| GET | `/api/v1/businesses/{id}/simulations` | bearer | simulation history summary |
+| GET | `/api/v1/businesses/{id}/simulations/{sid}` | bearer | one persisted simulation run |
+| POST | `/api/v1/businesses/{id}/simulations/{sid}/rerun` | bearer | re-run with the stored inputs |
+| POST | `/api/v1/businesses/{id}/campaigns/{cid}/simulate` | bearer | create + run at campaign scope |
 
 Schema: `/openapi.json` (served by FastAPI). Client types are generated from
 this live schema into `packages/shared-types` by
@@ -137,7 +147,7 @@ this live schema into `packages/shared-types` by
 - `html lang` and `dir` are set from the resolved locale (Inter for Latin,
   Noto Sans Arabic for Arabic) in `src/app/[locale]/layout.tsx`.
 - All user-facing strings live in `apps/web/messages/{en,ar}/*.json`
-  (namespaces: `common`, `auth`, `dashboard`, `metrics`) and are reached
+  (namespaces: `common`, `auth`, `dashboard`, `metrics`, `simulator`) and are reached
   through next-intl keys. No strings are hardcoded in components.
 - UI components in `src/components/ui/*` (button, input, label, card, select)
   are shadcn-style primitives; no component is a "giant" file.
@@ -149,6 +159,11 @@ this live schema into `packages/shared-types` by
   analytics API: KPI cards, Recharts trend charts, funnel and campaigns
   tables, data-quality cards. Money is displayed only through
   `src/lib/money.ts` formatters; no arithmetic happens in the browser.
+- The same page hosts the simulator view (`src/features/simulator`): run
+  controls, scenario/sensitivity/break-even/target tables, the assumption
+  editor and a persisted history — a fetch/format/display view only; every
+  computed value comes from the API, and overrides are submitted with the
+  request rather than computed locally.
 
 ## Testing strategy
 
@@ -206,6 +221,7 @@ this live schema into `packages/shared-types` by
 - `docs/architecture/diagnostics.md` — deterministic findings, evidence-backed diagnostics layer
 - `docs/architecture/forecasting.md` — deterministic forecasting engine, scenarios, confidence, campaign attribution
 - `docs/architecture/recommendations.md` — deterministic decision engine, review-only structured decisions, evidence, safety
+- `docs/architecture/simulator.md` — deterministic campaign simulator, scenarios, sensitivity, break-even, targets, evidence
 - `docs/adr/0001-monolith.md` — monolith decision
 - `docs/adr/0002-multi-tenancy.md` — tenancy decision (incl. why no RLS yet)
 - `AGENTS.md` — permanent engineering rules

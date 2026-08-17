@@ -36,6 +36,7 @@ import {
 import { DiagnosticsSection } from "@/features/diagnostics/diagnostics-section";
 import { ForecastSection } from "@/features/forecasting/forecast-section";
 import { RecommendationsSection } from "@/features/recommendations/recommendations-section";
+import { SimulatorSection } from "@/features/simulator/simulator-section";
 import { formatMoney, formatRatio } from "@/lib/money";
 
 const RANGE_OPTIONS: { value: RangeKind; labelKey: string }[] = [
@@ -485,6 +486,7 @@ export default function MetricsPage() {
       <DiagnosticsSection businessId={businessId as string} rangeKind={rangeKind} />
       <ForecastSection businessId={businessId} rangeKind={rangeKind} />
       <RecommendationsSection businessId={businessId} rangeKind={rangeKind} />
+      <SimulatorSection businessId={businessId} />
     </div>
   );
 }

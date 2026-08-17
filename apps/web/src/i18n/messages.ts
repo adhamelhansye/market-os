@@ -12,6 +12,7 @@ import metricsEn from "../../messages/en/metrics.json";
 import diagnosticsEn from "../../messages/en/diagnostics.json";
 import forecastingEn from "../../messages/en/forecasting.json";
 import recommendationsEn from "../../messages/en/recommendations.json";
+import simulatorEn from "../../messages/en/simulator.json";
 
 import commonAr from "../../messages/ar/common.json";
 import authAr from "../../messages/ar/auth.json";
@@ -25,6 +26,7 @@ import metricsAr from "../../messages/ar/metrics.json";
 import diagnosticsAr from "../../messages/ar/diagnostics.json";
 import forecastingAr from "../../messages/ar/forecasting.json";
 import recommendationsAr from "../../messages/ar/recommendations.json";
+import simulatorAr from "../../messages/ar/simulator.json";
 
 export const messagesByLocale: Record<string, AbstractIntlMessages> = {
   en: {
@@ -40,6 +42,7 @@ export const messagesByLocale: Record<string, AbstractIntlMessages> = {
     diagnostics: diagnosticsEn,
     forecasting: forecastingEn,
     recommendations: recommendationsEn,
+    simulator: simulatorEn,
   },
   ar: {
     common: commonAr,
@@ -54,5 +57,6 @@ export const messagesByLocale: Record<string, AbstractIntlMessages> = {
     diagnostics: diagnosticsAr,
     forecasting: forecastingAr,
     recommendations: recommendationsAr,
+    simulator: simulatorAr,
   },
 };

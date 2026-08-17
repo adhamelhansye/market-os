@@ -14,6 +14,7 @@ from src.db.models.product_price import ProductPrice
 from src.db.models.recommendation import Recommendation
 from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
+from src.db.models.simulation import Simulation, SimulationAssumption, SimulationResult
 from src.db.models.user import User
 from src.modules.integrations.models import (
     Ad,
@@ -61,6 +62,9 @@ __all__ = [
     "Recommendation",
     "Role",
     "ShippingRule",
+    "Simulation",
+    "SimulationAssumption",
+    "SimulationResult",
     "SyncRun",
     "User",
     "WebhookEvent",
