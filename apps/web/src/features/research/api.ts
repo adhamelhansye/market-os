@@ -70,6 +70,13 @@ export type ResearchCollectionJobResponse =
   components["schemas"]["ResearchCollectionJobResponse"];
 export type ResearchCollectionJobListResponse =
   components["schemas"]["ResearchCollectionJobListResponse"];
+export type ResearchIntelligenceResponse =
+  components["schemas"]["ResearchIntelligenceResponse"];
+export type ResearchPricingResponse = components["schemas"]["ResearchPricingResponse"];
+export type ResearchIntelligenceSummaryResponse =
+  components["schemas"]["ResearchIntelligenceSummaryResponse"];
+export type ResearchIntelligenceSnapshotResponse =
+  components["schemas"]["ResearchIntelligenceSnapshotResponse"];
 
 export const CONFIDENCE_VALUES = ["observed", "supported", "inferred", "hypothesis"] as const;
 export type Confidence = (typeof CONFIDENCE_VALUES)[number];
@@ -258,5 +265,91 @@ export function cancelResearchCollection(
   return apiPost<{ collection: ResearchCollectionJobResponse }>(
     researchUrl(businessId, `collections/${collectionId}/cancel`),
     {}
+  );
+}
+
+type IntelligenceFilters = {
+  research_project_id?: string;
+  competitor_id?: string;
+  category?: string;
+  classification?: string;
+  strength?: string;
+  freshness?: string;
+  source_type?: string;
+  date_from?: string;
+  date_to?: string;
+};
+
+function intelligenceQuery(filters?: IntelligenceFilters): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters ?? {})) {
+    if (value) search.set(key, value);
+  }
+  const query = search.toString();
+  return query ? `?${query}` : "";
+}
+
+export function fetchResearchIntelligence(
+  businessId: string,
+  type: "market" | "customer" | "competitors",
+  filters?: IntelligenceFilters
+): Promise<ResearchIntelligenceResponse> {
+  return apiGet<ResearchIntelligenceResponse>(
+    researchUrl(businessId, `intelligence/${type}${intelligenceQuery(filters)}`)
+  );
+}
+
+export function fetchCompetitorIntelligence(
+  businessId: string,
+  competitorId: string,
+  filters?: Omit<IntelligenceFilters, "competitor_id">
+): Promise<ResearchIntelligenceResponse> {
+  return apiGet<ResearchIntelligenceResponse>(
+    researchUrl(
+      businessId,
+      `intelligence/competitors/${competitorId}${intelligenceQuery(filters)}`
+    )
+  );
+}
+
+export function fetchResearchPricing(
+  businessId: string,
+  filters?: IntelligenceFilters
+): Promise<ResearchPricingResponse> {
+  return apiGet<ResearchPricingResponse>(
+    researchUrl(businessId, `intelligence/pricing${intelligenceQuery(filters)}`)
+  );
+}
+
+export function fetchResearchMessaging(
+  businessId: string,
+  filters?: IntelligenceFilters
+): Promise<ResearchIntelligenceResponse> {
+  return apiGet<ResearchIntelligenceResponse>(
+    researchUrl(businessId, `intelligence/messaging${intelligenceQuery(filters)}`)
+  );
+}
+
+export function fetchResearchIntelligenceSummary(
+  businessId: string,
+  projectId?: string
+): Promise<ResearchIntelligenceSummaryResponse> {
+  return apiGet<ResearchIntelligenceSummaryResponse>(
+    researchUrl(
+      businessId,
+      `intelligence/summary${intelligenceQuery({ research_project_id: projectId })}`
+    )
+  );
+}
+
+export function fetchResearchIntelligenceSnapshot(
+  businessId: string,
+  projectId?: string
+): Promise<ResearchIntelligenceSnapshotResponse> {
+  return apiGet<ResearchIntelligenceSnapshotResponse>(
+    researchUrl(
+      businessId,
+      `intelligence/snapshot${intelligenceQuery({ research_project_id: projectId })}`
+    )
   );
 }

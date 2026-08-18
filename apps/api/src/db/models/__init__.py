@@ -18,10 +18,13 @@ from src.db.models.research import (
     ResearchCompetitor,
     ResearchEvidence,
     ResearchFinding,
+    ResearchIntelligenceItem,
+    ResearchIntelligenceSnapshot,
     ResearchProject,
     ResearchSource,
     ResearchSourceSnapshot,
     research_finding_evidence,
+    research_intelligence_item_findings,
 )
 from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
@@ -76,10 +79,13 @@ __all__ = [
     "ResearchCollectionPage",
     "ResearchEvidence",
     "ResearchFinding",
+    "ResearchIntelligenceItem",
+    "ResearchIntelligenceSnapshot",
     "ResearchProject",
     "ResearchSource",
     "ResearchSourceSnapshot",
     "research_finding_evidence",
+    "research_intelligence_item_findings",
     "Role",
     "ShippingRule",
     "Simulation",

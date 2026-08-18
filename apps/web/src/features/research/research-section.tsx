@@ -13,6 +13,7 @@ import { SourceList } from "./source-list";
 import { EvidenceList } from "./evidence-list";
 import { FindingsList } from "./findings-list";
 import { CollectionPanel } from "./collection-panel";
+import { IntelligencePanel } from "./intelligence-panel";
 import {
   fetchResearchProject,
   fetchResearchProjects,
@@ -190,6 +191,7 @@ export function ResearchSection({ businessId }: ResearchSectionProps) {
 
       <ResearchProjects businessId={businessId} />
       <CollectionPanel businessId={businessId} projectId={activeProjectId} />
+      <IntelligencePanel businessId={businessId} projectId={activeProjectId} />
       <CompetitorList businessId={businessId} />
       <SourceList businessId={businessId} />
       <EvidenceList businessId={businessId} />

@@ -182,6 +182,65 @@ vi.mock("./api", () => ({
     const hits = state.searchResults.get(query.toLowerCase()) ?? [];
     return Promise.resolve({ hits, total: hits.length });
   }),
+  fetchResearchCollections: vi.fn(() => Promise.resolve({ collections: [], total: 0 })),
+  fetchResearchIntelligenceSummary: vi.fn(() =>
+    Promise.resolve({
+      snapshot_id: "snap-1",
+      generated_at: "2026-08-15T10:00:00Z",
+      intelligence_version: "research_intelligence_v1",
+      source_count: 0,
+      snapshot_count: 0,
+      evidence_count: 0,
+      finding_count: 0,
+      market_signal_count: 0,
+      customer_signal_count: 0,
+      competitor_count: 0,
+      competitor_signal_count: 0,
+      freshness: "unknown",
+      coverage: {},
+      missing_research_areas: [],
+    })
+  ),
+  fetchResearchIntelligence: vi.fn(() =>
+    Promise.resolve({
+      snapshot_id: "snap-1",
+      intelligence_type: "market",
+      generated_at: "2026-08-15T10:00:00Z",
+      intelligence_version: "research_intelligence_v1",
+      items: [],
+      total: 0,
+      freshness: "unknown",
+      coverage: {},
+      missing_research_areas: [],
+    })
+  ),
+  fetchResearchPricing: vi.fn(() =>
+    Promise.resolve({
+      snapshot_id: "snap-1",
+      intelligence_type: "market",
+      generated_at: "2026-08-15T10:00:00Z",
+      intelligence_version: "research_intelligence_v1",
+      items: [],
+      total: 0,
+      freshness: "unknown",
+      coverage: {},
+      missing_research_areas: [],
+      pricing: {},
+    })
+  ),
+  fetchResearchMessaging: vi.fn(() =>
+    Promise.resolve({
+      snapshot_id: "snap-1",
+      intelligence_type: "market",
+      generated_at: "2026-08-15T10:00:00Z",
+      intelligence_version: "research_intelligence_v1",
+      items: [],
+      total: 0,
+      freshness: "unknown",
+      coverage: {},
+      missing_research_areas: [],
+    })
+  ),
 }));
 
 function renderSection(locale: "en" | "ar") {

@@ -238,6 +238,84 @@ class ResearchCollectionCancelResponse(BaseModel):
     collection: ResearchCollectionJobResponse
 
 
+class ResearchIntelligenceProvenanceResponse(BaseModel):
+    finding_id: uuid.UUID
+    finding_title: str
+    evidence_id: uuid.UUID
+    evidence_statement: str
+    source_id: uuid.UUID
+    source_title: str
+    source_url: str | None = None
+    snapshot_id: uuid.UUID | None = None
+    captured_at: datetime
+
+
+class ResearchIntelligenceItemResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    intelligence_type: str
+    research_project_id: uuid.UUID | None = None
+    competitor_id: uuid.UUID | None = None
+    category: str
+    title: str
+    statement: str
+    classification: str
+    strength: str
+    evidence_count: int
+    source_count: int
+    freshness: str
+    metadata_json: dict[str, Any] = Field(default_factory=dict, serialization_alias="metadata")
+    provenance: list[ResearchIntelligenceProvenanceResponse] = Field(default_factory=list)
+
+
+class ResearchIntelligenceResponse(BaseModel):
+    snapshot_id: uuid.UUID
+    intelligence_type: str
+    generated_at: datetime
+    intelligence_version: str
+    items: list[ResearchIntelligenceItemResponse]
+    total: int
+    freshness: str
+    coverage: dict[str, Any]
+    missing_research_areas: list[dict[str, Any]]
+
+
+class ResearchPricingResponse(ResearchIntelligenceResponse):
+    pricing: dict[str, Any] = Field(default_factory=dict)
+
+
+class ResearchIntelligenceSummaryResponse(BaseModel):
+    snapshot_id: uuid.UUID
+    generated_at: datetime
+    intelligence_version: str
+    source_count: int
+    snapshot_count: int
+    evidence_count: int
+    finding_count: int
+    market_signal_count: int
+    customer_signal_count: int
+    competitor_count: int
+    competitor_signal_count: int
+    freshness: str
+    coverage: dict[str, Any]
+    missing_research_areas: list[dict[str, Any]]
+
+
+class ResearchIntelligenceSnapshotResponse(BaseModel):
+    snapshot_id: uuid.UUID
+    research_project_id: uuid.UUID | None = None
+    generated_at: datetime
+    source_count: int
+    snapshot_count: int
+    evidence_count: int
+    finding_count: int
+    intelligence_version: str
+    freshness: str
+    coverage: dict[str, Any]
+    missing_research_areas: list[dict[str, Any]]
+
+
 # ---------------------------------------------------------------------------
 # Create / update request models (explicit tenant-free DTOs)
 # ---------------------------------------------------------------------------

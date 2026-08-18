@@ -327,6 +327,116 @@ class ResearchCollectionPage(Base):
     )
 
 
+class ResearchIntelligenceSnapshot(Base):
+    __tablename__ = "research_intelligence_snapshots"
+    __table_args__ = (
+        Index(
+            "ix_research_intelligence_snapshots_business_generated",
+            "business_id",
+            "generated_at",
+        ),
+        Index(
+            "ix_research_intelligence_snapshots_project_generated",
+            "research_project_id",
+            "generated_at",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    research_project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_projects.id", ondelete="CASCADE"), nullable=True
+    )
+    generated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    source_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    snapshot_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    evidence_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    finding_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    intelligence_version: Mapped[str] = mapped_column(
+        String(40), nullable=False, default="research_intelligence_v1"
+    )
+    input_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    freshness: Mapped[str] = mapped_column(String(20), nullable=False, default="unknown")
+    coverage_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    missing_areas_json: Mapped[list[dict[str, Any]]] = mapped_column(
+        JSONB, nullable=False, default=list
+    )
+
+
+class ResearchIntelligenceItem(Base):
+    __tablename__ = "research_intelligence_items"
+    __table_args__ = (
+        Index(
+            "ix_research_intelligence_items_snapshot_type",
+            "snapshot_id",
+            "intelligence_type",
+        ),
+        Index(
+            "ix_research_intelligence_items_business_category",
+            "business_id",
+            "category",
+        ),
+        Index("ix_research_intelligence_items_competitor", "competitor_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    snapshot_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("research_intelligence_snapshots.id", ondelete="CASCADE"), nullable=False
+    )
+    research_project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_projects.id", ondelete="CASCADE"), nullable=True
+    )
+    competitor_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_competitors.id", ondelete="CASCADE"), nullable=True
+    )
+    intelligence_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    category: Mapped[str] = mapped_column(String(40), nullable=False)
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    statement: Mapped[str] = mapped_column(Text, nullable=False)
+    classification: Mapped[str] = mapped_column(String(20), nullable=False)
+    strength: Mapped[str] = mapped_column(String(20), nullable=False)
+    evidence_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    source_count: Mapped[int] = mapped_column(nullable=False, default=0)
+    freshness: Mapped[str] = mapped_column(String(20), nullable=False, default="unknown")
+    metadata_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+research_intelligence_item_findings = Table(
+    "research_intelligence_item_findings",
+    Base.metadata,
+    Column(
+        "item_id",
+        ForeignKey("research_intelligence_items.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "finding_id",
+        ForeignKey("research_findings.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Index("ix_research_intelligence_item_findings_finding", "finding_id"),
+)
+
+
 class ResearchFinding(Base):
     __tablename__ = "research_findings"
     __table_args__ = (
@@ -386,10 +496,13 @@ __all__ = [
     "ResearchCompetitor",
     "ResearchCollectionJob",
     "ResearchCollectionPage",
+    "ResearchIntelligenceItem",
+    "ResearchIntelligenceSnapshot",
     "ResearchEvidence",
     "ResearchFinding",
     "ResearchProject",
     "ResearchSource",
     "ResearchSourceSnapshot",
+    "research_intelligence_item_findings",
     "research_finding_evidence",
 ]

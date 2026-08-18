@@ -15,9 +15,11 @@ unknown or cross-tenant ids return 404, never a leak.
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, Query
+from sqlalchemy import func, select
 
 from src.core.dependencies import (
     CurrentBusinessId,
@@ -36,6 +38,7 @@ from src.db.models import (
     ResearchSource,
 )
 from src.modules.businesses.service import get_business
+from src.modules.research import intelligence as research_intelligence
 from src.modules.research import service as research_service
 from src.modules.research.collection import jobs as collection_jobs
 from src.modules.research.collection import service as collection_service
@@ -58,6 +61,12 @@ from src.modules.research.schemas import (
     ResearchFindingDetailResponse,
     ResearchFindingListResponse,
     ResearchFindingResponse,
+    ResearchIntelligenceItemResponse,
+    ResearchIntelligenceProvenanceResponse,
+    ResearchIntelligenceResponse,
+    ResearchIntelligenceSnapshotResponse,
+    ResearchIntelligenceSummaryResponse,
+    ResearchPricingResponse,
     ResearchProjectCreateRequest,
     ResearchProjectDetailResponse,
     ResearchProjectListResponse,
@@ -105,6 +114,60 @@ def _to_competitor_response(competitor: ResearchCompetitor) -> ResearchCompetito
 
 def _to_project_response(project: ResearchProject) -> ResearchProjectResponse:
     return ResearchProjectResponse.model_validate(project)
+
+
+async def _intelligence_response(
+    session: DbSession,
+    business,
+    *,
+    intelligence_type: str,
+    project_id: uuid.UUID | None = None,
+    competitor_id: uuid.UUID | None = None,
+    category: str | None = None,
+    classification: str | None = None,
+    strength: str | None = None,
+    freshness: str | None = None,
+    source_type: str | None = None,
+    date_from: datetime | None = None,
+    date_to: datetime | None = None,
+    limit: int = 100,
+) -> ResearchIntelligenceResponse:
+    store = research_intelligence.ResearchIntelligenceStore(session)
+    snapshot = await store.ensure_snapshot(business, project_id)
+    items = await store.items(
+        business,
+        snapshot,
+        intelligence_type=intelligence_type,
+        project_id=project_id,
+        competitor_id=competitor_id,
+        category=category,
+        classification=classification,
+        strength=strength,
+        freshness_value=freshness,
+        source_type=source_type,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+    )
+    responses = []
+    for item in items:
+        response = ResearchIntelligenceItemResponse.model_validate(item)
+        response.provenance = [
+            ResearchIntelligenceProvenanceResponse(**row)
+            for row in await store.provenance(business, item)
+        ]
+        responses.append(response)
+    return ResearchIntelligenceResponse(
+        snapshot_id=snapshot.id,
+        intelligence_type=intelligence_type,
+        generated_at=snapshot.generated_at,
+        intelligence_version=snapshot.intelligence_version,
+        items=responses,
+        total=len(responses),
+        freshness=snapshot.freshness,
+        coverage=snapshot.coverage_json,
+        missing_research_areas=snapshot.missing_areas_json,
+    )
 
 
 async def _get_project_or_404(
@@ -479,6 +542,344 @@ async def research_finding_get(
         for e in evidence
     ]
     return response
+
+
+# ---------------------------------------------------------------------------
+# Deterministic research intelligence
+# ---------------------------------------------------------------------------
+@router.get(
+    "/businesses/{business_id}/research/intelligence/market",
+    response_model=ResearchIntelligenceResponse,
+    summary="Get deterministic market intelligence",
+)
+async def research_intelligence_market(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+    category: Annotated[str | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
+    strength: Annotated[str | None, Query()] = None,
+    freshness: Annotated[str | None, Query()] = None,
+    source_type: Annotated[str | None, Query()] = None,
+    date_from: Annotated[datetime | None, Query()] = None,
+    date_to: Annotated[datetime | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchIntelligenceResponse:
+    business = await get_business(session, business_id)
+    return await _intelligence_response(
+        session,
+        business,
+        intelligence_type="market",
+        project_id=research_project_id,
+        category=category,
+        classification=classification,
+        strength=strength,
+        freshness=freshness,
+        source_type=source_type,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/customer",
+    response_model=ResearchIntelligenceResponse,
+    summary="Get deterministic customer intelligence",
+)
+async def research_intelligence_customer(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+    category: Annotated[str | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
+    strength: Annotated[str | None, Query()] = None,
+    freshness: Annotated[str | None, Query()] = None,
+    source_type: Annotated[str | None, Query()] = None,
+    date_from: Annotated[datetime | None, Query()] = None,
+    date_to: Annotated[datetime | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchIntelligenceResponse:
+    business = await get_business(session, business_id)
+    return await _intelligence_response(
+        session,
+        business,
+        intelligence_type="customer",
+        project_id=research_project_id,
+        category=category,
+        classification=classification,
+        strength=strength,
+        freshness=freshness,
+        source_type=source_type,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/competitors",
+    response_model=ResearchIntelligenceResponse,
+    summary="Get deterministic competitor intelligence",
+)
+async def research_intelligence_competitors(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+    competitor_id: Annotated[uuid.UUID | None, Query()] = None,
+    category: Annotated[str | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
+    strength: Annotated[str | None, Query()] = None,
+    freshness: Annotated[str | None, Query()] = None,
+    source_type: Annotated[str | None, Query()] = None,
+    date_from: Annotated[datetime | None, Query()] = None,
+    date_to: Annotated[datetime | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchIntelligenceResponse:
+    business = await get_business(session, business_id)
+    if competitor_id is not None:
+        competitor = await session.scalar(
+            select(ResearchCompetitor).where(
+                ResearchCompetitor.id == competitor_id,
+                ResearchCompetitor.organization_id == business.organization_id,
+                ResearchCompetitor.business_id == business.id,
+            )
+        )
+        if competitor is None:
+            raise _not_found("competitor", competitor_id)
+    return await _intelligence_response(
+        session,
+        business,
+        intelligence_type="competitor",
+        project_id=research_project_id,
+        competitor_id=competitor_id,
+        category=category,
+        classification=classification,
+        strength=strength,
+        freshness=freshness,
+        source_type=source_type,
+        date_from=date_from,
+        date_to=date_to,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/competitors/{competitor_id}",
+    response_model=ResearchIntelligenceResponse,
+    summary="Get one competitor's intelligence",
+)
+async def research_intelligence_competitor(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    competitor_id: uuid.UUID,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+    category: Annotated[str | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
+    strength: Annotated[str | None, Query()] = None,
+    freshness: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchIntelligenceResponse:
+    business = await get_business(session, business_id)
+    competitor = await session.scalar(
+        select(ResearchCompetitor).where(
+            ResearchCompetitor.id == competitor_id,
+            ResearchCompetitor.organization_id == business.organization_id,
+            ResearchCompetitor.business_id == business.id,
+        )
+    )
+    if competitor is None:
+        raise _not_found("competitor", competitor_id)
+    return await _intelligence_response(
+        session,
+        business,
+        intelligence_type="competitor",
+        project_id=research_project_id,
+        competitor_id=competitor_id,
+        category=category,
+        classification=classification,
+        strength=strength,
+        freshness=freshness,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/pricing",
+    response_model=ResearchPricingResponse,
+    summary="Get deterministic pricing intelligence",
+)
+async def research_intelligence_pricing(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+    competitor_id: Annotated[uuid.UUID | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
+    strength: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchPricingResponse:
+    business = await get_business(session, business_id)
+    base = await _intelligence_response(
+        session,
+        business,
+        intelligence_type="competitor" if competitor_id else "market",
+        project_id=research_project_id,
+        competitor_id=competitor_id,
+        category="pricing",
+        classification=classification,
+        strength=strength,
+        limit=limit,
+    )
+    pricing = await research_intelligence.ResearchIntelligenceStore(session).pricing_summary(
+        business, research_project_id, competitor_id
+    )
+    return ResearchPricingResponse(**base.model_dump(), pricing=pricing)
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/messaging",
+    response_model=ResearchIntelligenceResponse,
+    summary="Get observed messaging patterns",
+)
+async def research_intelligence_messaging(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+    classification: Annotated[str | None, Query()] = None,
+    strength: Annotated[str | None, Query()] = None,
+    freshness: Annotated[str | None, Query()] = None,
+    source_type: Annotated[str | None, Query()] = None,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchIntelligenceResponse:
+    business = await get_business(session, business_id)
+    return await _intelligence_response(
+        session,
+        business,
+        intelligence_type="market",
+        project_id=research_project_id,
+        category="messaging",
+        classification=classification,
+        strength=strength,
+        freshness=freshness,
+        source_type=source_type,
+        limit=limit,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/summary",
+    response_model=ResearchIntelligenceSummaryResponse,
+    summary="Get deterministic research intelligence summary",
+)
+async def research_intelligence_summary(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+) -> ResearchIntelligenceSummaryResponse:
+    business = await get_business(session, business_id)
+    store = research_intelligence.ResearchIntelligenceStore(session)
+    snapshot = await store.ensure_snapshot(business, research_project_id)
+    counts = {}
+    for intelligence_type in ("market", "customer", "competitor"):
+        counts[intelligence_type] = len(
+            await store.items(business, snapshot, intelligence_type=intelligence_type, limit=200)
+        )
+    competitor_count = int(
+        await session.scalar(
+            select(func.count())
+            .select_from(ResearchCompetitor)
+            .where(
+                ResearchCompetitor.organization_id == business.organization_id,
+                ResearchCompetitor.business_id == business.id,
+            )
+        )
+        or 0
+    )
+    return ResearchIntelligenceSummaryResponse(
+        snapshot_id=snapshot.id,
+        generated_at=snapshot.generated_at,
+        intelligence_version=snapshot.intelligence_version,
+        source_count=snapshot.source_count,
+        snapshot_count=snapshot.snapshot_count,
+        evidence_count=snapshot.evidence_count,
+        finding_count=snapshot.finding_count,
+        market_signal_count=counts["market"],
+        customer_signal_count=counts["customer"],
+        competitor_count=competitor_count,
+        competitor_signal_count=counts["competitor"],
+        freshness=snapshot.freshness,
+        coverage=snapshot.coverage_json,
+        missing_research_areas=snapshot.missing_areas_json,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/snapshot",
+    response_model=ResearchIntelligenceSnapshotResponse,
+    summary="Get the latest deterministic intelligence snapshot",
+)
+async def research_intelligence_snapshot(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    research_project_id: Annotated[uuid.UUID | None, Query()] = None,
+) -> ResearchIntelligenceSnapshotResponse:
+    business = await get_business(session, business_id)
+    snapshot = await research_intelligence.ResearchIntelligenceStore(session).ensure_snapshot(
+        business, research_project_id
+    )
+    return ResearchIntelligenceSnapshotResponse(
+        snapshot_id=snapshot.id,
+        research_project_id=snapshot.research_project_id,
+        generated_at=snapshot.generated_at,
+        source_count=snapshot.source_count,
+        snapshot_count=snapshot.snapshot_count,
+        evidence_count=snapshot.evidence_count,
+        finding_count=snapshot.finding_count,
+        intelligence_version=snapshot.intelligence_version,
+        freshness=snapshot.freshness,
+        coverage=snapshot.coverage_json,
+        missing_research_areas=snapshot.missing_areas_json,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/intelligence/snapshots/{snapshot_id}",
+    response_model=ResearchIntelligenceSnapshotResponse,
+    summary="Get a stored intelligence snapshot",
+)
+async def research_intelligence_snapshot_get(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    snapshot_id: uuid.UUID,
+) -> ResearchIntelligenceSnapshotResponse:
+    business = await get_business(session, business_id)
+    snapshot = await research_intelligence.ResearchIntelligenceStore(session).get_snapshot(
+        business, snapshot_id
+    )
+    if snapshot is None:
+        raise _not_found("intelligence snapshot", snapshot_id)
+    return ResearchIntelligenceSnapshotResponse(
+        snapshot_id=snapshot.id,
+        research_project_id=snapshot.research_project_id,
+        generated_at=snapshot.generated_at,
+        source_count=snapshot.source_count,
+        snapshot_count=snapshot.snapshot_count,
+        evidence_count=snapshot.evidence_count,
+        finding_count=snapshot.finding_count,
+        intelligence_version=snapshot.intelligence_version,
+        freshness=snapshot.freshness,
+        coverage=snapshot.coverage_json,
+        missing_research_areas=snapshot.missing_areas_json,
+    )
 
 
 def _collection_invalid(message: str) -> ApiError:
