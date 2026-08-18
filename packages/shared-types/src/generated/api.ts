@@ -1382,6 +1382,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/research/projects/{project_id}/collect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue public research collection */
+        post: operations["research_collection_create_api_v1_businesses__business_id__research_projects__project_id__collect_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/collections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List collection jobs */
+        get: operations["research_collection_list_api_v1_businesses__business_id__research_collections_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/collections/{collection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a collection job */
+        get: operations["research_collection_get_api_v1_businesses__business_id__research_collections__collection_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/sources/{source_id}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh a public research source */
+        post: operations["research_source_refresh_api_v1_businesses__business_id__research_sources__source_id__refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/sources/{source_id}/crawl": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Queue limited same-domain collection */
+        post: operations["research_source_crawl_api_v1_businesses__business_id__research_sources__source_id__crawl_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/research/collections/{collection_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a queued collection */
+        post: operations["research_collection_cancel_api_v1_businesses__business_id__research_collections__collection_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3627,6 +3729,102 @@ export interface components {
              */
             token_type: "bearer";
         };
+        /** ResearchCollectionCancelResponse */
+        ResearchCollectionCancelResponse: {
+            collection: components["schemas"]["ResearchCollectionJobResponse"];
+        };
+        /** ResearchCollectionJobListResponse */
+        ResearchCollectionJobListResponse: {
+            /** Collections */
+            collections: components["schemas"]["ResearchCollectionJobResponse"][];
+            /** Total */
+            total: number;
+        };
+        /** ResearchCollectionJobResponse */
+        ResearchCollectionJobResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Research Project Id
+             * Format: uuid
+             */
+            research_project_id: string;
+            /** Source Id */
+            source_id?: string | null;
+            /** Provider */
+            provider: string;
+            /** Mode */
+            mode: string;
+            /** Status */
+            status: string;
+            /** Max Pages */
+            max_pages: number;
+            /** Max Depth */
+            max_depth: number;
+            /** Same Domain */
+            same_domain: boolean;
+            /** Pages Collected */
+            pages_collected: number;
+            /** Change Status */
+            change_status?: string | null;
+            /** Attempts */
+            attempts: number;
+            /** Error */
+            error?: string | null;
+            /** Started At */
+            started_at?: string | null;
+            /** Completed At */
+            completed_at?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ResearchCollectionRequest */
+        ResearchCollectionRequest: {
+            /** Research Project Id */
+            research_project_id?: string | null;
+            /** Source Url */
+            source_url?: string | null;
+            /**
+             * Mode
+             * @default single_page
+             */
+            mode: string;
+            /**
+             * Max Pages
+             * @default 1
+             */
+            max_pages: number;
+            /**
+             * Max Depth
+             * @default 0
+             */
+            max_depth: number;
+            /**
+             * Same Domain
+             * @default true
+             */
+            same_domain: boolean;
+            /**
+             * Refresh
+             * @default false
+             */
+            refresh: boolean;
+            /** Specific Urls */
+            specific_urls?: string[];
+            /** Idempotency Key */
+            idempotency_key?: string | null;
+        };
         /** ResearchCompetitorCreateRequest */
         ResearchCompetitorCreateRequest: {
             /** Name */
@@ -3737,6 +3935,10 @@ export interface components {
              * Format: uuid
              */
             source_id: string;
+            /** Research Project Id */
+            research_project_id?: string | null;
+            /** Snapshot Id */
+            snapshot_id?: string | null;
             /** Evidence Type */
             evidence_type: string;
             /** Statement */
@@ -4081,6 +4283,10 @@ export interface components {
             title: string;
             /** Url */
             url?: string | null;
+            /** Original Url */
+            original_url?: string | null;
+            /** Normalized Url */
+            normalized_url?: string | null;
             /** Domain */
             domain?: string | null;
             /** Author */
@@ -4135,6 +4341,10 @@ export interface components {
             title: string;
             /** Url */
             url?: string | null;
+            /** Original Url */
+            original_url?: string | null;
+            /** Normalized Url */
+            normalized_url?: string | null;
             /** Domain */
             domain?: string | null;
             /** Author */
@@ -7812,6 +8022,207 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ResearchFindingDetailResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_collection_create_api_v1_businesses__business_id__research_projects__project_id__collect_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Research project id. */
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchCollectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCollectionJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_collection_list_api_v1_businesses__business_id__research_collections_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCollectionJobListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_collection_get_api_v1_businesses__business_id__research_collections__collection_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCollectionJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_source_refresh_api_v1_businesses__business_id__research_sources__source_id__refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Research source id. */
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchCollectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCollectionJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_source_crawl_api_v1_businesses__business_id__research_sources__source_id__crawl_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Research source id. */
+                source_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchCollectionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCollectionJobResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_collection_cancel_api_v1_businesses__business_id__research_collections__collection_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                collection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchCollectionCancelResponse"];
                 };
             };
             /** @description Validation Error */

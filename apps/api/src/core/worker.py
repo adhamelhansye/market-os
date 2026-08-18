@@ -18,6 +18,8 @@ Never log: credentials, tokens, or provider secrets.
 """
 
 import secrets
+import uuid
+from datetime import UTC, datetime
 
 from arq import Retry, func
 from arq.connections import RedisSettings
@@ -25,6 +27,7 @@ from redis.asyncio import Redis
 
 from src.core.config import get_settings
 from src.core.logging import get_logger
+from src.db.models import ResearchCollectionJob
 from src.db.session import create_engine, create_session_factory
 from src.modules.integrations import service
 from src.modules.integrations.base.errors import (
@@ -35,6 +38,8 @@ from src.modules.integrations.base.errors import (
 from src.modules.integrations.meta.constants import (
     INITIAL_RESOURCES as META_INITIAL_RESOURCES,
 )
+from src.modules.research.collection import service as collection_service
+from src.modules.research.collection.provider import CollectionTransientError
 
 logger = get_logger(__name__)
 
@@ -95,9 +100,7 @@ async def _run_sync(
                     initial=initial,
                 )
             except ProviderAuthError:
-                logger.error(
-                    "sync failed: provider auth rejected (connection=%s)", connection_id
-                )
+                logger.error("sync failed: provider auth rejected (connection=%s)", connection_id)
                 raise
             except (ProviderRateLimitError, ProviderError) as exc:
                 raise await _retry_defer(ctx, exc) from exc
@@ -113,9 +116,7 @@ async def _run_sync(
 
 
 async def _shopify_initial_sync(ctx: dict, connection_id: str) -> dict[str, int]:
-    return await _run_sync(
-        ctx, connection_id, service.INITIAL_RESOURCES, initial=True
-    )
+    return await _run_sync(ctx, connection_id, service.INITIAL_RESOURCES, initial=True)
 
 
 async def _shopify_incremental_sync(
@@ -133,9 +134,7 @@ async def _shopify_webhook_processing(ctx: dict, event_id: str) -> None:
             redis = Redis.from_url(settings.redis_url, decode_responses=True)
             try:
                 try:
-                    await service.process_webhook_event(
-                        session, redis, settings, event_id=event_id
-                    )
+                    await service.process_webhook_event(session, redis, settings, event_id=event_id)
                 except (ProviderRateLimitError, ProviderError) as exc:
                     raise await _retry_defer(ctx, exc) from exc
             finally:
@@ -163,9 +162,7 @@ async def _run_meta_sync(
     token = secrets.token_urlsafe(16)
     acquired = await redis.set(lock_key, token, nx=True, px=_META_LOCK_TTL_MS)
     if not acquired:
-        logger.warning(
-            "meta sync skipped: lock held by another run (connection=%s)", connection_id
-        )
+        logger.warning("meta sync skipped: lock held by another run (connection=%s)", connection_id)
         await redis.aclose()
         return {"skipped": "locked"}
 
@@ -205,13 +202,34 @@ async def _run_meta_sync(
 
 
 async def _meta_initial_sync(ctx: dict, connection_id: str) -> dict:
-    return await _run_meta_sync(
-        ctx, connection_id, tuple(META_INITIAL_RESOURCES), initial=True
-    )
+    return await _run_meta_sync(ctx, connection_id, tuple(META_INITIAL_RESOURCES), initial=True)
 
 
 async def _meta_incremental_sync(ctx: dict, connection_id: str, resources: list[str]) -> dict:
     return await _run_meta_sync(ctx, connection_id, tuple(resources), initial=False)
+
+
+async def _research_collection(ctx: dict, collection_id: str) -> dict[str, str]:
+    settings = get_settings()
+    engine = create_engine(settings)
+    factory = create_session_factory(engine)
+    try:
+        async with factory() as session:
+            try:
+                job = await collection_service.run_job(session, uuid.UUID(collection_id))
+            except CollectionTransientError as exc:
+                attempts = int(await ctx["redis"].get(_RETRY_KEY.format(ctx["job_id"])) or 1)
+                if attempts >= 3:
+                    current = await session.get(ResearchCollectionJob, uuid.UUID(collection_id))
+                    if current:
+                        current.status, current.error = "failed", str(exc)
+                        current.completed_at = datetime.now(UTC)
+                        await session.commit()
+                    return {"status": "failed"}
+                raise Retry(defer=min(2 ** max(attempts - 1, 0) * 5, 300)) from exc
+        return {"status": job.status}
+    finally:
+        await engine.dispose()
 
 
 # Job names are the stable contract with jobs.py enqueue helpers.
@@ -239,6 +257,9 @@ meta_incremental_sync = func(
     max_tries=_MAX_TRIES,
     keep_result=0,
 )
+research_collection = func(
+    _research_collection, name="research_collection", max_tries=3, keep_result=0
+)
 
 
 class WorkerSettings:
@@ -248,6 +269,7 @@ class WorkerSettings:
         shopify_webhook_processing,
         meta_initial_sync,
         meta_incremental_sync,
+        research_collection,
     ]
     on_startup = startup
     on_shutdown = shutdown

@@ -65,6 +65,11 @@ export type ResearchFindingListResponse =
   components["schemas"]["ResearchFindingListResponse"];
 export type ResearchFindingCreateRequest =
   components["schemas"]["ResearchFindingCreateRequest"];
+export type ResearchCollectionRequest = components["schemas"]["ResearchCollectionRequest"];
+export type ResearchCollectionJobResponse =
+  components["schemas"]["ResearchCollectionJobResponse"];
+export type ResearchCollectionJobListResponse =
+  components["schemas"]["ResearchCollectionJobListResponse"];
 
 export const CONFIDENCE_VALUES = ["observed", "supported", "inferred", "hypothesis"] as const;
 export type Confidence = (typeof CONFIDENCE_VALUES)[number];
@@ -216,4 +221,42 @@ export function createResearchFinding(
   payload: ResearchFindingCreateRequest
 ): Promise<ResearchFindingResponse> {
   return apiPost<ResearchFindingResponse>(researchUrl(businessId, "findings"), payload);
+}
+
+export function fetchResearchCollections(
+  businessId: string
+): Promise<ResearchCollectionJobListResponse> {
+  return apiGet<ResearchCollectionJobListResponse>(researchUrl(businessId, "collections"));
+}
+
+export function collectResearchProject(
+  businessId: string,
+  projectId: string,
+  payload: ResearchCollectionRequest
+): Promise<ResearchCollectionJobResponse> {
+  return apiPost<ResearchCollectionJobResponse>(
+    researchUrl(businessId, `projects/${projectId}/collect`),
+    payload
+  );
+}
+
+export function refreshResearchSource(
+  businessId: string,
+  sourceId: string,
+  payload: ResearchCollectionRequest
+): Promise<ResearchCollectionJobResponse> {
+  return apiPost<ResearchCollectionJobResponse>(
+    researchUrl(businessId, `sources/${sourceId}/refresh`),
+    payload
+  );
+}
+
+export function cancelResearchCollection(
+  businessId: string,
+  collectionId: string
+): Promise<{ collection: ResearchCollectionJobResponse }> {
+  return apiPost<{ collection: ResearchCollectionJobResponse }>(
+    researchUrl(businessId, `collections/${collectionId}/cancel`),
+    {}
+  );
 }

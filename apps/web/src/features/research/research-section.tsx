@@ -12,6 +12,7 @@ import { CompetitorList } from "./competitor-list";
 import { SourceList } from "./source-list";
 import { EvidenceList } from "./evidence-list";
 import { FindingsList } from "./findings-list";
+import { CollectionPanel } from "./collection-panel";
 import {
   fetchResearchProject,
   fetchResearchProjects,
@@ -188,6 +189,7 @@ export function ResearchSection({ businessId }: ResearchSectionProps) {
       </Card>
 
       <ResearchProjects businessId={businessId} />
+      <CollectionPanel businessId={businessId} projectId={activeProjectId} />
       <CompetitorList businessId={businessId} />
       <SourceList businessId={businessId} />
       <EvidenceList businessId={businessId} />

@@ -13,6 +13,8 @@ from src.db.models.product_cost import ProductCost
 from src.db.models.product_price import ProductPrice
 from src.db.models.recommendation import Recommendation
 from src.db.models.research import (
+    ResearchCollectionJob,
+    ResearchCollectionPage,
     ResearchCompetitor,
     ResearchEvidence,
     ResearchFinding,
@@ -70,6 +72,8 @@ __all__ = [
     "ProductPrice",
     "Recommendation",
     "ResearchCompetitor",
+    "ResearchCollectionJob",
+    "ResearchCollectionPage",
     "ResearchEvidence",
     "ResearchFinding",
     "ResearchProject",

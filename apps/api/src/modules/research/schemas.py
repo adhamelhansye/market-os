@@ -69,9 +69,7 @@ class ResearchCompetitorResponse(BaseModel):
     description: str | None = None
     market: str | None = None
     status: str
-    metadata_json: dict[str, Any] = Field(
-        default_factory=dict, serialization_alias="metadata"
-    )
+    metadata_json: dict[str, Any] = Field(default_factory=dict, serialization_alias="metadata")
     created_at: datetime
     updated_at: datetime
 
@@ -88,14 +86,14 @@ class ResearchSourceResponse(BaseModel):
     source_type: str
     title: str
     url: str | None = None
+    original_url: str | None = None
+    normalized_url: str | None = None
     domain: str | None = None
     author: str | None = None
     published_at: datetime | None = None
     captured_at: datetime
     content_hash: str | None = None
-    metadata_json: dict[str, Any] = Field(
-        default_factory=dict, serialization_alias="metadata"
-    )
+    metadata_json: dict[str, Any] = Field(default_factory=dict, serialization_alias="metadata")
     status: str
     competitor_id: uuid.UUID | None = None
     created_at: datetime
@@ -109,9 +107,7 @@ class ResearchSnapshotResponse(BaseModel):
     captured_at: datetime
     content_hash: str
     content: str
-    metadata_json: dict[str, Any] = Field(
-        default_factory=dict, serialization_alias="metadata"
-    )
+    metadata_json: dict[str, Any] = Field(default_factory=dict, serialization_alias="metadata")
 
 
 class ResearchSourceDetailResponse(ResearchSourceResponse):
@@ -128,6 +124,8 @@ class ResearchEvidenceResponse(BaseModel):
 
     id: uuid.UUID
     source_id: uuid.UUID
+    research_project_id: uuid.UUID | None = None
+    snapshot_id: uuid.UUID | None = None
     evidence_type: str
     statement: str
     raw_excerpt: str | None = None
@@ -195,6 +193,49 @@ class ResearchSearchHitResponse(BaseModel):
 class ResearchSearchResponse(BaseModel):
     hits: list[ResearchSearchHitResponse]
     total: int
+
+
+class ResearchCollectionJobResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    research_project_id: uuid.UUID
+    source_id: uuid.UUID | None = None
+    provider: str
+    mode: str
+    status: str
+    max_pages: int
+    max_depth: int
+    same_domain: bool
+    pages_collected: int
+    change_status: str | None = None
+    attempts: int
+    error: str | None = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
+
+
+class ResearchCollectionJobListResponse(BaseModel):
+    collections: list[ResearchCollectionJobResponse]
+    total: int
+
+
+class ResearchCollectionRequest(BaseModel):
+    research_project_id: uuid.UUID | None = None
+    source_url: str | None = Field(default=None, max_length=2048)
+    mode: str = "single_page"
+    max_pages: int = Field(default=1, ge=1, le=50)
+    max_depth: int = Field(default=0, ge=0, le=2)
+    same_domain: bool = True
+    refresh: bool = False
+    specific_urls: list[str] = Field(default_factory=list, max_length=50)
+    idempotency_key: str | None = Field(default=None, max_length=255)
+
+
+class ResearchCollectionCancelResponse(BaseModel):
+    collection: ResearchCollectionJobResponse
 
 
 # ---------------------------------------------------------------------------

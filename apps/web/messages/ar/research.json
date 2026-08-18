@@ -169,5 +169,16 @@
   "provenance_paraphrased": "معاد صياغته",
   "provenance_analyzed": "محلل",
   "provenance_synthesized": "تركيبي",
-  "noSelection": "اختر قيمة…"
+  "noSelection": "اختر قيمة…",
+  "collectionTitle": "الجمع العام",
+  "collectionDescription": "اجمع صفحة عامة واحدة في لقطات قابلة لإعادة الإنتاج وأدلة مرصودة.",
+  "collect": "جمع",
+  "collectionError": "تعذر وضع مهمة الجمع في قائمة الانتظار.",
+  "noCollections": "لا توجد مهام جمع بعد.",
+  "pages": "صفحات",
+  "collectionStatus_queued": "في الانتظار",
+  "collectionStatus_running": "قيد التنفيذ",
+  "collectionStatus_completed": "مكتملة",
+  "collectionStatus_failed": "فشلت",
+  "collectionStatus_cancelled": "ملغاة"
 }

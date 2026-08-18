@@ -21,6 +21,7 @@ dependencies = [
     # Redis-backed async task queue for background jobs (initial/incremental
     # sync, webhook processing) with retries and exponential backoff.
     "arq>=0.28",
+    "httpx>=0.27",
 ]
 
 [project.optional-dependencies]

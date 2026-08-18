@@ -53,9 +53,7 @@ from src.db.base import Base
 
 class ResearchProject(Base):
     __tablename__ = "research_projects"
-    __table_args__ = (
-        Index("ix_research_projects_business_created", "business_id", "created_at"),
-    )
+    __table_args__ = (Index("ix_research_projects_business_created", "business_id", "created_at"),)
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
     organization_id: Mapped[uuid.UUID] = mapped_column(
@@ -142,6 +140,8 @@ class ResearchSource(Base):
     source_type: Mapped[str] = mapped_column(String(30), nullable=False)
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
+    original_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    normalized_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
     domain: Mapped[str | None] = mapped_column(String(255), nullable=True)
     author: Mapped[str | None] = mapped_column(String(255), nullable=True)
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -203,6 +203,12 @@ class ResearchEvidence(Base):
     source_id: Mapped[uuid.UUID] = mapped_column(
         ForeignKey("research_sources.id", ondelete="CASCADE"), nullable=False
     )
+    research_project_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_projects.id", ondelete="CASCADE"), nullable=True
+    )
+    snapshot_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_source_snapshots.id", ondelete="SET NULL"), nullable=True
+    )
     evidence_type: Mapped[str] = mapped_column(String(30), nullable=False)
     statement: Mapped[str] = mapped_column(Text, nullable=False)
     raw_excerpt: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -231,6 +237,94 @@ class ResearchEvidence(Base):
     @classification.setter
     def classification(self, value: str) -> None:
         self.confidence = value
+
+
+class ResearchCollectionJob(Base):
+    __tablename__ = "research_collection_jobs"
+    __table_args__ = (
+        Index("ix_research_collection_jobs_business_created", "business_id", "created_at"),
+        Index("ix_research_collection_jobs_project_status", "research_project_id", "status"),
+        Index("ix_research_collection_jobs_source_created", "source_id", "created_at"),
+        UniqueConstraint(
+            "organization_id",
+            "business_id",
+            "idempotency_key",
+            name="uq_research_collection_idempotency",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    research_project_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("research_projects.id", ondelete="CASCADE"), nullable=False
+    )
+    source_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("research_sources.id", ondelete="SET NULL"), nullable=True
+    )
+    provider: Mapped[str] = mapped_column(String(40), nullable=False)
+    mode: Mapped[str] = mapped_column(String(30), nullable=False)
+    status: Mapped[str] = mapped_column(String(20), nullable=False, default="queued")
+    max_pages: Mapped[int] = mapped_column(nullable=False, default=1)
+    max_depth: Mapped[int] = mapped_column(nullable=False, default=0)
+    same_domain: Mapped[bool] = mapped_column(nullable=False, default=True)
+    refresh: Mapped[bool] = mapped_column(nullable=False, default=False)
+    requested_urls: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    pages_collected: Mapped[int] = mapped_column(nullable=False, default=0)
+    change_status: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    attempts: Mapped[int] = mapped_column(nullable=False, default=0)
+    error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    idempotency_key: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_by: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now()
+    )
+
+
+class ResearchCollectionPage(Base):
+    __tablename__ = "research_collection_pages"
+    __table_args__ = (
+        UniqueConstraint(
+            "collection_job_id", "normalized_url", name="uq_research_collection_page_url"
+        ),
+        Index("ix_research_collection_pages_job", "collection_job_id"),
+        Index("ix_research_collection_pages_source", "source_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    collection_job_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("research_collection_jobs.id", ondelete="CASCADE"), nullable=False
+    )
+    source_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("research_sources.id", ondelete="CASCADE"), nullable=False
+    )
+    original_url: Mapped[str] = mapped_column(String(2048), nullable=False)
+    normalized_url: Mapped[str] = mapped_column(String(2048), nullable=False)
+    http_status: Mapped[int] = mapped_column(nullable=False)
+    content_type: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    title: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    canonical_url: Mapped[str | None] = mapped_column(String(2048), nullable=True)
+    content_hash: Mapped[str] = mapped_column(String(64), nullable=False)
+    content: Mapped[str] = mapped_column(Text, nullable=False)
+    metadata_json: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    response_size: Mapped[int] = mapped_column(nullable=False, default=0)
+    duration_ms: Mapped[int] = mapped_column(nullable=False, default=0)
+    depth: Mapped[int] = mapped_column(nullable=False, default=0)
+    retrieved_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
 
 
 class ResearchFinding(Base):
@@ -290,6 +384,8 @@ research_finding_evidence = Table(
 
 __all__ = [
     "ResearchCompetitor",
+    "ResearchCollectionJob",
+    "ResearchCollectionPage",
     "ResearchEvidence",
     "ResearchFinding",
     "ResearchProject",

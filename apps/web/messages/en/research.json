@@ -169,5 +169,16 @@
   "provenance_paraphrased": "Paraphrased",
   "provenance_analyzed": "Analyzed",
   "provenance_synthesized": "Synthesized",
-  "noSelection": "Select a value…"
+  "noSelection": "Select a value…",
+  "collectionTitle": "Public collection",
+  "collectionDescription": "Collect one public page into reproducible snapshots and observed evidence.",
+  "collect": "Collect",
+  "collectionError": "Could not queue collection.",
+  "noCollections": "No collection jobs yet.",
+  "pages": "pages",
+  "collectionStatus_queued": "Queued",
+  "collectionStatus_running": "Running",
+  "collectionStatus_completed": "Completed",
+  "collectionStatus_failed": "Failed",
+  "collectionStatus_cancelled": "Cancelled"
 }

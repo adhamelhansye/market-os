@@ -174,7 +174,7 @@ class ResearchStore:
             scope=request.scope or None,
             status="draft",
             created_by=created_by,
-    )
+        )
         session.add(project)
         await session.commit()
         await session.refresh(project)
@@ -194,7 +194,7 @@ class ResearchStore:
                 )
             )
             or 0
-    )
+        )
         rows = list(
             await session.scalars(
                 select(ResearchProject)
@@ -205,7 +205,7 @@ class ResearchStore:
                 .order_by(desc(ResearchProject.created_at))
                 .limit(limit)
             )
-    )
+        )
         return rows, total
 
     async def get_project(
@@ -218,7 +218,7 @@ class ResearchStore:
                 ResearchProject.business_id == business.id,
                 ResearchProject.id == project_id,
             )
-    )
+        )
 
     async def set_project_status(
         self,
@@ -239,9 +239,7 @@ class ResearchStore:
         await session.refresh(stored)
         return stored
 
-    async def project_summary(
-        self, business: Business, project_id: uuid.UUID
-    ) -> dict[str, Any]:
+    async def project_summary(self, business: Business, project_id: uuid.UUID) -> dict[str, Any]:
         """Deterministic data-quality summary for a project detail."""
         session = self._session_factory
         where_evidence = [
@@ -253,7 +251,7 @@ class ResearchStore:
                 select(func.count()).select_from(ResearchEvidence).where(*where_evidence)
             )
             or 0
-    )
+        )
         where_source = [
             ResearchSource.organization_id == business.organization_id,
             ResearchSource.business_id == business.id,
@@ -263,19 +261,17 @@ class ResearchStore:
                 select(func.count()).select_from(ResearchSource).where(*where_source)
             )
             or 0
-    )
+        )
         where_competitor = [
             ResearchCompetitor.organization_id == business.organization_id,
             ResearchCompetitor.business_id == business.id,
         ]
         competitor_count = int(
             await session.scalar(
-                select(func.count())
-                .select_from(ResearchCompetitor)
-                .where(*where_competitor)
+                select(func.count()).select_from(ResearchCompetitor).where(*where_competitor)
             )
             or 0
-    )
+        )
         where_finding = [
             ResearchFinding.organization_id == business.organization_id,
             ResearchFinding.business_id == business.id,
@@ -286,12 +282,8 @@ class ResearchStore:
                 select(func.count()).select_from(ResearchFinding).where(*where_finding)
             )
             or 0
-    )
-        covered = set(
-            await session.scalars(
-                select(ResearchFinding.category).where(*where_finding)
-            )
-    )
+        )
+        covered = set(await session.scalars(select(ResearchFinding.category).where(*where_finding)))
         total_categories = len(FINDING_CATEGORIES)
         coverage = {
             "status": "available" if total_categories > 0 else "unavailable",
@@ -308,7 +300,7 @@ class ResearchStore:
                 .order_by(desc(ResearchEvidence.captured_at))
                 .limit(1)
             )
-    )
+        )
         freshness = latest[0] if latest else None
         evidence_by_type = dict(
             Counter(
@@ -317,7 +309,7 @@ class ResearchStore:
                     select(ResearchEvidence.evidence_type).where(*where_evidence)
                 )
             )
-    )
+        )
         strength_counts: dict[str, int] = {}
         for strength in ("strong", "moderate", "weak", "insufficient"):
             strength_counts[strength] = int(
@@ -355,10 +347,9 @@ class ResearchStore:
             select(ResearchCompetitor).where(
                 ResearchCompetitor.organization_id == business.organization_id,
                 ResearchCompetitor.business_id == business.id,
-                func.lower(ResearchCompetitor.name)
-                == request.name.strip().lower(),
+                func.lower(ResearchCompetitor.name) == request.name.strip().lower(),
             )
-    )
+        )
         if duplicate is not None:
             raise ResearchResourceConflictError(
                 "duplicate_competitor",
@@ -374,7 +365,7 @@ class ResearchStore:
             status=request.status or "active",
             metadata_json=_money_safe_json(request.metadata or {}),
             created_by=created_by,
-    )
+        )
         session.add(competitor)
         await session.commit()
         await session.refresh(competitor)
@@ -389,11 +380,9 @@ class ResearchStore:
             ResearchCompetitor.business_id == business.id,
         ]
         total = int(
-            await session.scalar(
-                select(func.count()).select_from(ResearchCompetitor).where(*where)
-            )
+            await session.scalar(select(func.count()).select_from(ResearchCompetitor).where(*where))
             or 0
-    )
+        )
         rows = list(
             await session.scalars(
                 select(ResearchCompetitor)
@@ -401,7 +390,7 @@ class ResearchStore:
                 .order_by(asc(ResearchCompetitor.name))
                 .limit(limit)
             )
-    )
+        )
         return rows, total
 
     async def get_competitor(
@@ -414,7 +403,7 @@ class ResearchStore:
                 ResearchCompetitor.business_id == business.id,
                 ResearchCompetitor.id == competitor_id,
             )
-    )
+        )
 
     # ------------------------------------------------------------------
     # Sources
@@ -456,6 +445,8 @@ class ResearchStore:
             source_type=request.source_type,
             title=request.title.strip(),
             url=request.url or None,
+            original_url=request.url or None,
+            normalized_url=request.url or None,
             domain=domain,
             author=request.author or None,
             published_at=request.published_at,
@@ -464,7 +455,7 @@ class ResearchStore:
             status="active",
             competitor_id=request.competitor_id,
             created_by=created_by,
-    )
+        )
         session.add(source)
         await session.flush()
         if content_hash is not None:
@@ -501,11 +492,9 @@ class ResearchStore:
         if status:
             where.append(ResearchSource.status == status)
         total = int(
-            await session.scalar(
-                select(func.count()).select_from(ResearchSource).where(*where)
-            )
+            await session.scalar(select(func.count()).select_from(ResearchSource).where(*where))
             or 0
-    )
+        )
         rows = list(
             await session.scalars(
                 select(ResearchSource)
@@ -513,12 +502,10 @@ class ResearchStore:
                 .order_by(desc(ResearchSource.created_at))
                 .limit(limit)
             )
-    )
+        )
         return rows, total
 
-    async def get_source(
-        self, business: Business, source_id: uuid.UUID
-    ) -> ResearchSource | None:
+    async def get_source(self, business: Business, source_id: uuid.UUID) -> ResearchSource | None:
         session = self._session_factory
         return await session.scalar(
             select(ResearchSource).where(
@@ -526,11 +513,9 @@ class ResearchStore:
                 ResearchSource.business_id == business.id,
                 ResearchSource.id == source_id,
             )
-    )
+        )
 
-    async def get_source_snapshots(
-        self, source: ResearchSource
-    ) -> list[ResearchSourceSnapshot]:
+    async def get_source_snapshots(self, source: ResearchSource) -> list[ResearchSourceSnapshot]:
         session = self._session_factory
         return list(
             await session.scalars(
@@ -538,7 +523,7 @@ class ResearchStore:
                 .where(ResearchSourceSnapshot.source_id == source.id)
                 .order_by(desc(ResearchSourceSnapshot.captured_at))
             )
-    )
+        )
 
     # ------------------------------------------------------------------
     # Evidence
@@ -560,7 +545,7 @@ class ResearchStore:
                 ResearchSource.business_id == business.id,
                 ResearchSource.id == request.source_id,
             )
-    )
+        )
         if source is None:
             raise ResearchNotFoundError("source", str(request.source_id))
 
@@ -591,7 +576,7 @@ class ResearchStore:
             confidence=classification,
             provenance=request.provenance,
             created_by=created_by,
-    )
+        )
         session.add(evidence)
         await session.commit()
         await session.refresh(evidence)
@@ -622,11 +607,9 @@ class ResearchStore:
         if provenance:
             where.append(ResearchEvidence.provenance == provenance)
         total = int(
-            await session.scalar(
-                select(func.count()).select_from(ResearchEvidence).where(*where)
-            )
+            await session.scalar(select(func.count()).select_from(ResearchEvidence).where(*where))
             or 0
-    )
+        )
         rows = list(
             await session.scalars(
                 select(ResearchEvidence)
@@ -634,7 +617,7 @@ class ResearchStore:
                 .order_by(desc(ResearchEvidence.created_at))
                 .limit(limit)
             )
-    )
+        )
         return rows, total
 
     # ------------------------------------------------------------------
@@ -658,7 +641,7 @@ class ResearchStore:
                 ResearchProject.business_id == business.id,
                 ResearchProject.id == request.research_project_id,
             )
-    )
+        )
         if project is None:
             raise ResearchNotFoundError("project", str(request.research_project_id))
 
@@ -701,9 +684,7 @@ class ResearchStore:
             raise ResearchConfirmationError(
                 classification="observed",
                 reasons=["observed_requires_evidence"],
-                details=[
-                    "An observed finding must reference at least one evidence row."
-                ],
+                details=["An observed finding must reference at least one evidence row."],
             )
 
         corroborated = 0
@@ -732,7 +713,7 @@ class ResearchStore:
             importance=request.importance,
             evidence_strength=evidence_strength_ladder(len(valid_ids), corroborated),
             created_by=created_by,
-    )
+        )
         session.add(finding)
         await session.flush()
         for evidence_id in valid_ids:
@@ -769,11 +750,9 @@ class ResearchStore:
         if importance:
             where.append(ResearchFinding.importance == importance)
         total = int(
-            await session.scalar(
-                select(func.count()).select_from(ResearchFinding).where(*where)
-            )
+            await session.scalar(select(func.count()).select_from(ResearchFinding).where(*where))
             or 0
-    )
+        )
         rows = list(
             await session.scalars(
                 select(ResearchFinding)
@@ -781,7 +760,7 @@ class ResearchStore:
                 .order_by(desc(ResearchFinding.created_at))
                 .limit(limit)
             )
-    )
+        )
         return rows, total
 
     async def get_finding(
@@ -794,7 +773,7 @@ class ResearchStore:
                 ResearchFinding.business_id == business.id,
                 ResearchFinding.id == finding_id,
             )
-    )
+        )
         if finding is None:
             return None
         evidence = list(
@@ -807,7 +786,7 @@ class ResearchStore:
                 .where(research_finding_evidence.c.finding_id == finding.id)
                 .order_by(desc(ResearchEvidence.created_at))
             )
-    )
+        )
         return finding, evidence
 
     # ------------------------------------------------------------------

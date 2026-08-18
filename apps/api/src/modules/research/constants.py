@@ -89,9 +89,7 @@ FINDING_CATEGORIES: frozenset[str] = frozenset(
 
 # Deterministic classification & confidence ladder (spec-defined).
 CLASSIFICATION_VALUES: frozenset[str] = frozenset({"observed", "inferred", "hypothesis"})
-CONFIDENCE_VALUES: frozenset[str] = frozenset(
-    {"observed", "supported", "inferred", "hypothesis"}
-)
+CONFIDENCE_VALUES: frozenset[str] = frozenset({"observed", "supported", "inferred", "hypothesis"})
 
 PROVENANCE_VALUES: frozenset[str] = frozenset(
     {"collected", "cited", "paraphrased", "analyzed", "synthesized"}

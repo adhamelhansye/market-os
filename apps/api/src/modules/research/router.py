@@ -25,9 +25,10 @@ from src.core.dependencies import (
     DbSession,
     require_permission,
 )
-from src.core.exceptions import NotFoundError
+from src.core.exceptions import ApiError, NotFoundError
 from src.core.tenancy import TenantContext
 from src.db.models import (
+    ResearchCollectionJob,
     ResearchCompetitor,
     ResearchEvidence,
     ResearchFinding,
@@ -36,7 +37,16 @@ from src.db.models import (
 )
 from src.modules.businesses.service import get_business
 from src.modules.research import service as research_service
+from src.modules.research.collection import jobs as collection_jobs
+from src.modules.research.collection import service as collection_service
+from src.modules.research.collection.errors import CollectionRequestError
+from src.modules.research.collection.provider import CollectionError
+from src.modules.research.collection.security import URLPolicyError
 from src.modules.research.schemas import (
+    ResearchCollectionCancelResponse,
+    ResearchCollectionJobListResponse,
+    ResearchCollectionJobResponse,
+    ResearchCollectionRequest,
     ResearchCompetitorCreateRequest,
     ResearchCompetitorListResponse,
     ResearchCompetitorResponse,
@@ -184,9 +194,7 @@ async def research_project_status(
 ) -> ResearchProjectResponse:
     business = await get_business(session, business_id)
     project = await _get_project_or_404(session, business, project_id)
-    updated = await _get_store(session).set_project_status(
-        business, project, request=payload
-    )
+    updated = await _get_store(session).set_project_status(business, project, request=payload)
     return _to_project_response(updated)
 
 
@@ -293,9 +301,7 @@ async def research_source_create(
     user: CurrentUser,
 ) -> ResearchSourceResponse:
     business = await get_business(session, business_id)
-    source = await _get_store(session).create_source(
-        business, request=payload, created_by=user.id
-    )
+    source = await _get_store(session).create_source(business, request=payload, created_by=user.id)
     return _to_source_response(source)
 
 
@@ -473,6 +479,159 @@ async def research_finding_get(
         for e in evidence
     ]
     return response
+
+
+def _collection_invalid(message: str) -> ApiError:
+    return CollectionRequestError(message, details={"phase": "6B"})
+
+
+async def _queue_collection(
+    session, business, project, payload, user, source: ResearchSource | None = None
+) -> ResearchCollectionJob:
+    try:
+        job = await collection_service.create_job(
+            session, business, project, payload, user.id, source=source
+        )
+    except (URLPolicyError, CollectionError) as exc:
+        raise _collection_invalid(str(exc)) from exc
+    await collection_jobs.enqueue_collection_job(job.id)
+    return job
+
+
+@router.post(
+    "/businesses/{business_id}/research/projects/{project_id}/collect",
+    response_model=ResearchCollectionJobResponse,
+    status_code=202,
+    summary="Queue public research collection",
+)
+async def research_collection_create(
+    payload: ResearchCollectionRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    user: CurrentUser,
+    project_id: uuid.UUID = _PROJECT_ID,
+) -> ResearchCollectionJobResponse:
+    business = await get_business(session, business_id)
+    project = await _get_project_or_404(session, business, project_id)
+    job = await _queue_collection(session, business, project, payload, user)
+    return ResearchCollectionJobResponse.model_validate(job)
+
+
+@router.get(
+    "/businesses/{business_id}/research/collections",
+    response_model=ResearchCollectionJobListResponse,
+    summary="List collection jobs",
+)
+async def research_collection_list(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    limit: Annotated[int, Query(ge=1, le=200)] = 100,
+) -> ResearchCollectionJobListResponse:
+    business = await get_business(session, business_id)
+    rows, total = await collection_service.list_jobs(session, business, limit)
+    return ResearchCollectionJobListResponse(
+        collections=[ResearchCollectionJobResponse.model_validate(row) for row in rows], total=total
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/research/collections/{collection_id}",
+    response_model=ResearchCollectionJobResponse,
+    summary="Get a collection job",
+)
+async def research_collection_get(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    collection_id: uuid.UUID,
+) -> ResearchCollectionJobResponse:
+    business = await get_business(session, business_id)
+    job = await collection_service.get_job(session, business, collection_id)
+    if job is None:
+        raise _not_found("collection job", collection_id)
+    return ResearchCollectionJobResponse.model_validate(job)
+
+
+async def _source_for_collection(session, business, source_id: uuid.UUID) -> ResearchSource:
+    source = await _get_store(session).get_source(business, source_id)
+    if source is None:
+        raise _not_found("research source", source_id)
+    return source
+
+
+@router.post(
+    "/businesses/{business_id}/research/sources/{source_id}/refresh",
+    response_model=ResearchCollectionJobResponse,
+    status_code=202,
+    summary="Refresh a public research source",
+)
+async def research_source_refresh(
+    payload: ResearchCollectionRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    user: CurrentUser,
+    source_id: uuid.UUID = _SOURCE_ID,
+) -> ResearchCollectionJobResponse:
+    business = await get_business(session, business_id)
+    source = await _source_for_collection(session, business, source_id)
+    if payload.source_url is None:
+        payload.source_url = source.normalized_url or source.url
+    project_id = payload.research_project_id
+    if not project_id:
+        raise _collection_invalid("refresh requires a research project")
+    project = await _get_project_or_404(session, business, project_id)
+    job = await _queue_collection(session, business, project, payload, user, source)
+    return ResearchCollectionJobResponse.model_validate(job)
+
+
+@router.post(
+    "/businesses/{business_id}/research/sources/{source_id}/crawl",
+    response_model=ResearchCollectionJobResponse,
+    status_code=202,
+    summary="Queue limited same-domain collection",
+)
+async def research_source_crawl(
+    payload: ResearchCollectionRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    user: CurrentUser,
+    source_id: uuid.UUID = _SOURCE_ID,
+) -> ResearchCollectionJobResponse:
+    payload.mode = "site_limited"
+    business = await get_business(session, business_id)
+    source = await _source_for_collection(session, business, source_id)
+    project_id = payload.research_project_id
+    if not project_id:
+        raise _collection_invalid("crawl requires a research project")
+    project = await _get_project_or_404(session, business, project_id)
+    return ResearchCollectionJobResponse.model_validate(
+        await _queue_collection(session, business, project, payload, user, source)
+    )
+
+
+@router.post(
+    "/businesses/{business_id}/research/collections/{collection_id}/cancel",
+    response_model=ResearchCollectionCancelResponse,
+    summary="Cancel a queued collection",
+)
+async def research_collection_cancel(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    collection_id: uuid.UUID,
+) -> ResearchCollectionCancelResponse:
+    business = await get_business(session, business_id)
+    job = await collection_service.get_job(session, business, collection_id)
+    if job is None:
+        raise _not_found("collection job", collection_id)
+    job = await collection_service.cancel_job(session, business, job)
+    return ResearchCollectionCancelResponse(
+        collection=ResearchCollectionJobResponse.model_validate(job)
+    )
 
 
 __all__ = ["router"]
