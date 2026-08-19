@@ -123,3 +123,93 @@ async def test_strategy_summary_and_snapshot_endpoints(client: AsyncClient, tena
     assert summary.json()["positioning"]["status"] == "insufficient_data"
     snapshot = await client.get(f"{base}/snapshot", headers=tenant["headers"])
     assert snapshot.status_code == 404
+
+
+async def test_strategy_decision_integrates_research_and_performance(
+    client: AsyncClient, tenant: dict
+) -> None:
+    base = f"/api/v1/businesses/{tenant['business'].id}/strategy"
+    candidate = await client.post(
+        f"{base}/positioning/candidates",
+        headers=tenant["headers"],
+        json={
+            "name": "Decision candidate",
+            "solution": "A product solution",
+            "promise": "A supported outcome",
+        },
+    )
+    assert candidate.status_code == 201, candidate.text
+    decision = await client.post(
+        f"{base}/decisions/evaluate",
+        headers=tenant["headers"],
+        json={"candidate_type": "positioning", "candidate_id": candidate.json()["id"]},
+    )
+    assert decision.status_code == 201, decision.text
+    body = decision.json()
+    assert body["decision_rules_version"] == "strategy_decision_v1"
+    assert body["status"] in {"not_recommended", "insufficient_data"}
+    assert "metrics_range" in body["input_snapshot"]
+    assert "metrics" in body["evaluation"]
+    listed = await client.get(f"{base}/decisions", headers=tenant["headers"])
+    assert listed.status_code == 200
+    assert listed.json()["decisions"][0]["id"] == body["id"]
+    provenance = await client.get(
+        f"{base}/decisions/{body['id']}/provenance", headers=tenant["headers"]
+    )
+    assert provenance.status_code == 200
+
+
+async def test_offer_decision_economic_gate_and_goal_reference(
+    session: AsyncSession, client: AsyncClient, tenant: dict
+) -> None:
+    product = await _product(session, tenant, cogs="120.00")
+    goal = await client.post(
+        f"/api/v1/businesses/{tenant['business'].id}/goals",
+        headers=tenant["headers"],
+        json={
+            "period_start": "2020-01-01T00:00:00Z",
+            "period_end": "2099-01-01T00:00:00Z",
+            "maximum_cpa": "20.00",
+            "target_roas": "2.00",
+            "currency": "USD",
+        },
+    )
+    assert goal.status_code == 201, goal.text
+    base = f"/api/v1/businesses/{tenant['business'].id}/strategy"
+    candidate = await client.post(
+        f"{base}/offers/candidates",
+        headers=tenant["headers"],
+        json={"name": "Invalid decision offer", "product_id": str(product.id)},
+    )
+    assert candidate.status_code == 201, candidate.text
+    decision = await client.post(
+        f"{base}/decisions/evaluate",
+        headers=tenant["headers"],
+        json={"candidate_type": "offer", "candidate_id": candidate.json()["id"]},
+    )
+    assert decision.status_code == 201, decision.text
+    body = decision.json()
+    assert body["status"] == "economically_invalid"
+    assert body["evaluation"]["goal"]["status"] == "available"
+    assert any(reason["type"] == "economic" for reason in body["reasons"])
+
+
+async def test_strategy_decision_cross_tenant_isolation(
+    session: AsyncSession, client: AsyncClient, tenant: dict
+) -> None:
+    created = await client.post(
+        f"/api/v1/businesses/{tenant['business'].id}/strategy/positioning/candidates",
+        headers=tenant["headers"],
+        json={"name": "Private candidate"},
+    )
+    assert created.status_code == 201
+    foreign = await create_tenant(session)
+    response = await client.post(
+        f"/api/v1/businesses/{foreign['business'].id}/strategy/decisions/evaluate",
+        headers=foreign["headers"],
+        json={
+            "candidate_type": "positioning",
+            "candidate_id": created.json()["id"],
+        },
+    )
+    assert response.status_code == 404

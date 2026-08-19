@@ -5,10 +5,11 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
 
-from src.core.dependencies import CurrentBusinessId, DbSession, require_permission
+from src.core.dependencies import CurrentBusinessId, DbSession, SettingsDep, require_permission
 from src.core.exceptions import NotFoundError
 from src.core.tenancy import TenantContext
 from src.modules.businesses.service import get_business
+from src.modules.strategy import decision as decision_service
 from src.modules.strategy import service
 from src.modules.strategy.schemas import (
     OfferCandidateCreate,
@@ -20,6 +21,10 @@ from src.modules.strategy.schemas import (
     PositioningCandidateRead,
     PositioningResponse,
     PositioningVersionsResponse,
+    StrategyDecisionEvaluateRequest,
+    StrategyDecisionListResponse,
+    StrategyDecisionProvenanceResponse,
+    StrategyDecisionRead,
     StrategySnapshotResponse,
     StrategySummaryResponse,
 )
@@ -39,6 +44,25 @@ def _offers(data: dict) -> OfferResponse:
         OfferCandidateRead.model_validate(candidate) for candidate in data["candidates"]
     ]
     return OfferResponse.model_validate(data)
+
+
+def _decision(row) -> StrategyDecisionRead:
+    return StrategyDecisionRead.model_validate(
+        {
+            "id": row.id,
+            "candidate_type": row.candidate_type,
+            "candidate_id": row.candidate_id,
+            "strategy_version": row.strategy_version,
+            "decision_rules_version": row.decision_rules_version,
+            "status": row.status,
+            "overall_score": row.overall_score,
+            "input_snapshot": row.input_snapshot,
+            "evaluation": row.evaluation,
+            "reasons": row.reasons,
+            "provenance": row.provenance,
+            "created_at": row.created_at,
+        }
+    )
 
 
 @router.get("/businesses/{business_id}/strategy/positioning", response_model=PositioningResponse)
@@ -291,3 +315,70 @@ async def get_strategy_snapshot(
             "created_at": snapshot.created_at,
         }
     )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/decisions",
+    response_model=StrategyDecisionListResponse,
+)
+async def list_strategy_decisions(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> StrategyDecisionListResponse:
+    business = await get_business(session, business_id)
+    return StrategyDecisionListResponse(
+        decisions=[
+            _decision(row) for row in await decision_service.list_decisions(session, business)
+        ]
+    )
+
+
+@router.post(
+    "/businesses/{business_id}/strategy/decisions/evaluate",
+    response_model=StrategyDecisionRead,
+    status_code=201,
+)
+async def evaluate_strategy_decision(
+    payload: StrategyDecisionEvaluateRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    settings: SettingsDep,
+) -> StrategyDecisionRead:
+    business = await get_business(session, business_id)
+    return _decision(await decision_service.evaluate_decision(session, business, payload, settings))
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/decisions/{decision_id}/provenance",
+    response_model=StrategyDecisionProvenanceResponse,
+)
+async def strategy_decision_provenance(
+    business_id: CurrentBusinessId,
+    decision_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> StrategyDecisionProvenanceResponse:
+    business = await get_business(session, business_id)
+    row = await decision_service.get_decision(session, business, decision_id)
+    return StrategyDecisionProvenanceResponse(
+        decision_id=row.id,
+        candidate_type=row.candidate_type,
+        candidate_id=row.candidate_id,
+        provenance=row.provenance,
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/decisions/{decision_id}",
+    response_model=StrategyDecisionRead,
+)
+async def get_strategy_decision(
+    business_id: CurrentBusinessId,
+    decision_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> StrategyDecisionRead:
+    business = await get_business(session, business_id)
+    return _decision(await decision_service.get_decision(session, business, decision_id))

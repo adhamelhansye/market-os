@@ -10,12 +10,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import {
   createOfferCandidate,
   createPositioningCandidate,
+  evaluateStrategyDecision,
+  fetchStrategyDecisions,
   fetchStrategySummary,
   recommendOffer,
   recommendPositioning,
   validateOffer,
   type OfferCandidateRead,
   type PositioningCandidateRead,
+  type StrategyDecisionRead,
 } from "./api";
 
 function Provenance({ item, t }: { item: PositioningCandidateRead | OfferCandidateRead; t: (key: string) => string }) {
@@ -31,7 +34,7 @@ function Provenance({ item, t }: { item: PositioningCandidateRead | OfferCandida
   );
 }
 
-function PositioningCard({ item, t }: { item: PositioningCandidateRead; t: (key: string) => string }) {
+function PositioningCard({ item, t, onEvaluate }: { item: PositioningCandidateRead; t: (key: string) => string; onEvaluate: () => void }) {
   return (
     <div className="space-y-2 rounded-md border p-3" data-testid="positioning-candidate">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -47,13 +50,14 @@ function PositioningCard({ item, t }: { item: PositioningCandidateRead; t: (key:
         <div><dt className="text-xs text-muted-foreground">{t("score")}</dt><dd>{item.score ?? t("unavailable")}</dd></div>
       </dl>
       <p className="text-sm text-muted-foreground">{item.positioning_statement ?? t("derivedStatementUnavailable")}</p>
+      <Button type="button" size="sm" variant="outline" onClick={onEvaluate}>{t("evaluateDecision")}</Button>
       {item.risks.length > 0 ? <div className="text-xs text-muted-foreground">{t("risks")}: {item.risks.map((risk) => String(risk.code ?? risk.reason)).join(", ")}</div> : null}
       <Provenance item={item} t={t} />
     </div>
   );
 }
 
-function OfferCard({ item, t, onValidate }: { item: OfferCandidateRead; t: (key: string) => string; onValidate: () => void }) {
+function OfferCard({ item, t, onValidate, onEvaluate }: { item: OfferCandidateRead; t: (key: string) => string; onValidate: () => void; onEvaluate: () => void }) {
   const economics = item.economics;
   return (
     <div className="space-y-2 rounded-md border p-3" data-testid="offer-candidate">
@@ -69,8 +73,28 @@ function OfferCard({ item, t, onValidate }: { item: OfferCandidateRead; t: (key:
         <div><span className="text-xs text-muted-foreground">{t("breakEvenRoas")}: </span>{String(economics.break_even_roas ?? t("unavailable"))}</div>
       </div>
       {item.status === "draft" ? <Button type="button" size="sm" variant="outline" onClick={onValidate}>{t("validate")}</Button> : null}
+      <Button type="button" size="sm" variant="outline" onClick={onEvaluate}>{t("evaluateDecision")}</Button>
       {item.risks.length > 0 ? <div className="text-xs text-muted-foreground">{t("risks")}: {item.risks.map((risk) => String(risk.code ?? risk.reason)).join(", ")}</div> : null}
       <Provenance item={item} t={t} />
+    </div>
+  );
+}
+
+function DecisionCard({ item, t }: { item: StrategyDecisionRead; t: (key: string) => string }) {
+  return (
+    <div className="space-y-2 rounded-md border p-3" data-testid="strategy-decision">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">{item.candidate_type} · {item.candidate_id}</span>
+        <span className="text-xs text-muted-foreground">{item.status} · {item.overall_score ?? t("unavailable")}</span>
+      </div>
+      <div className="grid gap-1 text-sm sm:grid-cols-2">
+        <div><span className="text-xs text-muted-foreground">{t("goalAlignment")}: </span>{String(item.evaluation.goal_alignment ?? t("unavailable"))}</div>
+        <div><span className="text-xs text-muted-foreground">{t("performanceCompatibility")}: </span>{String(item.evaluation.performance_compatibility ?? t("unavailable"))}</div>
+        <div><span className="text-xs text-muted-foreground">{t("forecastAlignment")}: </span>{String(item.evaluation.forecast_alignment ?? t("unavailable"))}</div>
+        <div><span className="text-xs text-muted-foreground">{t("simulationAlignment")}: </span>{String(item.evaluation.simulation_alignment ?? t("unavailable"))}</div>
+      </div>
+      {item.reasons.length ? <div className="text-xs text-muted-foreground">{t("decisionReasons")}: {item.reasons.map((reason) => reason.statement).join("; ")}</div> : null}
+      <div className="border-t pt-2 text-xs text-muted-foreground">{t("decisionRulesVersion")}: {item.decision_rules_version}</div>
     </div>
   );
 }
@@ -88,6 +112,8 @@ export function StrategySection({ businessId }: { businessId: string }) {
   const recommendPositioningMutation = useMutation({ mutationFn: () => recommendPositioning(businessId), onSuccess: invalidate });
   const recommendOfferMutation = useMutation({ mutationFn: () => recommendOffer(businessId), onSuccess: invalidate });
   const validateMutation = useMutation({ mutationFn: (id: string) => validateOffer(businessId, id), onSuccess: invalidate });
+  const decisionsQuery = useQuery({ queryKey: ["strategy-decisions", businessId], queryFn: () => fetchStrategyDecisions(businessId), enabled: Boolean(businessId) });
+  const evaluateMutation = useMutation({ mutationFn: (input: { candidate_type: "positioning" | "offer"; candidate_id: string }) => evaluateStrategyDecision(businessId, { ...input, range_kind: "last_30_days" }), onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["strategy-decisions", businessId] }) });
 
   return (
     <div className="space-y-4" data-testid="strategy-section">
@@ -105,7 +131,7 @@ export function StrategySection({ businessId }: { businessId: string }) {
           <CardContent className="space-y-3">
             <form className="flex gap-2" onSubmit={(event) => { event.preventDefault(); if (positioningName.trim()) positioningMutation.mutate(); }}><input className="min-w-0 flex-1 rounded-md border bg-background px-3 py-2 text-sm" aria-label={t("candidateName")} value={positioningName} onChange={(event) => setPositioningName(event.target.value)} placeholder={t("candidateName")} /><Button type="submit">{t("addCandidate")}</Button></form>
             <Button type="button" variant="outline" onClick={() => recommendPositioningMutation.mutate()}>{t("recommend")}</Button>
-            {query.data?.positioning.candidates.length ? query.data.positioning.candidates.map((item) => <PositioningCard key={item.id} item={item} t={t} />) : <p className="text-sm text-muted-foreground">{t("noCandidates")}</p>}
+            {query.data?.positioning.candidates.length ? query.data.positioning.candidates.map((item) => <PositioningCard key={item.id} item={item} t={t} onEvaluate={() => evaluateMutation.mutate({ candidate_type: "positioning", candidate_id: item.id })} />) : <p className="text-sm text-muted-foreground">{t("noCandidates")}</p>}
           </CardContent>
         </Card>
         <Card>
@@ -113,10 +139,18 @@ export function StrategySection({ businessId }: { businessId: string }) {
           <CardContent className="space-y-3">
             <form className="grid gap-2" onSubmit={(event) => { event.preventDefault(); if (offerName.trim() && productId.trim()) offerMutation.mutate(); }}><input className="rounded-md border bg-background px-3 py-2 text-sm" aria-label={t("candidateName")} value={offerName} onChange={(event) => setOfferName(event.target.value)} placeholder={t("offerName")} /><input className="rounded-md border bg-background px-3 py-2 text-sm" aria-label={t("productId")} value={productId} onChange={(event) => setProductId(event.target.value)} placeholder={t("productId")} /><Button type="submit">{t("addCandidate")}</Button></form>
             <Button type="button" variant="outline" onClick={() => recommendOfferMutation.mutate()}>{t("recommend")}</Button>
-            {query.data?.offers.candidates.length ? query.data.offers.candidates.map((item) => <OfferCard key={item.id} item={item} t={t} onValidate={() => validateMutation.mutate(item.id)} />) : <p className="text-sm text-muted-foreground">{t("noCandidates")}</p>}
+            {query.data?.offers.candidates.length ? query.data.offers.candidates.map((item) => <OfferCard key={item.id} item={item} t={t} onValidate={() => validateMutation.mutate(item.id)} onEvaluate={() => evaluateMutation.mutate({ candidate_type: "offer", candidate_id: item.id })} />) : <p className="text-sm text-muted-foreground">{t("noCandidates")}</p>}
           </CardContent>
         </Card>
       </div>
+      <Card>
+        <CardHeader><CardTitle>{t("decisionSummary")}</CardTitle><CardDescription>{t("decisionDescription")}</CardDescription></CardHeader>
+        <CardContent className="space-y-3">
+          {decisionsQuery.isLoading ? <div className="text-sm text-muted-foreground">{t("loadingDecisions")}</div> : null}
+          {decisionsQuery.isError || evaluateMutation.isError ? <div className="text-sm text-destructive">{t("decisionError")}</div> : null}
+          {decisionsQuery.data?.decisions.length ? decisionsQuery.data.decisions.map((item) => <DecisionCard key={item.id} item={item} t={t} />) : <p className="text-sm text-muted-foreground">{t("noDecisions")}</p>}
+        </CardContent>
+      </Card>
     </div>
   );
 }

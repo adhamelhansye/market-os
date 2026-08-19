@@ -34,6 +34,7 @@ from src.db.models.strategy import (
     OfferStrategy,
     PositioningCandidate,
     PositioningStrategy,
+    StrategyDecision,
     StrategySnapshot,
 )
 from src.db.models.user import User
@@ -102,6 +103,7 @@ __all__ = [
     "OfferStrategy",
     "PositioningCandidate",
     "PositioningStrategy",
+    "StrategyDecision",
     "StrategySnapshot",
     "SyncRun",
     "User",

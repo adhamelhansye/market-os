@@ -1943,6 +1943,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/decisions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Strategy Decisions */
+        get: operations["list_strategy_decisions_api_v1_businesses__business_id__strategy_decisions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/decisions/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Evaluate Strategy Decision */
+        post: operations["evaluate_strategy_decision_api_v1_businesses__business_id__strategy_decisions_evaluate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/decisions/{decision_id}/provenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Strategy Decision Provenance */
+        get: operations["strategy_decision_provenance_api_v1_businesses__business_id__strategy_decisions__decision_id__provenance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/decisions/{decision_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Strategy Decision */
+        get: operations["get_strategy_decision_api_v1_businesses__business_id__strategy_decisions__decision_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5717,6 +5785,112 @@ export interface components {
             total: number;
             /** Simulations */
             simulations?: components["schemas"]["SimulationRead"][];
+        };
+        /** StrategyDecisionEvaluateRequest */
+        StrategyDecisionEvaluateRequest: {
+            /**
+             * Candidate Type
+             * @enum {string}
+             */
+            candidate_type: "positioning" | "offer";
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /**
+             * Range Kind
+             * @default last_30_days
+             * @enum {string}
+             */
+            range_kind: "today" | "yesterday" | "last_7_days" | "last_14_days" | "last_30_days" | "month_to_date" | "custom";
+            /** Period Start */
+            period_start?: string | null;
+            /** Period End */
+            period_end?: string | null;
+            /** Forecast Id */
+            forecast_id?: string | null;
+            /** Simulation Id */
+            simulation_id?: string | null;
+        };
+        /** StrategyDecisionListResponse */
+        StrategyDecisionListResponse: {
+            /** Decisions */
+            decisions: components["schemas"]["StrategyDecisionRead"][];
+        };
+        /** StrategyDecisionProvenanceResponse */
+        StrategyDecisionProvenanceResponse: {
+            /**
+             * Decision Id
+             * Format: uuid
+             */
+            decision_id: string;
+            /** Candidate Type */
+            candidate_type: string;
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** StrategyDecisionRead */
+        StrategyDecisionRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Candidate Type */
+            candidate_type: string;
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+            /** Strategy Version */
+            strategy_version: string;
+            /** Decision Rules Version */
+            decision_rules_version: string;
+            /** Status */
+            status: string;
+            /** Overall Score */
+            overall_score?: string | null;
+            /** Input Snapshot */
+            input_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Evaluation */
+            evaluation: {
+                [key: string]: unknown;
+            };
+            /** Reasons */
+            reasons: components["schemas"]["StrategyDecisionReasonRead"][];
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** StrategyDecisionReasonRead */
+        StrategyDecisionReasonRead: {
+            /** Type */
+            type: string;
+            /** Severity */
+            severity: string;
+            /** Statement */
+            statement: string;
+            /** Source */
+            source: string;
+            /** Reference Id */
+            reference_id?: string | null;
         };
         /** StrategySnapshotResponse */
         StrategySnapshotResponse: {
@@ -9987,6 +10161,121 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StrategySnapshotResponse"];
+                };
+            };
+        };
+    };
+    list_strategy_decisions_api_v1_businesses__business_id__strategy_decisions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategyDecisionListResponse"];
+                };
+            };
+        };
+    };
+    evaluate_strategy_decision_api_v1_businesses__business_id__strategy_decisions_evaluate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StrategyDecisionEvaluateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategyDecisionRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    strategy_decision_provenance_api_v1_businesses__business_id__strategy_decisions__decision_id__provenance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                decision_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategyDecisionProvenanceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_strategy_decision_api_v1_businesses__business_id__strategy_decisions__decision_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                decision_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategyDecisionRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

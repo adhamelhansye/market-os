@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Literal
 
@@ -157,3 +158,55 @@ class StrategySnapshotResponse(BaseModel):
     coverage: dict[str, Any]
     missing_research_areas: list[dict[str, Any]]
     created_at: Any
+
+
+class StrategyDecisionEvaluateRequest(BaseModel):
+    candidate_type: Literal["positioning", "offer"]
+    candidate_id: uuid.UUID
+    range_kind: Literal[
+        "today",
+        "yesterday",
+        "last_7_days",
+        "last_14_days",
+        "last_30_days",
+        "month_to_date",
+        "custom",
+    ] = "last_30_days"
+    period_start: date | None = None
+    period_end: date | None = None
+    forecast_id: uuid.UUID | None = None
+    simulation_id: uuid.UUID | None = None
+
+
+class StrategyDecisionReasonRead(BaseModel):
+    type: str
+    severity: str
+    statement: str
+    source: str
+    reference_id: uuid.UUID | None = None
+
+
+class StrategyDecisionRead(BaseModel):
+    id: uuid.UUID
+    candidate_type: str
+    candidate_id: uuid.UUID
+    strategy_version: str
+    decision_rules_version: str
+    status: str
+    overall_score: Decimal | None = None
+    input_snapshot: dict[str, Any]
+    evaluation: dict[str, Any]
+    reasons: list[StrategyDecisionReasonRead]
+    provenance: list[dict[str, Any]]
+    created_at: datetime
+
+
+class StrategyDecisionListResponse(BaseModel):
+    decisions: list[StrategyDecisionRead]
+
+
+class StrategyDecisionProvenanceResponse(BaseModel):
+    decision_id: uuid.UUID
+    candidate_type: str
+    candidate_id: uuid.UUID
+    provenance: list[dict[str, Any]]

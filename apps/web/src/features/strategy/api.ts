@@ -10,6 +10,10 @@ export type OfferCandidateRead = components["schemas"]["OfferCandidateRead"];
 export type OfferCandidateCreate = components["schemas"]["OfferCandidateCreate"];
 export type StrategySummaryResponse = components["schemas"]["StrategySummaryResponse"];
 export type StrategySnapshotResponse = components["schemas"]["StrategySnapshotResponse"];
+export type StrategyDecisionRead = components["schemas"]["StrategyDecisionRead"];
+export type StrategyDecisionEvaluateRequest = components["schemas"]["StrategyDecisionEvaluateRequest"];
+export type StrategyDecisionListResponse = components["schemas"]["StrategyDecisionListResponse"];
+export type StrategyDecisionProvenanceResponse = components["schemas"]["StrategyDecisionProvenanceResponse"];
 
 function strategyUrl(businessId: string, path: string): string {
   return `/api/v1/businesses/${businessId}/strategy/${path}`;
@@ -55,4 +59,22 @@ export function fetchStrategySummary(businessId: string): Promise<StrategySummar
 
 export function fetchStrategySnapshot(businessId: string): Promise<StrategySnapshotResponse> {
   return apiGet<StrategySnapshotResponse>(strategyUrl(businessId, "snapshot"));
+}
+
+export function fetchStrategyDecisions(businessId: string): Promise<StrategyDecisionListResponse> {
+  return apiGet<StrategyDecisionListResponse>(strategyUrl(businessId, "decisions"));
+}
+
+export function evaluateStrategyDecision(
+  businessId: string,
+  payload: StrategyDecisionEvaluateRequest
+): Promise<StrategyDecisionRead> {
+  return apiPost<StrategyDecisionRead>(strategyUrl(businessId, "decisions/evaluate"), payload);
+}
+
+export function fetchStrategyDecisionProvenance(
+  businessId: string,
+  decisionId: string
+): Promise<StrategyDecisionProvenanceResponse> {
+  return apiGet<StrategyDecisionProvenanceResponse>(strategyUrl(businessId, `decisions/${decisionId}/provenance`));
 }

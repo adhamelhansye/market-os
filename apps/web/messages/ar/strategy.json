@@ -31,5 +31,17 @@
   "contributionProfit": "الربح المساهم",
   "contributionMargin": "الهامش المساهم",
   "breakEvenCpa": "CPA عند التعادل",
-  "breakEvenRoas": "ROAS عند التعادل"
+  "breakEvenRoas": "ROAS عند التعادل",
+  "evaluateDecision": "تقييم القرار",
+  "decisionSummary": "قرارات الاستراتيجية",
+  "decisionDescription": "تقييم حتمي يستند إلى البحث والأهداف والأداء والتوقعات والمحاكاة.",
+  "loadingDecisions": "جارٍ تحميل القرارات…",
+  "decisionError": "تعذر تحميل القرار أو تقييمه.",
+  "noDecisions": "لا توجد قرارات استراتيجية بعد.",
+  "goalAlignment": "التوافق مع الهدف",
+  "performanceCompatibility": "التوافق مع الأداء",
+  "forecastAlignment": "التوافق مع التوقعات",
+  "simulationAlignment": "التوافق مع المحاكاة",
+  "decisionReasons": "أسباب القرار",
+  "decisionRulesVersion": "إصدار قواعد القرار"
 }

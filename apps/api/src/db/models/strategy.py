@@ -170,10 +170,42 @@ class OfferCandidate(Base):
     )
 
 
+class StrategyDecision(Base):
+    """Reproducible, tenant-scoped evaluation of one strategy candidate."""
+
+    __tablename__ = "strategy_decisions"
+    __table_args__ = (
+        Index("ix_strategy_decisions_business_created", "business_id", "created_at"),
+        Index("ix_strategy_decisions_candidate", "candidate_id"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    candidate_type: Mapped[str] = mapped_column(String(20), nullable=False)
+    candidate_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    strategy_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    decision_rules_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), nullable=False)
+    overall_score: Mapped[Decimal | None] = mapped_column(Numeric(6, 4), nullable=True)
+    input_snapshot: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    evaluation: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    reasons: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    provenance: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
 __all__ = [
     "OfferCandidate",
     "OfferStrategy",
     "PositioningCandidate",
     "PositioningStrategy",
+    "StrategyDecision",
     "StrategySnapshot",
 ]

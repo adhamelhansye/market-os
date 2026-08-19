@@ -420,6 +420,18 @@ async def diagnose_business(
     quality = await metrics_service.data_quality(session, business, range, settings)
     sync_failures = await _recent_sync_failures(session, business.id)
 
+    current_goal = profile.get("current_goal")
+    goal_view = (
+        {
+            "target_revenue": current_goal.target_revenue,
+            "target_profit": current_goal.target_profit,
+            "maximum_cpa": current_goal.maximum_cpa,
+            "target_roas": current_goal.target_roas,
+            "ad_budget": current_goal.ad_budget,
+        }
+        if current_goal is not None
+        else None
+    )
     ctx = RuleContext(
         business_id=business.id,
         business_name=business.name,
@@ -427,7 +439,7 @@ async def diagnose_business(
         timezone=business.timezone,
         range=range,
         profile=profile,
-        goal=profile.get("current_goal"),
+        goal=goal_view,
         summary=current,
         previous_summary=previous,
         funnel=funnel,

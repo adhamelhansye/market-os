@@ -31,5 +31,17 @@
   "contributionProfit": "Contribution profit",
   "contributionMargin": "Contribution margin",
   "breakEvenCpa": "Break-even CPA",
-  "breakEvenRoas": "Break-even ROAS"
+  "breakEvenRoas": "Break-even ROAS",
+  "evaluateDecision": "Evaluate decision",
+  "decisionSummary": "Strategy decisions",
+  "decisionDescription": "Deterministic evaluation across research, goals, performance, forecasts and simulations.",
+  "loadingDecisions": "Loading decisions…",
+  "decisionError": "Could not evaluate or load the decision.",
+  "noDecisions": "No strategy decisions yet.",
+  "goalAlignment": "Goal alignment",
+  "performanceCompatibility": "Performance compatibility",
+  "forecastAlignment": "Forecast alignment",
+  "simulationAlignment": "Simulation alignment",
+  "decisionReasons": "Decision reasons",
+  "decisionRulesVersion": "Decision rules"
 }
