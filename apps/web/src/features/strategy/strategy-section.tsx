@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/api-client";
+import { FunnelSection } from "./funnel-section";
 import {
   createOfferCandidate,
   createPositioningCandidate,
@@ -294,6 +295,7 @@ export function StrategySection({ businessId }: { businessId: string }) {
         </CardContent>
       </Card>
       <MessagingCard businessId={businessId} t={t} />
+      <FunnelSection businessId={businessId} />
     </div>
   );
 }

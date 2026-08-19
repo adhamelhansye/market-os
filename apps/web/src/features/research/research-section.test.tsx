@@ -4,6 +4,7 @@ import userEvent from "@testing-library/user-event";
 import { within } from "@testing-library/react";
 
 import { renderWithI18n, screen } from "@/test/render";
+import { ApiError } from "@/lib/api-client";
 import { ResearchSection } from "./research-section";
 
 const state = vi.hoisted(() => ({
@@ -274,6 +275,12 @@ vi.mock("@/features/strategy/api", () => ({
   createOfferCandidate: vi.fn(),
   recommendOffer: vi.fn(),
   validateOffer: vi.fn(),
+  fetchMessaging: vi.fn(() => Promise.reject(new ApiError(404, "not_found", "not found"))),
+  generateMessaging: vi.fn(),
+  fetchMessagingVersions: vi.fn(() => Promise.resolve({ versions: [] })),
+  fetchFunnel: vi.fn(() => Promise.reject(new ApiError(404, "not_found", "not found"))),
+  generateFunnel: vi.fn(),
+  fetchFunnelVersions: vi.fn(() => Promise.resolve({ versions: [] })),
 }));
 
 function renderSection(locale: "en" | "ar") {

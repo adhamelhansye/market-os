@@ -4,6 +4,13 @@ from src.db.models.business_goal import BusinessGoal
 from src.db.models.business_profile import BusinessProfile
 from src.db.models.discount import Discount
 from src.db.models.forecast import Forecast, ForecastPoint
+from src.db.models.funnel import (
+    FunnelGap,
+    FunnelStage,
+    FunnelStageChannel,
+    FunnelStageKpi,
+    FunnelStrategy,
+)
 from src.db.models.inventory_snapshot import InventorySnapshot
 from src.db.models.invitation import Invitation
 from src.db.models.membership import Membership
@@ -73,6 +80,11 @@ __all__ = [
     "Discount",
     "Forecast",
     "ForecastPoint",
+    "FunnelGap",
+    "FunnelStage",
+    "FunnelStageChannel",
+    "FunnelStageKpi",
+    "FunnelStrategy",
     "IntegrationConnection",
     "IntegrationCredential",
     "Invitation",

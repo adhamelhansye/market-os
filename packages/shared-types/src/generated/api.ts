@@ -2096,6 +2096,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/funnel/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate Funnel */
+        post: operations["generate_funnel_api_v1_businesses__business_id__strategy_funnel_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/funnel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Funnel */
+        get: operations["get_funnel_api_v1_businesses__business_id__strategy_funnel_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/funnel/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Funnel Versions */
+        get: operations["funnel_versions_api_v1_businesses__business_id__strategy_funnel_versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/funnel/{funnel_strategy_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Funnel By Id */
+        get: operations["get_funnel_by_id_api_v1_businesses__business_id__strategy_funnel__funnel_strategy_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/funnel/{funnel_strategy_id}/provenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Funnel Provenance */
+        get: operations["funnel_provenance_api_v1_businesses__business_id__strategy_funnel__funnel_strategy_id__provenance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3614,6 +3699,69 @@ export interface components {
             /** Previous Rate */
             previous_rate?: string | null;
         };
+        /** FunnelGapRead */
+        FunnelGapRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Gap Type */
+            gap_type: string;
+            /** Stage From */
+            stage_from?: string | null;
+            /** Stage To */
+            stage_to?: string | null;
+            /** Severity */
+            severity: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string;
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            }[];
+            /** Recommended Direction */
+            recommended_direction: string;
+            /** Status */
+            status: string;
+        };
+        /** FunnelGenerateRequest */
+        FunnelGenerateRequest: {
+            /** Positioning Candidate Id */
+            positioning_candidate_id?: string | null;
+            /** Offer Candidate Id */
+            offer_candidate_id?: string | null;
+            /** Strategy Decision Id */
+            strategy_decision_id?: string | null;
+            /** Messaging Strategy Id */
+            messaging_strategy_id?: string | null;
+            /** Variant */
+            variant?: ("direct_response" | "content_led" | "product_led" | "education_led" | "lead_generation" | "ecommerce") | null;
+            /**
+             * Range Kind
+             * @default last_30_days
+             * @enum {string}
+             */
+            range_kind: "today" | "yesterday" | "last_7_days" | "last_14_days" | "last_30_days" | "month_to_date" | "custom";
+            /** Period Start */
+            period_start?: string | null;
+            /** Period End */
+            period_end?: string | null;
+        };
+        /** FunnelProvenanceResponse */
+        FunnelProvenanceResponse: {
+            /**
+             * Funnel Strategy Id
+             * Format: uuid
+             */
+            funnel_strategy_id: string;
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            }[];
+        };
         /** FunnelRead */
         FunnelRead: {
             /**
@@ -3640,6 +3788,160 @@ export interface components {
             reason?: string | null;
             conversion_rate?: components["schemas"]["MeasureRead"] | null;
             dropoff_rate?: components["schemas"]["MeasureRead"] | null;
+        };
+        /** FunnelStageChannelRead */
+        FunnelStageChannelRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Channel */
+            channel: string;
+            /** Status */
+            status: string;
+            /** Role */
+            role: string;
+            /** Priority */
+            priority: number;
+            /** Weight */
+            weight?: string | null;
+            /** Rationale */
+            rationale: string;
+            /** Integration Connection Id */
+            integration_connection_id?: string | null;
+            /** Evidence Refs */
+            evidence_refs: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** FunnelStageKpiRead */
+        FunnelStageKpiRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kpi Code */
+            kpi_code: string;
+            /** Kpi Kind */
+            kpi_kind: string;
+            /** Role */
+            role: string;
+            /** Status */
+            status: string;
+            /** Metric Code */
+            metric_code?: string | null;
+            /** Value Ref */
+            value_ref?: {
+                [key: string]: unknown;
+            } | null;
+            /** Threshold Code */
+            threshold_code?: string | null;
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            };
+        };
+        /** FunnelStageRead */
+        FunnelStageRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Stage */
+            stage: string;
+            /** Position */
+            position: number;
+            /** Objective */
+            objective: string;
+            /** Audience State */
+            audience_state: string;
+            /** Customer Problem */
+            customer_problem?: string | null;
+            /** Customer Desire */
+            customer_desire?: string | null;
+            /** Message Direction */
+            message_direction: string;
+            /** Offer Direction */
+            offer_direction?: string | null;
+            /** Content Direction */
+            content_direction: string;
+            /** Cta Type */
+            cta_type?: string | null;
+            /** Entry Condition */
+            entry_condition?: {
+                [key: string]: unknown;
+            };
+            /** Exit Condition */
+            exit_condition?: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Risks */
+            risks: {
+                [key: string]: unknown;
+            }[];
+            /** Evidence Refs */
+            evidence_refs: {
+                [key: string]: unknown;
+            }[];
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            }[];
+            /** Channels */
+            channels?: components["schemas"]["FunnelStageChannelRead"][];
+            /** Kpis */
+            kpis?: components["schemas"]["FunnelStageKpiRead"][];
+        };
+        /** FunnelStrategyRead */
+        FunnelStrategyRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Version */
+            version: number;
+            /** Funnel Version */
+            funnel_version: string;
+            /** Variant */
+            variant: string;
+            /** Status */
+            status: string;
+            /** Positioning Candidate Id */
+            positioning_candidate_id?: string | null;
+            /** Offer Candidate Id */
+            offer_candidate_id?: string | null;
+            /** Strategy Decision Id */
+            strategy_decision_id?: string | null;
+            /** Messaging Strategy Id */
+            messaging_strategy_id?: string | null;
+            /** Input Snapshot */
+            input_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Health */
+            health: {
+                [key: string]: unknown;
+            };
+            /** Stages */
+            stages?: components["schemas"]["FunnelStageRead"][];
+            /** Gaps */
+            gaps?: components["schemas"]["FunnelGapRead"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** FunnelVersionsResponse */
+        FunnelVersionsResponse: {
+            /** Versions */
+            versions: components["schemas"]["FunnelStrategyRead"][];
         };
         /**
          * GenerateRequest
@@ -10618,6 +10920,141 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["MessagingProvenanceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_funnel_api_v1_businesses__business_id__strategy_funnel_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FunnelGenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FunnelStrategyRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_funnel_api_v1_businesses__business_id__strategy_funnel_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FunnelStrategyRead"];
+                };
+            };
+        };
+    };
+    funnel_versions_api_v1_businesses__business_id__strategy_funnel_versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FunnelVersionsResponse"];
+                };
+            };
+        };
+    };
+    get_funnel_by_id_api_v1_businesses__business_id__strategy_funnel__funnel_strategy_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                funnel_strategy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FunnelStrategyRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    funnel_provenance_api_v1_businesses__business_id__strategy_funnel__funnel_strategy_id__provenance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                funnel_strategy_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FunnelProvenanceResponse"];
                 };
             };
             /** @description Validation Error */

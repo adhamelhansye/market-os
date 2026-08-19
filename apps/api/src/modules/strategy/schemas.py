@@ -269,3 +269,125 @@ class MessagingVersionsResponse(BaseModel):
 class MessagingProvenanceResponse(BaseModel):
     messaging_strategy_id: uuid.UUID
     provenance: list[dict[str, Any]]
+
+
+FunnelVariant = Literal[
+    "direct_response",
+    "content_led",
+    "product_led",
+    "education_led",
+    "lead_generation",
+    "ecommerce",
+]
+
+
+class FunnelGenerateRequest(BaseModel):
+    positioning_candidate_id: uuid.UUID | None = None
+    offer_candidate_id: uuid.UUID | None = None
+    strategy_decision_id: uuid.UUID | None = None
+    messaging_strategy_id: uuid.UUID | None = None
+    variant: FunnelVariant | None = None
+    range_kind: Literal[
+        "today",
+        "yesterday",
+        "last_7_days",
+        "last_14_days",
+        "last_30_days",
+        "month_to_date",
+        "custom",
+    ] = "last_30_days"
+    period_start: date | None = None
+    period_end: date | None = None
+
+
+class FunnelStageChannelRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    channel: str
+    status: str
+    role: str
+    priority: int
+    weight: Decimal | None = None
+    rationale: str
+    integration_connection_id: uuid.UUID | None = None
+    evidence_refs: list[dict[str, Any]]
+
+
+class FunnelStageKpiRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    kpi_code: str
+    kpi_kind: str
+    role: str
+    status: str
+    metric_code: str | None = None
+    value_ref: dict[str, Any] | None = None
+    threshold_code: str | None = None
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class FunnelStageRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    stage: str
+    position: int
+    objective: str
+    audience_state: str
+    customer_problem: str | None = None
+    customer_desire: str | None = None
+    message_direction: str
+    offer_direction: str | None = None
+    content_direction: str
+    cta_type: str | None = None
+    entry_condition: dict[str, Any] = Field(default_factory=dict)
+    exit_condition: dict[str, Any] = Field(default_factory=dict)
+    status: str
+    risks: list[dict[str, Any]]
+    evidence_refs: list[dict[str, Any]]
+    provenance: list[dict[str, Any]]
+    channels: list[FunnelStageChannelRead] = Field(default_factory=list)
+    kpis: list[FunnelStageKpiRead] = Field(default_factory=list)
+
+
+class FunnelGapRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    gap_type: str
+    stage_from: str | None = None
+    stage_to: str | None = None
+    severity: str
+    title: str
+    description: str
+    evidence: list[dict[str, Any]]
+    recommended_direction: str
+    status: str
+
+
+class FunnelStrategyRead(BaseModel):
+    id: uuid.UUID
+    version: int
+    funnel_version: str
+    variant: str
+    status: str
+    positioning_candidate_id: uuid.UUID | None = None
+    offer_candidate_id: uuid.UUID | None = None
+    strategy_decision_id: uuid.UUID | None = None
+    messaging_strategy_id: uuid.UUID | None = None
+    input_snapshot: dict[str, Any]
+    health: dict[str, Any]
+    stages: list[FunnelStageRead] = Field(default_factory=list)
+    gaps: list[FunnelGapRead] = Field(default_factory=list)
+    created_at: datetime
+
+
+class FunnelVersionsResponse(BaseModel):
+    versions: list[FunnelStrategyRead]
+
+
+class FunnelProvenanceResponse(BaseModel):
+    funnel_strategy_id: uuid.UUID
+    provenance: list[dict[str, Any]]

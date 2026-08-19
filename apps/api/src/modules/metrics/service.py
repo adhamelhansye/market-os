@@ -231,7 +231,7 @@ async def build_summary(session: AsyncSession, business: Business, range: Range)
         break_even_cpa = _money_measure(avg_unit_profit, business.currency, "economics")
         break_even_roas_value = profit_profile.get("break_even_roas")
         if break_even_roas_value is not None:
-            break_even_roas = _kpi(Measure(break_even_roas_value, STATUS_AVAILABLE))
+            break_even_roas = Measure(break_even_roas_value, STATUS_AVAILABLE)
         else:
             break_even_roas = Measure.unavailable(
                 "no positive contribution profit in economics profile"

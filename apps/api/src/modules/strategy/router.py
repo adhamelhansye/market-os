@@ -10,9 +10,18 @@ from src.core.exceptions import NotFoundError
 from src.core.tenancy import TenantContext
 from src.modules.businesses.service import get_business
 from src.modules.strategy import decision as decision_service
+from src.modules.strategy import funnel as funnel_service
 from src.modules.strategy import messaging as messaging_service
 from src.modules.strategy import service
 from src.modules.strategy.schemas import (
+    FunnelGapRead,
+    FunnelGenerateRequest,
+    FunnelProvenanceResponse,
+    FunnelStageChannelRead,
+    FunnelStageKpiRead,
+    FunnelStageRead,
+    FunnelStrategyRead,
+    FunnelVersionsResponse,
     MessagingGenerateRequest,
     MessagingProvenanceResponse,
     MessagingStrategyRead,
@@ -118,6 +127,43 @@ async def _messaging(session: DbSession, row) -> MessagingStrategyRead:
                 for item in angles
             ],
             "created_at": row.created_at,
+        }
+    )
+
+
+def _funnel_channel(row) -> FunnelStageChannelRead:
+    return FunnelStageChannelRead.model_validate(row)
+
+
+def _funnel_kpi(row) -> FunnelStageKpiRead:
+    return FunnelStageKpiRead.model_validate(row)
+
+
+async def _funnel_stage(session: DbSession, row) -> FunnelStageRead:
+    return FunnelStageRead.model_validate(
+        {
+            **{column.name: getattr(row, column.name) for column in row.__table__.columns},
+            "channels": [
+                _funnel_channel(channel) for channel in await funnel_service.channels(session, row)
+            ],
+            "kpis": [_funnel_kpi(kpi) for kpi in await funnel_service.kpis(session, row)],
+        }
+    )
+
+
+def _funnel_gap(row) -> FunnelGapRead:
+    return FunnelGapRead.model_validate(row)
+
+
+async def _funnel(session: DbSession, row) -> FunnelStrategyRead:
+    return FunnelStrategyRead.model_validate(
+        {
+            **{column.name: getattr(row, column.name) for column in row.__table__.columns},
+            "stages": [
+                await _funnel_stage(session, stage)
+                for stage in await funnel_service.stages(session, row)
+            ],
+            "gaps": [_funnel_gap(gap) for gap in await funnel_service.gaps(session, row)],
         }
     )
 
@@ -525,3 +571,93 @@ async def messaging_provenance(
         messaging_strategy_id=row.id,
         provenance=[entry for component in components for entry in component.provenance],
     )
+
+
+@router.post(
+    "/businesses/{business_id}/strategy/funnel/generate",
+    response_model=FunnelStrategyRead,
+    status_code=201,
+)
+async def generate_funnel(
+    payload: FunnelGenerateRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+    settings: SettingsDep,
+) -> FunnelStrategyRead:
+    row = await funnel_service.generate(
+        session, await get_business(session, business_id), payload, settings
+    )
+    return await _funnel(session, row)
+
+
+@router.get("/businesses/{business_id}/strategy/funnel", response_model=FunnelStrategyRead)
+async def get_funnel(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> FunnelStrategyRead:
+    business = await get_business(session, business_id)
+    row = await funnel_service.latest(session, business)
+    if row is None:
+        raise NotFoundError("Funnel strategy not found")
+    return await _funnel(session, row)
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/funnel/versions",
+    response_model=FunnelVersionsResponse,
+)
+async def funnel_versions(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> FunnelVersionsResponse:
+    business = await get_business(session, business_id)
+    return FunnelVersionsResponse(
+        versions=[
+            await _funnel(session, row) for row in await funnel_service.versions(session, business)
+        ]
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/funnel/{funnel_strategy_id}",
+    response_model=FunnelStrategyRead,
+)
+async def get_funnel_by_id(
+    business_id: CurrentBusinessId,
+    funnel_strategy_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> FunnelStrategyRead:
+    business = await get_business(session, business_id)
+    return await _funnel(
+        session,
+        await funnel_service.get_strategy(session, business, funnel_strategy_id),
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/funnel/{funnel_strategy_id}/provenance",
+    response_model=FunnelProvenanceResponse,
+)
+async def funnel_provenance(
+    business_id: CurrentBusinessId,
+    funnel_strategy_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> FunnelProvenanceResponse:
+    business = await get_business(session, business_id)
+    row = await funnel_service.get_strategy(session, business, funnel_strategy_id)
+    stages = await funnel_service.stages(session, row)
+    provenance: list[dict] = []
+    seen: set = set()
+    for stage in stages:
+        for entry in stage.provenance or []:
+            marker = (entry.get("evidence_id"), entry.get("input_type"), entry.get("reference_id"))
+            if marker in seen:
+                continue
+            seen.add(marker)
+            provenance.append(entry)
+    return FunnelProvenanceResponse(funnel_strategy_id=row.id, provenance=provenance)

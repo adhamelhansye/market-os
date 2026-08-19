@@ -19,6 +19,12 @@ export type MessageComponentRead = components["schemas"]["MessageComponentRead"]
 export type MessageAngleRead = components["schemas"]["MessageAngleRead"];
 export type MessagingGenerateRequest = components["schemas"]["MessagingGenerateRequest"];
 export type MessagingVersionsResponse = components["schemas"]["MessagingVersionsResponse"];
+export type FunnelStrategyRead = components["schemas"]["FunnelStrategyRead"];
+export type FunnelStageRead = components["schemas"]["FunnelStageRead"];
+export type FunnelGapRead = components["schemas"]["FunnelGapRead"];
+export type FunnelGenerateRequest = components["schemas"]["FunnelGenerateRequest"];
+export type FunnelVersionsResponse = components["schemas"]["FunnelVersionsResponse"];
+export type FunnelProvenanceResponse = components["schemas"]["FunnelProvenanceResponse"];
 
 function strategyUrl(businessId: string, path: string): string {
   return `/api/v1/businesses/${businessId}/strategy/${path}`;
@@ -97,4 +103,26 @@ export function generateMessaging(
 
 export function fetchMessagingVersions(businessId: string): Promise<MessagingVersionsResponse> {
   return apiGet<MessagingVersionsResponse>(strategyUrl(businessId, "messaging/versions"));
+}
+
+export function fetchFunnel(businessId: string): Promise<FunnelStrategyRead> {
+  return apiGet<FunnelStrategyRead>(strategyUrl(businessId, "funnel"));
+}
+
+export function generateFunnel(
+  businessId: string,
+  payload: FunnelGenerateRequest = { range_kind: "last_30_days" }
+): Promise<FunnelStrategyRead> {
+  return apiPost<FunnelStrategyRead>(strategyUrl(businessId, "funnel/generate"), payload);
+}
+
+export function fetchFunnelVersions(businessId: string): Promise<FunnelVersionsResponse> {
+  return apiGet<FunnelVersionsResponse>(strategyUrl(businessId, "funnel/versions"));
+}
+
+export function fetchFunnelProvenance(
+  businessId: string,
+  funnelId: string
+): Promise<FunnelProvenanceResponse> {
+  return apiGet<FunnelProvenanceResponse>(strategyUrl(businessId, `funnel/${funnelId}/provenance`));
 }
