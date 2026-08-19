@@ -2011,6 +2011,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/messaging": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Messaging */
+        get: operations["get_messaging_api_v1_businesses__business_id__strategy_messaging_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/messaging/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate Messaging */
+        post: operations["generate_messaging_api_v1_businesses__business_id__strategy_messaging_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/messaging/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Messaging Versions */
+        get: operations["messaging_versions_api_v1_businesses__business_id__strategy_messaging_versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/messaging/{messaging_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Messaging By Id */
+        get: operations["get_messaging_by_id_api_v1_businesses__business_id__strategy_messaging__messaging_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/messaging/{messaging_id}/provenance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Messaging Provenance */
+        get: operations["messaging_provenance_api_v1_businesses__business_id__strategy_messaging__messaging_id__provenance_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3758,6 +3843,137 @@ export interface components {
             role_name: string;
             /** Permissions */
             permissions: string[];
+        };
+        /** MessageAngleRead */
+        MessageAngleRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Angle Type */
+            angle_type: string;
+            /** Core Message */
+            core_message: string;
+            /** Hook Direction */
+            hook_direction: string;
+            /** Supporting Points */
+            supporting_points: string[];
+            /** Cta Type */
+            cta_type?: string | null;
+            /** Funnel Stage */
+            funnel_stage: string;
+            /** Strength */
+            strength: string;
+            /** Status */
+            status: string;
+            /** Evidence Refs */
+            evidence_refs: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** MessageComponentRead */
+        MessageComponentRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Component Type */
+            component_type: string;
+            /** Statement */
+            statement: string;
+            /** Classification */
+            classification: string;
+            /** Strength */
+            strength: string;
+            /** Claim Status */
+            claim_status: string;
+            /** Status */
+            status: string;
+            /** Funnel Stage */
+            funnel_stage?: string | null;
+            /** Details */
+            details?: {
+                [key: string]: unknown;
+            };
+            /** Evidence Refs */
+            evidence_refs: {
+                [key: string]: unknown;
+            }[];
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** MessagingGenerateRequest */
+        MessagingGenerateRequest: {
+            /** Positioning Candidate Id */
+            positioning_candidate_id?: string | null;
+            /** Offer Candidate Id */
+            offer_candidate_id?: string | null;
+            /** Strategy Decision Id */
+            strategy_decision_id?: string | null;
+        };
+        /** MessagingProvenanceResponse */
+        MessagingProvenanceResponse: {
+            /**
+             * Messaging Strategy Id
+             * Format: uuid
+             */
+            messaging_strategy_id: string;
+            /** Provenance */
+            provenance: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** MessagingStrategyRead */
+        MessagingStrategyRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Version */
+            version: number;
+            /** Messaging Version */
+            messaging_version: string;
+            /** Status */
+            status: string;
+            /** Positioning Candidate Id */
+            positioning_candidate_id?: string | null;
+            /** Offer Candidate Id */
+            offer_candidate_id?: string | null;
+            /** Strategy Decision Id */
+            strategy_decision_id?: string | null;
+            /** Input Snapshot */
+            input_snapshot: {
+                [key: string]: unknown;
+            };
+            /** Core Message */
+            core_message: {
+                [key: string]: unknown;
+            };
+            /** Quality */
+            quality: {
+                [key: string]: unknown;
+            };
+            /** Components */
+            components?: components["schemas"]["MessageComponentRead"][];
+            /** Angles */
+            angles?: components["schemas"]["MessageAngleRead"][];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** MessagingVersionsResponse */
+        MessagingVersionsResponse: {
+            /** Versions */
+            versions: components["schemas"]["MessagingStrategyRead"][];
         };
         /** MetaAccountRead */
         MetaAccountRead: {
@@ -10267,6 +10483,141 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["StrategyDecisionRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_messaging_api_v1_businesses__business_id__strategy_messaging_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagingStrategyRead"];
+                };
+            };
+        };
+    };
+    generate_messaging_api_v1_businesses__business_id__strategy_messaging_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessagingGenerateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagingStrategyRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    messaging_versions_api_v1_businesses__business_id__strategy_messaging_versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagingVersionsResponse"];
+                };
+            };
+        };
+    };
+    get_messaging_by_id_api_v1_businesses__business_id__strategy_messaging__messaging_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                messaging_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagingStrategyRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    messaging_provenance_api_v1_businesses__business_id__strategy_messaging__messaging_id__provenance_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                messaging_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessagingProvenanceResponse"];
                 };
             };
             /** @description Validation Error */

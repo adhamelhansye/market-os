@@ -201,6 +201,100 @@ class StrategyDecision(Base):
     )
 
 
+class MessagingStrategy(Base):
+    """Immutable deterministic messaging snapshot built from strategy inputs."""
+
+    __tablename__ = "messaging_strategies"
+    __table_args__ = (
+        Index("ix_messaging_strategies_business_created", "business_id", "created_at"),
+        Index("ix_messaging_strategies_business_version", "business_id", "version"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    version: Mapped[int] = mapped_column(nullable=False)
+    messaging_version: Mapped[str] = mapped_column(String(40), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), nullable=False)
+    positioning_candidate_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
+    offer_candidate_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
+    strategy_decision_id: Mapped[uuid.UUID | None] = mapped_column(nullable=True)
+    input_snapshot: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    core_message: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    quality: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class MessageComponent(Base):
+    __tablename__ = "message_components"
+    __table_args__ = (
+        Index("ix_message_components_strategy", "messaging_strategy_id"),
+        Index("ix_message_components_business_type", "business_id", "component_type"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    messaging_strategy_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("messaging_strategies.id", ondelete="CASCADE"), nullable=False
+    )
+    component_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    statement: Mapped[str] = mapped_column(Text, nullable=False)
+    classification: Mapped[str] = mapped_column(String(40), nullable=False)
+    strength: Mapped[str] = mapped_column(String(20), nullable=False)
+    claim_status: Mapped[str] = mapped_column(String(30), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), nullable=False, default="available")
+    funnel_stage: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    details: Mapped[dict[str, Any]] = mapped_column(JSONB, nullable=False, default=dict)
+    evidence_refs: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    provenance: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+class MessageAngle(Base):
+    __tablename__ = "message_angles"
+    __table_args__ = (
+        Index("ix_message_angles_strategy", "messaging_strategy_id"),
+        Index("ix_message_angles_business_type", "business_id", "angle_type"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    messaging_strategy_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("messaging_strategies.id", ondelete="CASCADE"), nullable=False
+    )
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    angle_type: Mapped[str] = mapped_column(String(30), nullable=False)
+    core_message: Mapped[str] = mapped_column(Text, nullable=False)
+    hook_direction: Mapped[str] = mapped_column(Text, nullable=False)
+    supporting_points: Mapped[list[str]] = mapped_column(JSONB, nullable=False, default=list)
+    cta_type: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    funnel_stage: Mapped[str] = mapped_column(String(20), nullable=False)
+    strength: Mapped[str] = mapped_column(String(20), nullable=False)
+    status: Mapped[str] = mapped_column(String(40), nullable=False)
+    evidence_refs: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, nullable=False, default=list)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
 __all__ = [
     "OfferCandidate",
     "OfferStrategy",
@@ -208,4 +302,7 @@ __all__ = [
     "PositioningStrategy",
     "StrategyDecision",
     "StrategySnapshot",
+    "MessagingStrategy",
+    "MessageComponent",
+    "MessageAngle",
 ]

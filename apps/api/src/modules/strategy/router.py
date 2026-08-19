@@ -10,8 +10,13 @@ from src.core.exceptions import NotFoundError
 from src.core.tenancy import TenantContext
 from src.modules.businesses.service import get_business
 from src.modules.strategy import decision as decision_service
+from src.modules.strategy import messaging as messaging_service
 from src.modules.strategy import service
 from src.modules.strategy.schemas import (
+    MessagingGenerateRequest,
+    MessagingProvenanceResponse,
+    MessagingStrategyRead,
+    MessagingVersionsResponse,
     OfferCandidateCreate,
     OfferCandidateRead,
     OfferResponse,
@@ -60,6 +65,58 @@ def _decision(row) -> StrategyDecisionRead:
             "evaluation": row.evaluation,
             "reasons": row.reasons,
             "provenance": row.provenance,
+            "created_at": row.created_at,
+        }
+    )
+
+
+async def _messaging(session: DbSession, row) -> MessagingStrategyRead:
+    components = await messaging_service.components(session, row)
+    angles = await messaging_service.angles(session, row)
+    return MessagingStrategyRead.model_validate(
+        {
+            "id": row.id,
+            "version": row.version,
+            "messaging_version": row.messaging_version,
+            "status": row.status,
+            "positioning_candidate_id": row.positioning_candidate_id,
+            "offer_candidate_id": row.offer_candidate_id,
+            "strategy_decision_id": row.strategy_decision_id,
+            "input_snapshot": row.input_snapshot,
+            "core_message": row.core_message,
+            "quality": row.quality,
+            "components": [
+                {
+                    "id": item.id,
+                    "component_type": item.component_type,
+                    "statement": item.statement,
+                    "classification": item.classification,
+                    "strength": item.strength,
+                    "claim_status": item.claim_status,
+                    "status": item.status,
+                    "funnel_stage": item.funnel_stage,
+                    "details": item.details,
+                    "evidence_refs": item.evidence_refs,
+                    "provenance": item.provenance,
+                }
+                for item in components
+            ],
+            "angles": [
+                {
+                    "id": item.id,
+                    "name": item.name,
+                    "angle_type": item.angle_type,
+                    "core_message": item.core_message,
+                    "hook_direction": item.hook_direction,
+                    "supporting_points": item.supporting_points,
+                    "cta_type": item.cta_type,
+                    "funnel_stage": item.funnel_stage,
+                    "strength": item.strength,
+                    "status": item.status,
+                    "evidence_refs": item.evidence_refs,
+                }
+                for item in angles
+            ],
             "created_at": row.created_at,
         }
     )
@@ -382,3 +439,89 @@ async def get_strategy_decision(
 ) -> StrategyDecisionRead:
     business = await get_business(session, business_id)
     return _decision(await decision_service.get_decision(session, business, decision_id))
+
+
+@router.get("/businesses/{business_id}/strategy/messaging", response_model=MessagingStrategyRead)
+async def get_messaging(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> MessagingStrategyRead:
+    business = await get_business(session, business_id)
+    row = await messaging_service.latest(session, business)
+    if row is None:
+        raise NotFoundError("Messaging strategy not found")
+    return await _messaging(session, row)
+
+
+@router.post(
+    "/businesses/{business_id}/strategy/messaging/generate",
+    response_model=MessagingStrategyRead,
+    status_code=201,
+)
+async def generate_messaging(
+    payload: MessagingGenerateRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+) -> MessagingStrategyRead:
+    row = await messaging_service.generate(
+        session, await get_business(session, business_id), payload
+    )
+    return await _messaging(session, row)
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/messaging/versions",
+    response_model=MessagingVersionsResponse,
+)
+async def messaging_versions(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> MessagingVersionsResponse:
+    business = await get_business(session, business_id)
+    return MessagingVersionsResponse(
+        versions=[
+            await _messaging(session, row)
+            for row in await messaging_service.versions(session, business)
+        ]
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/messaging/{messaging_id}",
+    response_model=MessagingStrategyRead,
+)
+async def get_messaging_by_id(
+    business_id: CurrentBusinessId,
+    messaging_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> MessagingStrategyRead:
+    return await _messaging(
+        session,
+        await messaging_service.get_strategy(
+            session, await get_business(session, business_id), messaging_id
+        ),
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/messaging/{messaging_id}/provenance",
+    response_model=MessagingProvenanceResponse,
+)
+async def messaging_provenance(
+    business_id: CurrentBusinessId,
+    messaging_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> MessagingProvenanceResponse:
+    row = await messaging_service.get_strategy(
+        session, await get_business(session, business_id), messaging_id
+    )
+    components = await messaging_service.components(session, row)
+    return MessagingProvenanceResponse(
+        messaging_strategy_id=row.id,
+        provenance=[entry for component in components for entry in component.provenance],
+    )

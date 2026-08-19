@@ -43,5 +43,61 @@
   "forecastAlignment": "التوافق مع التوقعات",
   "simulationAlignment": "التوافق مع المحاكاة",
   "decisionReasons": "أسباب القرار",
-  "decisionRulesVersion": "إصدار قواعد القرار"
+  "decisionRulesVersion": "إصدار قواعد القرار",
+  "messaging": "استراتيجية الرسائل",
+  "messagingDescription": "مكوّنات رسائل واتجاهات وأدلة حتمية مرتبطة بأدلة البحث.",
+  "version": "الإصدار",
+  "generateMessaging": "توليد استراتيجية الرسائل",
+  "generating": "جارٍ التوليد…",
+  "generateError": "تعذر توليد استراتيجية الرسائل.",
+  "loadingMessaging": "جارٍ تحميل استراتيجية الرسائل…",
+  "messagingError": "تعذر تحميل استراتيجية الرسائل.",
+  "noMessaging": "لا توجد استراتيجية رسائل بعد. يمكن توليدها من البحث والتموضع المتاحين.",
+  "missingComponents": "مكوّنات ناقصة",
+  "angles": "اتجاهات الرسائل",
+  "hookDirection": "اتجاه الخطاف",
+  "cta": "دعوة الإجراء",
+  "ctaValidation": "التحقق من دعوة الإجراء",
+  "proofAvailable": "توفر الأدلة",
+  "yes": "نعم",
+  "no": "لا",
+  "respondWith": "الرد",
+  "unsupportedClaims": "ادعاءات غير مدعومة",
+  "claimValidation": "التحقق من الادعاءات",
+  "performanceAttribution": "إسناد الأداء",
+  "competitorPatterns": "أنماط المنافسين",
+  "competitorWhitespace": "الفجوة التنافسية",
+  "versions": "الإصدارات",
+  "component": {
+    "problem": "المشكلة",
+    "pain": "نقطة الألم",
+    "desire": "الرغبة",
+    "benefit": "المنفعة",
+    "feature": "الميزة",
+    "differentiator": "عنصر التميّز",
+    "promise": "الوعد",
+    "objection": "الاعتراض",
+    "proof": "الدليل",
+    "cta": "دعوة الإجراء"
+  },
+  "angle": {
+    "problem_led": "القيادة بالمشكلة",
+    "pain_led": "القيادة بنقطة الألم",
+    "desire_led": "القيادة بالرغبة",
+    "benefit_led": "القيادة بالمنفعة",
+    "differentiator_led": "القيادة بعنصر التميّز",
+    "proof_led": "القيادة بالدليل",
+    "objection_led": "معالجة الاعتراض",
+    "offer_led": "القيادة بالعرض"
+  },
+  "stage": {
+    "awareness": "الوعي",
+    "interest": "الاهتمام",
+    "consideration": "الدراسة",
+    "purchase": "الشراء",
+    "retention": "الاحتفاظ"
+  },
+  "ctaType": {
+    "view_product": "عرض المنتج"
+  }
 }

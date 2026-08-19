@@ -210,3 +210,62 @@ class StrategyDecisionProvenanceResponse(BaseModel):
     candidate_type: str
     candidate_id: uuid.UUID
     provenance: list[dict[str, Any]]
+
+
+class MessagingGenerateRequest(BaseModel):
+    positioning_candidate_id: uuid.UUID | None = None
+    offer_candidate_id: uuid.UUID | None = None
+    strategy_decision_id: uuid.UUID | None = None
+
+
+class MessageComponentRead(BaseModel):
+    id: uuid.UUID
+    component_type: str
+    statement: str
+    classification: str
+    strength: str
+    claim_status: str
+    status: str
+    funnel_stage: str | None = None
+    details: dict[str, Any] = Field(default_factory=dict)
+    evidence_refs: list[dict[str, Any]]
+    provenance: list[dict[str, Any]]
+
+
+class MessageAngleRead(BaseModel):
+    id: uuid.UUID
+    name: str
+    angle_type: str
+    core_message: str
+    hook_direction: str
+    supporting_points: list[str]
+    cta_type: str | None = None
+    funnel_stage: str
+    strength: str
+    status: str
+    evidence_refs: list[dict[str, Any]]
+
+
+class MessagingStrategyRead(BaseModel):
+    id: uuid.UUID
+    version: int
+    messaging_version: str
+    status: str
+    positioning_candidate_id: uuid.UUID | None = None
+    offer_candidate_id: uuid.UUID | None = None
+    strategy_decision_id: uuid.UUID | None = None
+    input_snapshot: dict[str, Any]
+    core_message: dict[str, Any]
+    quality: dict[str, Any]
+    components: list[MessageComponentRead] = Field(default_factory=list)
+    angles: list[MessageAngleRead] = Field(default_factory=list)
+    created_at: datetime
+
+
+class MessagingVersionsResponse(BaseModel):
+    versions: list[MessagingStrategyRead]
+
+
+class MessagingProvenanceResponse(BaseModel):
+    messaging_strategy_id: uuid.UUID
+    provenance: list[dict[str, Any]]

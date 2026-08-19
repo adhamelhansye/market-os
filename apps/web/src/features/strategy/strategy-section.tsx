@@ -7,15 +7,22 @@ import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ApiError } from "@/lib/api-client";
 import {
   createOfferCandidate,
   createPositioningCandidate,
   evaluateStrategyDecision,
+  fetchMessaging,
+  fetchMessagingVersions,
   fetchStrategyDecisions,
   fetchStrategySummary,
+  generateMessaging,
   recommendOffer,
   recommendPositioning,
   validateOffer,
+  type MessageAngleRead,
+  type MessageComponentRead,
+  type MessagingStrategyRead,
   type OfferCandidateRead,
   type PositioningCandidateRead,
   type StrategyDecisionRead,
@@ -99,6 +106,141 @@ function DecisionCard({ item, t }: { item: StrategyDecisionRead; t: (key: string
   );
 }
 
+function CoreMessage({ message, t }: { message: Record<string, unknown>; t: (key: string) => string }) {
+  const fields: Array<[string, string]> = [
+    ["who", "who"],
+    ["problem", "problem"],
+    ["desired_outcome", "desiredOutcome"],
+    ["solution", "solution"],
+    ["differentiator", "differentiator"],
+    ["promise", "promise"],
+    ["cta", "cta"],
+  ];
+  return (
+    <dl className="grid gap-1 text-sm sm:grid-cols-2" data-testid="core-message">
+      {fields.map(([key, label]) => (
+        <div key={key}>
+          <dt className="text-xs text-muted-foreground">{t(label)}</dt>
+          <dd>{message[key] != null && message[key] !== "" ? String(message[key]) : t("unavailable")}</dd>
+        </div>
+      ))}
+      <div>
+        <dt className="text-xs text-muted-foreground">{t("proofAvailable")}</dt>
+        <dd>{message.proof_available === true ? t("yes") : t("no")}</dd>
+      </div>
+    </dl>
+  );
+}
+
+function ComponentCard({ item, t }: { item: MessageComponentRead; t: (key: string) => string }) {
+  const details = item.details ?? {};
+  const unsupported = Array.isArray(details.unsupported_claims) ? (details.unsupported_claims as string[]) : [];
+  return (
+    <div className="rounded-md border p-3" data-testid="message-component">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">{t(`component.${item.component_type}`)}</span>
+        <span className="text-xs text-muted-foreground">{item.classification} · {item.strength} · {item.claim_status}{item.funnel_stage ? ` · ${t(`stage.${item.funnel_stage}`)}` : null}</span>
+      </div>
+      <p className="text-sm">{item.statement}</p>
+      {unsupported.length ? <p className="text-xs text-destructive">{t("unsupportedClaims")}: {unsupported.join(", ")}</p> : null}
+      {item.component_type === "objection" && details.response_available === true ? (
+        <p className="text-xs text-muted-foreground">{t("respondWith")}: {String(details.response)}</p>
+      ) : null}
+    </div>
+  );
+}
+
+function AngleCard({ item, t }: { item: MessageAngleRead; t: (key: string) => string }) {
+  return (
+    <div className="rounded-md border p-3" data-testid="message-angle">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-medium">{item.name}</span>
+        <span className="text-xs text-muted-foreground">{t(`angle.${item.angle_type}`) || item.angle_type} · {t("hookDirection")}: {item.hook_direction} · {t(`stage.${item.funnel_stage}`)} · {item.strength}</span>
+      </div>
+      <p className="text-sm">{item.core_message}</p>
+      {item.supporting_points.length ? <p className="text-xs text-muted-foreground">{item.supporting_points.join(" · ")}</p> : null}
+      {item.cta_type ? <p className="text-xs">{t("cta")}: {t(`ctaType.${item.cta_type}`)}</p> : null}
+    </div>
+  );
+}
+
+function MessagingCard({ businessId, t }: { businessId: string; t: (key: string) => string }) {
+  const queryClient = useQueryClient();
+  const query = useQuery({
+    queryKey: ["messaging", businessId],
+    queryFn: () => fetchMessaging(businessId),
+    enabled: Boolean(businessId),
+  });
+  const versionsQuery = useQuery({ queryKey: ["messaging-versions", businessId], queryFn: () => fetchMessagingVersions(businessId), enabled: Boolean(businessId) });
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: ["messaging", businessId] });
+    void queryClient.invalidateQueries({ queryKey: ["messaging-versions", businessId] });
+  };
+  const generateMutation = useMutation({ mutationFn: () => generateMessaging(businessId), onSuccess: invalidate });
+
+  const item = query.data;
+  const quality = (item?.quality ?? {}) as Record<string, unknown>;
+  const missingComponents = Array.isArray(quality.missing_components) ? (quality.missing_components as string[]) : [];
+  const unsupportedClaims = Array.isArray(quality.unsupported_claims) ? (quality.unsupported_claims as Array<Record<string, unknown>>) : [];
+  const competitor = (quality.competitor_messaging ?? {}) as Record<string, unknown>;
+  const patterns = Array.isArray(competitor.patterns) ? (competitor.patterns as Array<Record<string, unknown>>) : [];
+
+  return (
+    <Card data-testid="messaging-card">
+      <CardHeader>
+        <CardTitle>{t("messaging")}</CardTitle>
+        <CardDescription>
+          {t("messagingDescription")}
+          {item ? ` · ${t("version")} ${item.version} · ${item.messaging_version} · ${item.status}` : null}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <Button type="button" variant="outline" onClick={() => generateMutation.mutate()} disabled={generateMutation.isPending}>
+          {generateMutation.isPending ? t("generating") : t("generateMessaging")}
+        </Button>
+        {generateMutation.isError ? <p className="text-sm text-destructive">{t("generateError")}</p> : null}
+        {query.isLoading ? <div className="flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> {t("loadingMessaging")}</div> : null}
+        {query.isError && !(query.error instanceof ApiError && query.error.status === 404) ? <p className="text-sm text-destructive">{t("messagingError")}</p> : null}
+        {!item ? <p className="text-sm text-muted-foreground">{t("noMessaging")}</p> : (
+          <>
+            {missingComponents.length ? <div className="rounded-md border border-dashed p-3 text-sm"><span className="font-medium">{t("missingComponents")}: </span>{missingComponents.map((name) => t(`component.${name}`)).join(", ")}</div> : null}
+            <CoreMessage message={item.core_message as Record<string, unknown>} t={t} />
+            {unsupportedClaims.length ? (
+              <div className="rounded-md border border-destructive/40 p-3 text-sm" data-testid="claim-validation">
+                <div className="font-medium">{t("claimValidation")}</div>
+                {unsupportedClaims.map((flag, index) => (
+                  <div key={`${flag.component_type}-${index}`} className="text-xs text-muted-foreground">
+                    {t(`component.${String(flag.component_type)}`)}: {Array.isArray(flag.claims) ? (flag.claims as string[]).join(", ") : String(flag.claims)}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {item.components?.length ? <div className="space-y-2">{item.components.map((component) => <ComponentCard key={component.id} item={component} t={t} />)}</div> : null}
+            {item.angles?.length ? (
+              <div>
+                <div className="mb-2 font-medium">{t("angles")}</div>
+                <div className="space-y-2">{item.angles.map((angle) => <AngleCard key={angle.id} item={angle} t={t} />)}</div>
+              </div>
+            ) : null}
+            <div className="grid gap-1 rounded-md border p-3 text-xs text-muted-foreground sm:grid-cols-2">
+              <div>{t("performanceAttribution")}: {String(quality.performance_attribution ?? t("unavailable"))}</div>
+              <div>{t("competitorPatterns")}: {patterns.map((pattern) => `${String(pattern.pattern)} (${String(pattern.saturation)})`).join(", ") || t("unavailable")}</div>
+              <div>{t("competitorWhitespace")}: {String(competitor.whitespace_claim ?? t("unavailable"))}</div>
+              <div>{t("ctaValidation")}: {JSON.stringify(quality.cta_validation ?? t("unavailable"))}</div>
+            </div>
+          </>
+        )}
+        {versionsQuery.data?.versions.length ? (
+          <div className="border-t pt-2 text-xs text-muted-foreground">
+            <span className="font-medium">{t("versions")}: </span>
+            {versionsQuery.data.versions.map((version) => `${version.version} ${version.status}`).join(" · ")}
+          </div>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function StrategySection({ businessId }: { businessId: string }) {
   const t = useTranslations("strategy");
   const queryClient = useQueryClient();
@@ -151,6 +293,7 @@ export function StrategySection({ businessId }: { businessId: string }) {
           {decisionsQuery.data?.decisions.length ? decisionsQuery.data.decisions.map((item) => <DecisionCard key={item.id} item={item} t={t} />) : <p className="text-sm text-muted-foreground">{t("noDecisions")}</p>}
         </CardContent>
       </Card>
+      <MessagingCard businessId={businessId} t={t} />
     </div>
   );
 }

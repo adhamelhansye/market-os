@@ -43,5 +43,61 @@
   "forecastAlignment": "Forecast alignment",
   "simulationAlignment": "Simulation alignment",
   "decisionReasons": "Decision reasons",
-  "decisionRulesVersion": "Decision rules"
+  "decisionRulesVersion": "Decision rules",
+  "messaging": "Messaging strategy",
+  "messagingDescription": "Deterministic message components, angles and proof anchored in research evidence.",
+  "version": "Version",
+  "generateMessaging": "Generate messaging",
+  "generating": "Generating…",
+  "generateError": "Could not generate messaging.",
+  "loadingMessaging": "Loading messaging…",
+  "messagingError": "Could not load messaging.",
+  "noMessaging": "No messaging strategy yet. Generate one from available research and positioning.",
+  "missingComponents": "Missing components",
+  "angles": "Message angles",
+  "hookDirection": "Hook direction",
+  "cta": "CTA",
+  "ctaValidation": "CTA validation",
+  "proofAvailable": "Proof available",
+  "yes": "Yes",
+  "no": "No",
+  "respondWith": "Response",
+  "unsupportedClaims": "Unsupported claims",
+  "claimValidation": "Claim validation",
+  "performanceAttribution": "Performance attribution",
+  "competitorPatterns": "Competitor patterns",
+  "competitorWhitespace": "Competitor whitespace",
+  "versions": "Versions",
+  "component": {
+    "problem": "Problem",
+    "pain": "Pain point",
+    "desire": "Desire",
+    "benefit": "Benefit",
+    "feature": "Feature",
+    "differentiator": "Differentiator",
+    "promise": "Promise",
+    "objection": "Objection",
+    "proof": "Proof",
+    "cta": "CTA"
+  },
+  "angle": {
+    "problem_led": "Problem-led",
+    "pain_led": "Pain-led",
+    "desire_led": "Desire-led",
+    "benefit_led": "Benefit-led",
+    "differentiator_led": "Differentiator-led",
+    "proof_led": "Proof-led",
+    "objection_led": "Objection-led",
+    "offer_led": "Offer-led"
+  },
+  "stage": {
+    "awareness": "Awareness",
+    "interest": "Interest",
+    "consideration": "Consideration",
+    "purchase": "Purchase",
+    "retention": "Retention"
+  },
+  "ctaType": {
+    "view_product": "View product"
+  }
 }

@@ -14,6 +14,11 @@ export type StrategyDecisionRead = components["schemas"]["StrategyDecisionRead"]
 export type StrategyDecisionEvaluateRequest = components["schemas"]["StrategyDecisionEvaluateRequest"];
 export type StrategyDecisionListResponse = components["schemas"]["StrategyDecisionListResponse"];
 export type StrategyDecisionProvenanceResponse = components["schemas"]["StrategyDecisionProvenanceResponse"];
+export type MessagingStrategyRead = components["schemas"]["MessagingStrategyRead"];
+export type MessageComponentRead = components["schemas"]["MessageComponentRead"];
+export type MessageAngleRead = components["schemas"]["MessageAngleRead"];
+export type MessagingGenerateRequest = components["schemas"]["MessagingGenerateRequest"];
+export type MessagingVersionsResponse = components["schemas"]["MessagingVersionsResponse"];
 
 function strategyUrl(businessId: string, path: string): string {
   return `/api/v1/businesses/${businessId}/strategy/${path}`;
@@ -77,4 +82,19 @@ export function fetchStrategyDecisionProvenance(
   decisionId: string
 ): Promise<StrategyDecisionProvenanceResponse> {
   return apiGet<StrategyDecisionProvenanceResponse>(strategyUrl(businessId, `decisions/${decisionId}/provenance`));
+}
+
+export function fetchMessaging(businessId: string): Promise<MessagingStrategyRead> {
+  return apiGet<MessagingStrategyRead>(strategyUrl(businessId, "messaging"));
+}
+
+export function generateMessaging(
+  businessId: string,
+  payload: MessagingGenerateRequest = {}
+): Promise<MessagingStrategyRead> {
+  return apiPost<MessagingStrategyRead>(strategyUrl(businessId, "messaging/generate"), payload);
+}
+
+export function fetchMessagingVersions(businessId: string): Promise<MessagingVersionsResponse> {
+  return apiGet<MessagingVersionsResponse>(strategyUrl(businessId, "messaging/versions"));
 }

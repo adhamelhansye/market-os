@@ -30,6 +30,9 @@ from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
 from src.db.models.simulation import Simulation, SimulationAssumption, SimulationResult
 from src.db.models.strategy import (
+    MessageAngle,
+    MessageComponent,
+    MessagingStrategy,
     OfferCandidate,
     OfferStrategy,
     PositioningCandidate,
@@ -101,6 +104,9 @@ __all__ = [
     "SimulationResult",
     "OfferCandidate",
     "OfferStrategy",
+    "MessageAngle",
+    "MessageComponent",
+    "MessagingStrategy",
     "PositioningCandidate",
     "PositioningStrategy",
     "StrategyDecision",
