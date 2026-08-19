@@ -1637,6 +1637,312 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/positioning": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Positioning */
+        get: operations["get_positioning_api_v1_businesses__business_id__strategy_positioning_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/positioning/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Positioning Candidate */
+        post: operations["create_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/positioning/candidate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Positioning Candidate */
+        post: operations["create_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/positioning/candidates/{candidate_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Positioning Candidate */
+        get: operations["get_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidates__candidate_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/positioning/candidate/{candidate_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Positioning Candidate */
+        get: operations["get_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidate__candidate_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/positioning/recommend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recommend Positioning */
+        post: operations["recommend_positioning_api_v1_businesses__business_id__strategy_positioning_recommend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/positioning/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Positioning Versions */
+        get: operations["get_positioning_versions_api_v1_businesses__business_id__strategy_positioning_versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Offers */
+        get: operations["get_offers_api_v1_businesses__business_id__strategy_offers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Offer Candidate */
+        post: operations["create_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/candidate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Offer Candidate */
+        post: operations["create_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/candidates/{candidate_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Offer Candidate */
+        get: operations["get_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidates__candidate_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/candidate/{candidate_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Offer Candidate */
+        get: operations["get_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidate__candidate_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Validate Offer */
+        post: operations["validate_offer_api_v1_businesses__business_id__strategy_offers_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/recommend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Recommend Offer */
+        post: operations["recommend_offer_api_v1_businesses__business_id__strategy_offers_recommend_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offer-versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Offer Versions */
+        get: operations["get_offer_versions_api_v1_businesses__business_id__strategy_offer_versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/offers/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Offer Versions */
+        get: operations["get_offer_versions_api_v1_businesses__business_id__strategy_offers_versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Strategy Summary */
+        get: operations["get_strategy_summary_api_v1_businesses__business_id__strategy_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Strategy Snapshot */
+        get: operations["get_strategy_snapshot_api_v1_businesses__business_id__strategy_snapshot_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -3463,6 +3769,125 @@ export interface components {
             /** Source */
             source?: string | null;
         };
+        /** OfferCandidateCreate */
+        OfferCandidateCreate: {
+            /** Name */
+            name: string;
+            /** Product Id */
+            product_id?: string | null;
+            /** Bundle Id */
+            bundle_id?: string | null;
+            /** Price Override */
+            price_override?: number | string | null;
+            /** Discount Id */
+            discount_id?: string | null;
+            /** Shipping Rule Id */
+            shipping_rule_id?: string | null;
+            /** Guarantee */
+            guarantee?: {
+                [key: string]: unknown;
+            } | null;
+            /** Bonus */
+            bonus?: {
+                [key: string]: unknown;
+            } | null;
+            /** Urgency */
+            urgency?: {
+                [key: string]: unknown;
+            } | null;
+            /** Risk Reversal */
+            risk_reversal?: {
+                [key: string]: unknown;
+            } | null;
+            /** Proof */
+            proof?: string[];
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /** Classification */
+            classification?: ("observed" | "inferred" | "hypothesis") | null;
+            /** Assumptions */
+            assumptions?: string[];
+        };
+        /** OfferCandidateRead */
+        OfferCandidateRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Product Id */
+            product_id: string | null;
+            /** Bundle Id */
+            bundle_id: string | null;
+            /** Components */
+            components: {
+                [key: string]: unknown;
+            };
+            /** Economics */
+            economics: {
+                [key: string]: unknown;
+            };
+            /** Classification */
+            classification: string;
+            /** Strength */
+            strength: string;
+            /** Score */
+            score: string | null;
+            /** Score Breakdown */
+            score_breakdown?: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Assumptions */
+            assumptions: string[];
+            /** Risks */
+            risks: {
+                [key: string]: unknown;
+            }[];
+            /** Provenance */
+            provenance: components["schemas"]["ProvenanceRead"][];
+            /** Strategy Version */
+            strategy_version: string;
+        };
+        /** OfferResponse */
+        OfferResponse: {
+            /** Strategy Id */
+            strategy_id: string | null;
+            /** Version */
+            version: number | null;
+            /** Strategy Version */
+            strategy_version: string;
+            /** Status */
+            status: string;
+            /** Selected Candidate Id */
+            selected_candidate_id: string | null;
+            /** Candidates */
+            candidates: components["schemas"]["OfferCandidateRead"][];
+            /** Coverage */
+            coverage: {
+                [key: string]: unknown;
+            };
+            /** Missing Research Areas */
+            missing_research_areas: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** OfferValidateRequest */
+        OfferValidateRequest: {
+            /**
+             * Candidate Id
+             * Format: uuid
+             */
+            candidate_id: string;
+        };
+        /** OfferVersionsResponse */
+        OfferVersionsResponse: {
+            /** Versions */
+            versions: components["schemas"]["OfferResponse"][];
+        };
         /** OrganizationRead */
         OrganizationRead: {
             /**
@@ -3508,6 +3933,118 @@ export interface components {
             role_name: string;
             /** Permissions */
             permissions: string[];
+        };
+        /** PositioningCandidateCreate */
+        PositioningCandidateCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Candidate Type
+             * @default problem_led
+             */
+            candidate_type: string;
+            /** Target Customer */
+            target_customer?: string | null;
+            /** Problem */
+            problem?: string | null;
+            /** Solution */
+            solution?: string | null;
+            /** Differentiator */
+            differentiator?: string | null;
+            /** Promise */
+            promise?: string | null;
+            /** Supporting Benefits */
+            supporting_benefits?: string[];
+            /** Proof Points */
+            proof_points?: string[];
+            /** Objections Addressed */
+            objections_addressed?: string[];
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /** Classification */
+            classification?: ("observed" | "inferred" | "hypothesis") | null;
+            /** Assumptions */
+            assumptions?: string[];
+        };
+        /** PositioningCandidateRead */
+        PositioningCandidateRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Candidate Type */
+            candidate_type: string;
+            /** Target Customer */
+            target_customer: string | null;
+            /** Problem */
+            problem: string | null;
+            /** Solution */
+            solution: string | null;
+            /** Differentiator */
+            differentiator: string | null;
+            /** Promise */
+            promise: string | null;
+            /** Supporting Benefits */
+            supporting_benefits: string[];
+            /** Proof Points */
+            proof_points: string[];
+            /** Objections Addressed */
+            objections_addressed: string[];
+            /** Positioning Statement */
+            positioning_statement: string | null;
+            /** Classification */
+            classification: string;
+            /** Strength */
+            strength: string;
+            /** Score */
+            score: string | null;
+            /** Score Breakdown */
+            score_breakdown?: {
+                [key: string]: unknown;
+            };
+            /** Status */
+            status: string;
+            /** Assumptions */
+            assumptions: string[];
+            /** Risks */
+            risks: {
+                [key: string]: unknown;
+            }[];
+            /** Provenance */
+            provenance: components["schemas"]["ProvenanceRead"][];
+            /** Strategy Version */
+            strategy_version: string;
+        };
+        /** PositioningResponse */
+        PositioningResponse: {
+            /** Strategy Id */
+            strategy_id: string | null;
+            /** Version */
+            version: number | null;
+            /** Strategy Version */
+            strategy_version: string;
+            /** Status */
+            status: string;
+            /** Selected Candidate Id */
+            selected_candidate_id: string | null;
+            /** Candidates */
+            candidates: components["schemas"]["PositioningCandidateRead"][];
+            /** Coverage */
+            coverage: {
+                [key: string]: unknown;
+            };
+            /** Missing Research Areas */
+            missing_research_areas: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** PositioningVersionsResponse */
+        PositioningVersionsResponse: {
+            /** Versions */
+            versions: components["schemas"]["PositioningResponse"][];
         };
         /** ProductCostCreate */
         ProductCostCreate: {
@@ -3825,6 +4362,23 @@ export interface components {
             contribution_profit?: string | null;
             /** Reason */
             reason?: string | null;
+        };
+        /** ProvenanceRead */
+        ProvenanceRead: {
+            /** Evidence Id */
+            evidence_id?: string | null;
+            /** Finding Id */
+            finding_id?: string | null;
+            /** Source Id */
+            source_id?: string | null;
+            /** Snapshot Id */
+            snapshot_id?: string | null;
+            /** Source Title */
+            source_title?: string | null;
+            /** Statement */
+            statement?: string | null;
+            /** Data Source */
+            data_source?: string | null;
         };
         /** ProviderQuality */
         ProviderQuality: {
@@ -5163,6 +5717,43 @@ export interface components {
             total: number;
             /** Simulations */
             simulations?: components["schemas"]["SimulationRead"][];
+        };
+        /** StrategySnapshotResponse */
+        StrategySnapshotResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Strategy Kind */
+            strategy_kind: string;
+            /** Strategy Version */
+            strategy_version: string;
+            /** Research Intelligence Version */
+            research_intelligence_version: string | null;
+            /** Input Snapshot Refs */
+            input_snapshot_refs: {
+                [key: string]: unknown;
+            };
+            /** Coverage */
+            coverage: {
+                [key: string]: unknown;
+            };
+            /** Missing Research Areas */
+            missing_research_areas: {
+                [key: string]: unknown;
+            }[];
+            /** Created At */
+            created_at: unknown;
+        };
+        /** StrategySummaryResponse */
+        StrategySummaryResponse: {
+            positioning: components["schemas"]["PositioningResponse"];
+            offers: components["schemas"]["OfferResponse"];
+            /** Missing Research Areas */
+            missing_research_areas: {
+                [key: string]: unknown;
+            }[];
         };
         /** SummaryRead */
         SummaryRead: {
@@ -8916,6 +9507,486 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_positioning_api_v1_businesses__business_id__strategy_positioning_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningResponse"];
+                };
+            };
+        };
+    };
+    create_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PositioningCandidateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PositioningCandidateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidates__candidate_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_positioning_candidate_api_v1_businesses__business_id__strategy_positioning_candidate__candidate_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommend_positioning_api_v1_businesses__business_id__strategy_positioning_recommend_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningResponse"];
+                };
+            };
+        };
+    };
+    get_positioning_versions_api_v1_businesses__business_id__strategy_positioning_versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositioningVersionsResponse"];
+                };
+            };
+        };
+    };
+    get_offers_api_v1_businesses__business_id__strategy_offers_get: {
+        parameters: {
+            query?: {
+                product_id?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferCandidateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferCandidateCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidates__candidate_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_offer_candidate_api_v1_businesses__business_id__strategy_offers_candidate__candidate_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                candidate_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferCandidateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_offer_api_v1_businesses__business_id__strategy_offers_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OfferValidateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommend_offer_api_v1_businesses__business_id__strategy_offers_recommend_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferResponse"];
+                };
+            };
+        };
+    };
+    get_offer_versions_api_v1_businesses__business_id__strategy_offer_versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferVersionsResponse"];
+                };
+            };
+        };
+    };
+    get_offer_versions_api_v1_businesses__business_id__strategy_offers_versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OfferVersionsResponse"];
+                };
+            };
+        };
+    };
+    get_strategy_summary_api_v1_businesses__business_id__strategy_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategySummaryResponse"];
+                };
+            };
+        };
+    };
+    get_strategy_snapshot_api_v1_businesses__business_id__strategy_snapshot_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StrategySnapshotResponse"];
                 };
             };
         };

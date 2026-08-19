@@ -243,6 +243,39 @@ vi.mock("./api", () => ({
   ),
 }));
 
+vi.mock("@/features/strategy/api", () => ({
+  fetchStrategySummary: vi.fn(() =>
+    Promise.resolve({
+      positioning: {
+        strategy_id: null,
+        version: null,
+        strategy_version: "positioning_v1",
+        status: "insufficient_data",
+        selected_candidate_id: null,
+        candidates: [],
+        coverage: {},
+        missing_research_areas: [],
+      },
+      offers: {
+        strategy_id: null,
+        version: null,
+        strategy_version: "offer_v1",
+        status: "insufficient_data",
+        selected_candidate_id: null,
+        candidates: [],
+        coverage: {},
+        missing_research_areas: [],
+      },
+      missing_research_areas: [],
+    })
+  ),
+  createPositioningCandidate: vi.fn(),
+  recommendPositioning: vi.fn(),
+  createOfferCandidate: vi.fn(),
+  recommendOffer: vi.fn(),
+  validateOffer: vi.fn(),
+}));
+
 function renderSection(locale: "en" | "ar") {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },

@@ -14,6 +14,7 @@ import forecastingEn from "../../messages/en/forecasting.json";
 import recommendationsEn from "../../messages/en/recommendations.json";
 import simulatorEn from "../../messages/en/simulator.json";
 import researchEn from "../../messages/en/research.json";
+import strategyEn from "../../messages/en/strategy.json";
 
 import commonAr from "../../messages/ar/common.json";
 import authAr from "../../messages/ar/auth.json";
@@ -29,6 +30,7 @@ import forecastingAr from "../../messages/ar/forecasting.json";
 import recommendationsAr from "../../messages/ar/recommendations.json";
 import simulatorAr from "../../messages/ar/simulator.json";
 import researchAr from "../../messages/ar/research.json";
+import strategyAr from "../../messages/ar/strategy.json";
 
 export const messagesByLocale: Record<string, AbstractIntlMessages> = {
   en: {
@@ -46,6 +48,7 @@ export const messagesByLocale: Record<string, AbstractIntlMessages> = {
     recommendations: recommendationsEn,
     simulator: simulatorEn,
     research: researchEn,
+    strategy: strategyEn,
   },
   ar: {
     common: commonAr,
@@ -62,5 +65,6 @@ export const messagesByLocale: Record<string, AbstractIntlMessages> = {
     recommendations: recommendationsAr,
     simulator: simulatorAr,
     research: researchAr,
+    strategy: strategyAr,
   },
 };

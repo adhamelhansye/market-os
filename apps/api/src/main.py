@@ -28,6 +28,7 @@ from src.modules.recommendations.router import router as recommendations_router
 from src.modules.research.router import router as research_router
 from src.modules.shipping.router import router as shipping_router
 from src.modules.simulator.router import router as simulator_router
+from src.modules.strategy.router import router as strategy_router
 
 logger = get_logger(__name__)
 
@@ -83,6 +84,7 @@ def create_app() -> FastAPI:
     app.include_router(recommendations_router, prefix=API_PREFIX)
     app.include_router(simulator_router, prefix=API_PREFIX)
     app.include_router(research_router, prefix=API_PREFIX)
+    app.include_router(strategy_router, prefix=API_PREFIX)
 
     return app
 

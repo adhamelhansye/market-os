@@ -1,0 +1,293 @@
+from __future__ import annotations
+
+import uuid
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query
+
+from src.core.dependencies import CurrentBusinessId, DbSession, require_permission
+from src.core.exceptions import NotFoundError
+from src.core.tenancy import TenantContext
+from src.modules.businesses.service import get_business
+from src.modules.strategy import service
+from src.modules.strategy.schemas import (
+    OfferCandidateCreate,
+    OfferCandidateRead,
+    OfferResponse,
+    OfferValidateRequest,
+    OfferVersionsResponse,
+    PositioningCandidateCreate,
+    PositioningCandidateRead,
+    PositioningResponse,
+    PositioningVersionsResponse,
+    StrategySnapshotResponse,
+    StrategySummaryResponse,
+)
+
+router = APIRouter(tags=["strategy"])
+
+
+def _positioning(data: dict) -> PositioningResponse:
+    data["candidates"] = [
+        PositioningCandidateRead.model_validate(candidate) for candidate in data["candidates"]
+    ]
+    return PositioningResponse.model_validate(data)
+
+
+def _offers(data: dict) -> OfferResponse:
+    data["candidates"] = [
+        OfferCandidateRead.model_validate(candidate) for candidate in data["candidates"]
+    ]
+    return OfferResponse.model_validate(data)
+
+
+@router.get("/businesses/{business_id}/strategy/positioning", response_model=PositioningResponse)
+async def get_positioning(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> PositioningResponse:
+    return _positioning(
+        await service.positioning_response(session, await get_business(session, business_id))
+    )
+
+
+@router.post(
+    "/businesses/{business_id}/strategy/positioning/candidate",
+    response_model=PositioningCandidateRead,
+    status_code=201,
+)
+@router.post(
+    "/businesses/{business_id}/strategy/positioning/candidates",
+    response_model=PositioningCandidateRead,
+    status_code=201,
+)
+async def create_positioning_candidate(
+    payload: PositioningCandidateCreate,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+) -> PositioningCandidateRead:
+    business = await get_business(session, business_id)
+    candidate = await service.create_positioning_candidate(session, business, payload)
+    strategy = await session.get(service.PositioningStrategy, candidate.positioning_strategy_id)
+    return PositioningCandidateRead.model_validate(
+        {
+            **{
+                column.name: getattr(candidate, column.name)
+                for column in candidate.__table__.columns
+            },
+            "strategy_version": strategy.strategy_version
+            if strategy
+            else service.POSITIONING_VERSION,
+        }
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/positioning/candidate/{candidate_id}",
+    response_model=PositioningCandidateRead,
+)
+@router.get(
+    "/businesses/{business_id}/strategy/positioning/candidates/{candidate_id}",
+    response_model=PositioningCandidateRead,
+)
+async def get_positioning_candidate(
+    business_id: CurrentBusinessId,
+    candidate_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> PositioningCandidateRead:
+    business = await get_business(session, business_id)
+    candidate = await service.get_positioning_candidate(session, business, candidate_id)
+    strategy = await session.get(service.PositioningStrategy, candidate.positioning_strategy_id)
+    return PositioningCandidateRead.model_validate(
+        {
+            **{
+                column.name: getattr(candidate, column.name)
+                for column in candidate.__table__.columns
+            },
+            "strategy_version": strategy.strategy_version
+            if strategy
+            else service.POSITIONING_VERSION,
+        }
+    )
+
+
+@router.post(
+    "/businesses/{business_id}/strategy/positioning/recommend", response_model=PositioningResponse
+)
+async def recommend_positioning(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+) -> PositioningResponse:
+    return _positioning(
+        await service.recommend_positioning(session, await get_business(session, business_id))
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/positioning/versions",
+    response_model=PositioningVersionsResponse,
+)
+async def get_positioning_versions(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> PositioningVersionsResponse:
+    business = await get_business(session, business_id)
+    return PositioningVersionsResponse(
+        versions=[
+            _positioning(row) for row in await service.positioning_versions(session, business)
+        ]
+    )
+
+
+@router.get("/businesses/{business_id}/strategy/offers", response_model=OfferResponse)
+async def get_offers(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+    product_id: Annotated[uuid.UUID | None, Query()] = None,
+) -> OfferResponse:
+    data = await service.offer_response(session, await get_business(session, business_id))
+    if product_id is not None:
+        data["candidates"] = [
+            candidate for candidate in data["candidates"] if candidate["product_id"] == product_id
+        ]
+    return _offers(data)
+
+
+@router.post(
+    "/businesses/{business_id}/strategy/offers/candidate",
+    response_model=OfferCandidateRead,
+    status_code=201,
+)
+@router.post(
+    "/businesses/{business_id}/strategy/offers/candidates",
+    response_model=OfferCandidateRead,
+    status_code=201,
+)
+async def create_offer_candidate(
+    payload: OfferCandidateCreate,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+) -> OfferCandidateRead:
+    business = await get_business(session, business_id)
+    candidate = await service.create_offer_candidate(session, business, payload)
+    strategy = await session.get(service.OfferStrategy, candidate.offer_strategy_id)
+    return OfferCandidateRead.model_validate(
+        {
+            **{
+                column.name: getattr(candidate, column.name)
+                for column in candidate.__table__.columns
+            },
+            "strategy_version": strategy.strategy_version if strategy else service.OFFER_VERSION,
+        }
+    )
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/offers/candidate/{candidate_id}",
+    response_model=OfferCandidateRead,
+)
+@router.get(
+    "/businesses/{business_id}/strategy/offers/candidates/{candidate_id}",
+    response_model=OfferCandidateRead,
+)
+async def get_offer_candidate(
+    business_id: CurrentBusinessId,
+    candidate_id: uuid.UUID,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> OfferCandidateRead:
+    business = await get_business(session, business_id)
+    candidate = await service.get_offer_candidate(session, business, candidate_id)
+    strategy = await session.get(service.OfferStrategy, candidate.offer_strategy_id)
+    return OfferCandidateRead.model_validate(
+        {
+            **{
+                column.name: getattr(candidate, column.name)
+                for column in candidate.__table__.columns
+            },
+            "strategy_version": strategy.strategy_version if strategy else service.OFFER_VERSION,
+        }
+    )
+
+
+@router.post("/businesses/{business_id}/strategy/offers/validate", response_model=OfferResponse)
+async def validate_offer(
+    payload: OfferValidateRequest,
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+) -> OfferResponse:
+    return _offers(
+        await service.validate_offer(
+            session, await get_business(session, business_id), payload.candidate_id
+        )
+    )
+
+
+@router.post("/businesses/{business_id}/strategy/offers/recommend", response_model=OfferResponse)
+async def recommend_offer(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:write"))],
+    session: DbSession,
+) -> OfferResponse:
+    return _offers(await service.recommend_offer(session, await get_business(session, business_id)))
+
+
+@router.get(
+    "/businesses/{business_id}/strategy/offers/versions",
+    response_model=OfferVersionsResponse,
+)
+@router.get(
+    "/businesses/{business_id}/strategy/offer-versions", response_model=OfferVersionsResponse
+)
+async def get_offer_versions(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> OfferVersionsResponse:
+    business = await get_business(session, business_id)
+    return OfferVersionsResponse(
+        versions=[_offers(row) for row in await service.offer_versions(session, business)]
+    )
+
+
+@router.get("/businesses/{business_id}/strategy/summary", response_model=StrategySummaryResponse)
+async def get_strategy_summary(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> StrategySummaryResponse:
+    data = await service.strategy_summary(session, await get_business(session, business_id))
+    data["positioning"] = _positioning(data["positioning"])
+    data["offers"] = _offers(data["offers"])
+    return StrategySummaryResponse.model_validate(data)
+
+
+@router.get("/businesses/{business_id}/strategy/snapshot", response_model=StrategySnapshotResponse)
+async def get_strategy_snapshot(
+    business_id: CurrentBusinessId,
+    tenant: Annotated[TenantContext, Depends(require_permission("business:read"))],
+    session: DbSession,
+) -> StrategySnapshotResponse:
+    snapshot = await service.latest_snapshot(session, await get_business(session, business_id))
+    if snapshot is None:
+        raise NotFoundError("Strategy snapshot not found")
+    return StrategySnapshotResponse.model_validate(
+        {
+            "id": snapshot.id,
+            "strategy_kind": snapshot.strategy_kind,
+            "strategy_version": snapshot.strategy_version,
+            "research_intelligence_version": snapshot.research_intelligence_version,
+            "input_snapshot_refs": snapshot.input_snapshot_refs,
+            "coverage": snapshot.coverage_json,
+            "missing_research_areas": snapshot.missing_research_areas,
+            "created_at": snapshot.created_at,
+        }
+    )

@@ -29,6 +29,13 @@ from src.db.models.research import (
 from src.db.models.role import Role
 from src.db.models.shipping_rule import ShippingRule
 from src.db.models.simulation import Simulation, SimulationAssumption, SimulationResult
+from src.db.models.strategy import (
+    OfferCandidate,
+    OfferStrategy,
+    PositioningCandidate,
+    PositioningStrategy,
+    StrategySnapshot,
+)
 from src.db.models.user import User
 from src.modules.integrations.models import (
     Ad,
@@ -91,6 +98,11 @@ __all__ = [
     "Simulation",
     "SimulationAssumption",
     "SimulationResult",
+    "OfferCandidate",
+    "OfferStrategy",
+    "PositioningCandidate",
+    "PositioningStrategy",
+    "StrategySnapshot",
     "SyncRun",
     "User",
     "WebhookEvent",
