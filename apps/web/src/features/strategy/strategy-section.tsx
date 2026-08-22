@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/api-client";
+import { CreativeLearningSection } from "./creative-learning-section";
 import { CreativePerformanceSection } from "./creative-performance-section";
 import { FunnelSection } from "./funnel-section";
 import {
@@ -298,6 +299,7 @@ export function StrategySection({ businessId }: { businessId: string }) {
       <MessagingCard businessId={businessId} t={t} />
       <FunnelSection businessId={businessId} />
       <CreativePerformanceSection businessId={businessId} />
+      <CreativeLearningSection businessId={businessId} />
     </div>
   );
 }

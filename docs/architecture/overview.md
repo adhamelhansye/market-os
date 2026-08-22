@@ -228,6 +228,7 @@ this live schema into `packages/shared-types` by
 - `docs/architecture/recommendations.md` — deterministic decision engine, review-only structured decisions, evidence, safety
 - `docs/architecture/simulator.md` — deterministic campaign simulator, scenarios, sensitivity, break-even, targets, evidence
 - `docs/architecture/strategy.md` — deterministic positioning, offers, decisions and messaging with provenance and versioned snapshots
+- `docs/architecture/creative.md` — creative intelligence stack (8A–8D): concepts, testing, performance intelligence, deterministic learning hierarchy
 - `docs/adr/0001-monolith.md` — monolith decision
 - `docs/adr/0002-multi-tenancy.md` — tenancy decision (incl. why no RLS yet)
 - `AGENTS.md` — permanent engineering rules

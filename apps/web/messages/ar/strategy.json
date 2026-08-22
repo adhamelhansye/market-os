@@ -209,5 +209,17 @@
   "signals": "الإشارات المتحققة",
   "readiness": "جاهزية التوسع (مراجعة فقط)",
   "comparisons": "المقارنات",
-  "rule": "القاعدة"
+  "rule": "القاعدة",
+  "creativeLearning": "التعلّم الإبداعي",
+  "creativeLearningDescription": "تعلّم حتمي من أداء المحتوى الإبداعي المرصود. ارتباطات فقط - ليست ادعاءات سببية.",
+  "generateLearning": "إعادة حساب التعلّم",
+  "snapshotFingerprint": "اللقطة",
+  "learningStatus": "حالة التعلّم",
+  "observedEntities": "الكيانات المرصودة",
+  "patternsCount": "الأنماط",
+  "recommendationsCount": "التوصيات",
+  "observedPatterns": "الأنماط المرصودة",
+  "recommendationsTitle": "التوصيات (مراجعة فقط)",
+  "noLearningSnapshot": "لا توجد لقطة تعلّم بعد. أعد الحساب لإنشاء واحدة من الأداء المرصود.",
+  "noLearningItems": "لا يوجد للقطة الحالية."
 }

@@ -1,4 +1,49 @@
 import { apiDelete, apiGet, apiPost } from "@/lib/api-client";
+
+// ---------------------------------------------------------------------------
+// Creative learning intelligence (Phase 8D) - observed-data learnings only
+// ---------------------------------------------------------------------------
+
+export type LearningSummaryResponse = {
+  status: string;
+  reason?: string | null;
+  entities_total?: number;
+  entities_sufficient?: number;
+  patterns_total?: number;
+  patterns_by_status?: Record<string, number>;
+  learnings_total?: number;
+  recommendations_total?: number;
+  learning_status?: string;
+  fingerprint?: string;
+  rules_version?: string;
+  range?: { kind: string; start: string; end: string };
+};
+
+export type LearningRecommendationItem = {
+  type: string;
+  reason_code: string;
+  statement: string;
+  affected: { dimension?: string; value?: string; id?: string; type?: string } | null;
+  priority: "high" | "medium" | "low";
+  priority_score: string;
+  review_only: boolean;
+  status: string;
+};
+
+export type LearningPatternItem = {
+  dimension: string;
+  value: string;
+  status: string;
+  dominant_direction: string | null;
+  observed_entities: number;
+  evidence_strength: string;
+};
+
+export type LearningProjectionResponse = {
+  status: string;
+  reason?: string | null;
+  items?: Record<string, unknown>[];
+};
 import type { components } from "@marketing-os/shared-types";
 
 export type PositioningResponse = components["schemas"]["PositioningResponse"];
@@ -260,4 +305,31 @@ export async function createCreativePerformanceSnapshot(
     `${performanceUrl(businessId, "/snapshots")}?range_kind=${encodeURIComponent(rangeKind)}`,
     {}
   );
+}
+
+function learningUrl(businessId: string, path = ""): string {
+  return `/api/v1/businesses/${businessId}/strategy/creative/learning${path}`;
+}
+
+export function generateCreativeLearning(
+  businessId: string,
+  rangeKind: string = "last_30_days"
+): Promise<{ business_id: string; snapshot_id: string | null; created: boolean }> {
+  return apiPost(
+    `${learningUrl(businessId, "/generate")}?range_kind=${encodeURIComponent(rangeKind)}`,
+    {}
+  );
+}
+
+export async function fetchLearningSummary(
+  businessId: string
+): Promise<LearningSummaryResponse> {
+  return apiGet<LearningSummaryResponse>(learningUrl(businessId, "/summary"));
+}
+
+export async function fetchLearningSection(
+  businessId: string,
+  section: "patterns" | "learnings" | "recommendations" | "profiles"
+): Promise<LearningProjectionResponse> {
+  return apiGet<LearningProjectionResponse>(learningUrl(businessId, `/${section}`));
 }

@@ -2409,6 +2409,145 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Learning
+         * @description Recompute the deterministic learning report (idempotent persist).
+         */
+        post: operations["generate_learning_api_v1_businesses__business_id__strategy_creative_learning_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Summary */
+        get: operations["learning_summary_api_v1_businesses__business_id__strategy_creative_learning_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/patterns": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Patterns */
+        get: operations["learning_patterns_api_v1_businesses__business_id__strategy_creative_learning_patterns_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/learnings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Learnings */
+        get: operations["learning_learnings_api_v1_businesses__business_id__strategy_creative_learning_learnings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Recommendations */
+        get: operations["learning_recommendations_api_v1_businesses__business_id__strategy_creative_learning_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/profiles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Learning Profiles */
+        get: operations["learning_profiles_api_v1_businesses__business_id__strategy_creative_learning_profiles_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Snapshots */
+        get: operations["list_snapshots_api_v1_businesses__business_id__strategy_creative_learning_snapshots_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/learning/snapshots/{snapshot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Snapshot */
+        get: operations["get_snapshot_api_v1_businesses__business_id__strategy_creative_learning_snapshots__snapshot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -4685,6 +4824,130 @@ export interface components {
         InventorySet: {
             /** Quantity */
             quantity: number;
+        };
+        /** LearningGenerateResponse */
+        LearningGenerateResponse: {
+            /** Business Id */
+            business_id: string;
+            /** Snapshot Id */
+            snapshot_id?: string | null;
+            /** Created */
+            created: boolean;
+            /** Report */
+            report: {
+                [key: string]: unknown;
+            };
+        };
+        /**
+         * LearningProjectionResponse
+         * @description Generic projection envelope for patterns/learnings/recommendations.
+         */
+        LearningProjectionResponse: {
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Items */
+            items?: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** LearningSnapshotRead */
+        LearningSnapshotRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Range Kind */
+            range_kind: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Currency */
+            currency: string;
+            /** Rules Version */
+            rules_version: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /** LearningSnapshotSummaryRead */
+        LearningSnapshotSummaryRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Range Kind */
+            range_kind: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Currency */
+            currency: string;
+            /** Rules Version */
+            rules_version: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** LearningSummaryResponse */
+        LearningSummaryResponse: {
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Entities Total */
+            entities_total?: number | null;
+            /** Entities Sufficient */
+            entities_sufficient?: number | null;
+            /** Patterns Total */
+            patterns_total?: number | null;
+            /** Patterns By Status */
+            patterns_by_status?: {
+                [key: string]: number;
+            } | null;
+            /** Learnings Total */
+            learnings_total?: number | null;
+            /** Recommendations Total */
+            recommendations_total?: number | null;
+            /** Learning Status */
+            learning_status?: string | null;
+            /** Fingerprint */
+            fingerprint?: string | null;
+            /** Rules Version */
+            rules_version?: string | null;
+            /** Range */
+            range?: {
+                [key: string]: unknown;
+            } | null;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -12226,6 +12489,207 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SnapshotRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_learning_api_v1_businesses__business_id__strategy_creative_learning_generate_post: {
+        parameters: {
+            query?: {
+                range_kind?: string;
+                /** @description Custom range start */
+                start?: string | null;
+                /** @description Custom range end */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningGenerateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learning_summary_api_v1_businesses__business_id__strategy_creative_learning_summary_get: {
+        parameters: {
+            query?: {
+                range_kind?: string;
+                /** @description Custom range start */
+                start?: string | null;
+                /** @description Custom range end */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningSummaryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    learning_patterns_api_v1_businesses__business_id__strategy_creative_learning_patterns_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningProjectionResponse"];
+                };
+            };
+        };
+    };
+    learning_learnings_api_v1_businesses__business_id__strategy_creative_learning_learnings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningProjectionResponse"];
+                };
+            };
+        };
+    };
+    learning_recommendations_api_v1_businesses__business_id__strategy_creative_learning_recommendations_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningProjectionResponse"];
+                };
+            };
+        };
+    };
+    learning_profiles_api_v1_businesses__business_id__strategy_creative_learning_profiles_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningProjectionResponse"];
+                };
+            };
+        };
+    };
+    list_snapshots_api_v1_businesses__business_id__strategy_creative_learning_snapshots_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningSnapshotSummaryRead"][];
+                };
+            };
+        };
+    };
+    get_snapshot_api_v1_businesses__business_id__strategy_creative_learning_snapshots__snapshot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LearningSnapshotRead"];
                 };
             };
             /** @description Validation Error */

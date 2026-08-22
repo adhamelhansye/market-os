@@ -209,5 +209,17 @@
   "signals": "Triggered signals",
   "readiness": "Scaling readiness (review only)",
   "comparisons": "Comparisons",
-  "rule": "Rule"
+  "rule": "Rule",
+  "creativeLearning": "Creative learning",
+  "creativeLearningDescription": "Deterministic learnings from observed creative performance. Associations only - never causal claims.",
+  "generateLearning": "Recalculate learning",
+  "snapshotFingerprint": "Snapshot",
+  "learningStatus": "Learning status",
+  "observedEntities": "Observed entities",
+  "patternsCount": "Patterns",
+  "recommendationsCount": "Recommendations",
+  "observedPatterns": "Observed patterns",
+  "recommendationsTitle": "Recommendations (review only)",
+  "noLearningSnapshot": "No learning snapshot yet. Recalculate to generate one from observed performance.",
+  "noLearningItems": "None for the current snapshot."
 }
