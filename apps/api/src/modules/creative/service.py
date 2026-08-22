@@ -34,7 +34,6 @@ from src.db.models.strategy import (
 from src.modules.creative.errors import InvalidCreativeInputError
 from src.modules.creative.schemas import WhitespaceGap, WhitespaceOut
 
-
 # ---------------------------------------------------------------------------
 # Objective validation — must map to a valid funnel stage
 # ---------------------------------------------------------------------------
@@ -559,7 +558,7 @@ def identify_creative_whitespace(
         for evidence in customer_evidence:
             pain_points = evidence.get("pain_points") or {}
             if isinstance(pain_points, dict):
-                evidence_sources.update(str(key) for key in pain_points.keys())
+                evidence_sources.update(str(key) for key in pain_points)
 
         raw_confidence = min(
             0.95,

@@ -19,10 +19,6 @@ from src.core.exceptions import NotFoundError
 from src.core.tenancy import TenantContext
 from src.db.models.creative import (
     CreativeConcept,
-    CreativePortfolio,
-    CreativeStrategy,
-    CreativeTest,
-    CreativeTestVariant,
 )
 from src.modules.businesses.service import get_business
 from src.modules.creative import service
@@ -93,7 +89,10 @@ async def list_concepts(
         cursor_id=cursor_row.id if cursor_row else None,
         include_archived=include_archived,
     )
-    return CreativeConceptPage(items=[CreativeConceptRead.model_validate(r) for r in items], next_cursor=next_cursor)
+    return CreativeConceptPage(
+        items=[CreativeConceptRead.model_validate(r) for r in items],
+        next_cursor=next_cursor,
+    )
 
 
 @router.get(

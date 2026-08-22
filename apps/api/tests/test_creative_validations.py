@@ -2,8 +2,7 @@
 
 import pytest
 
-from src.modules.creative.service import validate_hook_direction, validate_emotional_direction
-
+from src.modules.creative.service import validate_emotional_direction, validate_hook_direction
 
 # ——— validate_hook_direction ———
 

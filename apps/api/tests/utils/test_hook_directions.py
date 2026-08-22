@@ -4,10 +4,8 @@ Tests that validate_hook_direction correctly handles all 8 valid hook directions
 and rejects invalid ones.
 """
 
-import pytest
 
 from src.modules.creative.service import validate_hook_direction
-
 
 # The 8 valid hook directions from the controlled taxonomy
 VALID_HOOK_DIRECTIONS = {

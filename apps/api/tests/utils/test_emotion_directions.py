@@ -4,10 +4,8 @@ Tests that validate_emotional_direction correctly handles all 10 valid emotions
 and rejects invalid ones.
 """
 
-import pytest
 
 from src.modules.creative.service import validate_emotional_direction
-
 
 # The 10 valid emotions from the controlled taxonomy
 VALID_EMOTIONS = {
@@ -33,7 +31,8 @@ class TestEmotionalDirectionValidation:
             is_valid, error = validate_emotional_direction(emotion, None)
             assert is_valid, f"Emotion '{emotion}' should be valid but got error: {error}"
             is_valid, error = validate_emotional_direction(None, emotion)
-            assert is_valid, f"Emotion '{emotion}' should be valid as secondary but got error: {error}"
+            msg = f"Emotion '{emotion}' should be valid as secondary but got error: {error}"
+            assert is_valid, msg
 
     def test_none_is_valid(self):
         """None values (optional fields) should be valid."""

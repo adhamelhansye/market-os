@@ -6,7 +6,14 @@ exceptions, per P2 Decimal Precision & Safety Hardening requirements.
 
 from decimal import Decimal
 
-from src.core.utils import _safe, safe_divide, safe_multiply, safe_add, safe_subtract, percent_of, clamp_decimal
+from src.core.utils import (
+    _safe,
+    clamp_decimal,
+    percent_of,
+    safe_add,
+    safe_divide,
+    safe_multiply,
+)
 
 
 class TestSafe:

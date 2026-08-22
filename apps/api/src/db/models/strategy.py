@@ -12,7 +12,6 @@ from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.db.base import Base
-from src.db.models.funnel import FunnelStrategy
 
 
 class StrategySnapshot(Base):
