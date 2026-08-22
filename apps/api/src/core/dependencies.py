@@ -37,7 +37,12 @@ async def get_db_session() -> AsyncIterator[AsyncSession]:
     settings = get_settings()
     factory = create_db_session_factory(settings)
     async with factory() as session:
-        yield session
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
 
 
 async def get_redis_client() -> AsyncIterator[Redis]:

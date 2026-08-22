@@ -14,6 +14,7 @@ from src.core.middleware import RequestContextMiddleware
 from src.modules.auth.router import router as auth_router
 from src.modules.bundles.router import router as bundles_router
 from src.modules.businesses.router import router as businesses_router
+from src.modules.creative.router import router as creative_router
 from src.modules.diagnostics.router import router as diagnostics_router
 from src.modules.discounts.router import router as discounts_router
 from src.modules.economics.router import router as economics_router
@@ -85,6 +86,7 @@ def create_app() -> FastAPI:
     app.include_router(simulator_router, prefix=API_PREFIX)
     app.include_router(research_router, prefix=API_PREFIX)
     app.include_router(strategy_router, prefix=API_PREFIX)
+    app.include_router(creative_router, prefix=API_PREFIX)
 
     return app
 

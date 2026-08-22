@@ -1,34 +1,38 @@
-"""Deterministic creative intelligence service (Phase 8A).
+"""Deterministic creative intelligence service (Phases 8A/8B).
 
-Provides functions for creative concept generation, brief creation,
-validation, and matrix operations. All logic is deterministic — no LLM,
-no asset generation, no performance learning. Creative defines what and
-why, not the final image/video.
+Pure validators and taxonomy checks plus async persistence helpers for
+creative concepts. All logic is deterministic — no LLM, no asset
+generation, no performance learning. Creative defines what and why, not
+the final image/video.
 """
 
 from __future__ import annotations
 
+import uuid
+from collections.abc import Sequence
+from datetime import datetime
+from decimal import Decimal
 from typing import Any
 
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models.creative import (
-    CreativeConcept,
     CreativeBrief,
-    CreativeMatrixEntry,
-    CreativeRisk,
-    CreativeEvidence,
-    CreativeSnapshot,
-    CreativeProvenance,
+    CreativeConcept,
+    CreativeConceptPortfolio,
+    CreativePortfolio,
+    CreativeStrategy,
+    CreativeTest,
+    CreativeTestVariant,
 )
 from src.db.models.strategy import (
-    PositioningStrategy,
-    OfferCandidate,
     MessagingStrategy,
-    MessageAngle,
-    MessageComponent,
+    OfferCandidate,
+    PositioningStrategy,
 )
-from src.db.base import Base
+from src.modules.creative.errors import InvalidCreativeInputError
+from src.modules.creative.schemas import WhitespaceGap, WhitespaceOut
 
 
 # ---------------------------------------------------------------------------
@@ -37,8 +41,32 @@ from src.db.base import Base
 
 _VALID_FUNNEL_STAGES = {"awareness", "interest", "consideration", "purchase", "retention"}
 
+_OBJECTIVE_FUNNEL_STAGE_MAP = {
+    "awareness": "awareness",
+    "traffic": "awareness",
+    "reach": "awareness",
+    "interest": "interest",
+    "consideration": "consideration",
+    "evaluation": "consideration",
+    "purchase": "purchase",
+    "conversion": "purchase",
+    "sale": "purchase",
+    "retention": "retention",
+    "churn-reduction": "retention",
+    "loyalty": "retention",
+}
 
-def validate_objective_funnel_stage(objective: str, funnel_stage: str | None) -> tuple[bool, str | None]:
+
+def infer_funnel_stage_from_objective(objective: str | None) -> str | None:
+    """Deterministic objective → funnel stage mapping (None when unmapped)."""
+    if not objective:
+        return None
+    return _OBJECTIVE_FUNNEL_STAGE_MAP.get(objective.lower())
+
+
+def validate_objective_funnel_stage(
+    objective: str, funnel_stage: str | None
+) -> tuple[bool, str | None]:
     """Validate that objective is consistent with funnel stage.
 
     Returns (is_valid, error_reason). Error reason is None when valid.
@@ -46,36 +74,10 @@ def validate_objective_funnel_stage(objective: str, funnel_stage: str | None) ->
     if not objective:
         return False, "objective_required"
 
-    # Map objective to funnel stage
-    objective_lower = objective.lower()
-    stage_map = {
-        "awareness": "awareness",
-        "traffic": "awareness",
-        "reach": "awareness",
-        "interest": "interest",
-        "consideration": "consideration",
-        "evaluation": "consideration",
-        "purchase": "purchase",
-        "conversion": "purchase",
-        "sale": "purchase",
-        "retention": "retention",
-        "churn-reduction": "retention",
-        "loyalty": "retention",
-    }
-
-    expected_stage = stage_map.get(objective_lower)
+    expected_stage = _OBJECTIVE_FUNNEL_STAGE_MAP.get(objective.lower())
     if expected_stage and funnel_stage:
         if funnel_stage != expected_stage:
             return False, f"objective_funnel_mismatch:{objective}:{funnel_stage}"
-        return True, None
-
-    if expected_stage and not funnel_stage:
-        # No funnel stage provided — that's OK, will be validated later
-        return True, None
-
-    # If objective doesn't match known map but is provided, accept if
-    # funnel stage is also provided (they may be custom)
-    if not expected_stage and funnel_stage:
         return True, None
 
     return True, None
@@ -85,32 +87,23 @@ def validate_objective_funnel_stage(objective: str, funnel_stage: str | None) ->
 # Positioning consistency check
 # ---------------------------------------------------------------------------
 
+
 def validate_positioning_consistency(
-    concept: CreativeConcept,
     positioning: PositioningStrategy | None,
-    business_id: str,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
 ) -> tuple[bool, str | None]:
-    """Validate that concept positioning is consistent with strategy.
+    """Validate that a positioning strategy belongs to the same tenant/business.
 
-    Returns (is_valid, error_reason). Positioning contradiction → invalid,
-    reason positioning_conflict.
+    Returns (is_valid, error_reason).
     """
-    if not positioning:
-        # No positioning to conflict with — OK
+    if positioning is None:
         return True, None
-
-    # Check that positioning belongs to same business
-    if positioning.organization_id != concept.organization_id:
+    if positioning.organization_id != organization_id:
         return False, "cross_tenant_positioning"
-
     if positioning.business_id != business_id:
         return False, "business_mismatch"
-
-    # TODO: Add more consistency checks:
-    # - message alignment
-    # - offer alignment
-    # - audience alignment
-
     return True, None
 
 
@@ -118,34 +111,18 @@ def validate_positioning_consistency(
 # Offer availability check
 # ---------------------------------------------------------------------------
 
+
 def validate_offer_availability(
-    concept: CreativeConcept,
     offer_candidate: OfferCandidate | None,
-    business_id: str,
 ) -> tuple[bool, str | None]:
-    """Validate that concept offer is available.
+    """Validate that a referenced offer exists and is available.
 
-    If concept has offer_reference and offer is unavailable → offer_status
-    unavailable. Never fabricate promotion.
+    Never fabricates promotion: an unavailable offer is an explicit error.
     """
-    if not concept.offer_reference:
-        # No offer referenced — OK
-        return True, None
-
-    if not offer_candidate:
+    if offer_candidate is None:
         return False, "offer_unavailable"
-
-    # Check offer belongs to same business
-    if offer_candidate.organization_id != concept.organization_id:
-        return False, "cross_tenant_offer"
-
-    if offer_candidate.business_id != business_id:
-        return False, "business_mismatch"
-
-    # Check offer status
     if offer_candidate.status != "available":
         return False, f"offer_status:{offer_candidate.status}"
-
     return True, None
 
 
@@ -153,31 +130,23 @@ def validate_offer_availability(
 # Messaging proof reference check
 # ---------------------------------------------------------------------------
 
+
 def validate_proof_reference(
-    concept: CreativeConcept,
+    concept_reason_to_believe: str | None,
     messaging: MessagingStrategy | None,
 ) -> tuple[bool, str | None]:
-    """Validate that concept proof references exist in messaging.
+    """Validate that proof references exist in messaging.
 
-    Every reason_to_believe must have a traceable proof source in the
-    messaging strategy. Never invent reviews/ratings/statistics.
+    Every reason_to_believe must have traceable proof in the messaging
+    strategy. Never invents reviews/ratings/statistics.
     """
-    if not messaging:
-        # No messaging to reference — proof_status unavailable if
-        # reason_to_believe is present
-        if concept.reason_to_believe:
-            return False, "proof_status_unavailable"
+    if not concept_reason_to_believe:
         return True, None
-
-    # Check that proof references are traceable to messaging components
-    # This is a structural validation — we don't copy proof content,
-    # we only verify references exist
-    if concept.reason_to_believe:
-        # Verify at least one evidence_ref exists in messaging
-        proof_available = bool(messaging.input_snapshot.get("proof_points"))
-        if not proof_available:
-            return False, "proof_status_unavailable"
-
+    if messaging is None:
+        return False, "proof_status_unavailable"
+    proof_available = bool((messaging.input_snapshot or {}).get("proof_points"))
+    if not proof_available:
+        return False, "proof_status_unavailable"
     return True, None
 
 
@@ -245,47 +214,18 @@ def validate_creative_format(creative_format: str | None) -> tuple[bool, str | N
 # Creative Type separation (format ≠ type)
 # ---------------------------------------------------------------------------
 
+
 def validate_creative_type(
     creative_format: str | None,
     creative_type: str | None,
 ) -> tuple[bool, str | None]:
-    """Validate that creative_type is appropriate for the format.
-
-    Examples of valid format/type combos:
-    - format=short_video, type=ugc
-    - format=carousel, type=comparison
-    - format=static, type=product_focus
-    - format=testimonial, type=testimonial
-    """
+    """Validate that creative_type is appropriate for the format."""
     if not creative_format:
         return True, None
-    if not creative_type:
-        # Type optional when format provided — OK
-        return True, None
-
-    # Basic format/type compatibility checks
-    format_type_pairs = {
-        ("short_video", {"ugc", "testimonial", "product_demo", "founder_led"}),
-        ("carousel", {"comparison", "product_focus", "educational"}),
-        ("static", {"product_focus", "comparison", "educational", "before_after"}),
-        ("ugc", {"ugc", "testimonial"}),
-        ("testimonial", {"testimonial", "founder_led"}),
-        ("product_demo", {"product_demo", "short_video"}),
-        ("before_after", {"before_after", "static"}),
-        ("founder_led", {"founder_led", "short_video"}),
-        ("lifestyle", {"lifestyle", "static"}),
-        ("comparison", {"comparison", "carousel"}),
-        ("educational", {"educational", "static"}),
-    }
-
-    format_type_key = (creative_format, creative_type)
-    if format_type_key not in format_type_pairs:
-        # Allow any type if format is recognized — the combination may be
-        # valid in a specific context not covered by the basic taxonomy
-        if creative_format in _VALID_CREATIVE_FORMATS:
-            return True, None
+    if creative_format not in _VALID_CREATIVE_FORMATS:
         return False, f"invalid_creative_format:{creative_format}"
-
+    # Any type is accepted for a recognized format; format/type compatibility
+    # may be tightened per vertical without changing this contract.
     return True, None
 
 
@@ -311,21 +251,17 @@ def validate_emotional_direction(
     primary_emotion: str | None,
     secondary_emotion: str | None,
 ) -> tuple[bool, str | None]:
-    """Validate emotional direction categories.
+    """Validate emotional direction categories (controlled taxonomy).
 
-    Controlled categories that must connect to existing research.
+    Only ``None`` means "not provided"; an empty string is rejected.
     """
     errors = []
 
-    if primary_emotion and primary_emotion not in _VALID_EMOTIONS:
+    if primary_emotion is not None and primary_emotion not in _VALID_EMOTIONS:
         errors.append(f"invalid_primary_emotion:{primary_emotion}")
 
-    if secondary_emotion and secondary_emotion not in _VALID_EMOTIONS:
+    if secondary_emotion is not None and secondary_emotion not in _VALID_EMOTIONS:
         errors.append(f"invalid_secondary_emotion:{secondary_emotion}")
-
-    if primary_emotion and secondary_emotion and primary_emotion == secondary_emotion:
-        # Allow same emotion twice — OK for emphasis
-        pass
 
     if errors:
         return False, "; ".join(errors)
@@ -353,374 +289,19 @@ _KPI_METRIC_MAP = {
 
 
 def map_objective_to_metric(objective: str) -> str | None:
-    """Map objective to existing KPI metric.
-
-    Returns the KPI metric name, or None if unavailable.
-    """
-    objective_lower = objective.lower()
-    return _KPI_METRIC_MAP.get(objective_lower)
-
-
-# -------------------------------------------------------------------------#
-# Core: Creative Concept generation from Phase 7 data
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-def generate_creative_brief(
-    db: Session,
-    business_id: str,
-    *,
-    positioning_id: str | None = None,
-    offer_id: str | None = None,
-    messaging_id: str | None = None,
-    funnel_stage: str | None = None,
-    objective: str,
-    audience: str | None = None,
-    angle: str | None = None,
-    hook_direction: str | None = None,
-    creative_format: str,
-    creative_type: str | None = None,
-    message: str | None = None,
-    offer_direction: str | None = None,
-    cta: str | None = None,
-    visual_direction: str | None = None,
-    copy_direction: str | None = None,
-    primary_emotion: str | None = None,
-    secondary_emotion: str | None = None,
-    objection: str | None = None,
-    reason_to_believe: str | None = None,
-    testing_role: str | None = None,
-    success_metric: str | None = None,
-    evidence: dict[str, Any] | None = None,
-    risks: list[dict[str, Any]] | None = None,
-) -> CreativeBrief:
-    """Generate a CreativeBrief from Phase 7 strategy data.
-
-    All data references existing Phase 7 modules. Never fabricates
-    demographics, promotions, reviews, or performance predictions.
-    """
-    # Validate objective/funnel stage consistency
-    is_valid, error = validate_objective_funnel_stage(objective, funnel_stage)
-    if not is_valid:
-        raise ValueError(f"Objective funnel stage validation failed: {error}")
-
-    # Validate hook direction
-    is_valid, error = validate_hook_direction(hook_direction)
-    if not is_valid:
-        raise ValueError(f"Hook direction validation failed: {error}")
-
-    # Validate creative format
-    is_valid, error = validate_creative_format(creative_format)
-    if not is_valid:
-        raise ValueError(f"Creative format validation failed: {error}")
-
-    # Validate creative type if format provided
-    if creative_format and creative_type:
-        is_valid, error = validate_creative_type(creative_format, creative_type)
-        if not is_valid:
-            raise ValueError(f"Creative type validation failed: {error}")
-
-    # Validate emotional direction
-    is_valid, error = validate_emotional_direction(primary_emotion, secondary_emotion)
-    if not is_valid:
-        raise ValueError(f"Emotional direction validation failed: {error}")
-
-    # Map objective to success metric if not provided
-    if not success_metric:
-        mapped = map_objective_to_metric(objective)
-        if mapped:
-            success_metric = mapped
-
-    # Build the brief
-    brief = CreativeBrief(
-        objective=objective,
-        target_audience=audience,
-        funnel_stage=funnel_stage,
-        core_message=message,
-        angle=angle,
-        hook_direction=hook_direction,
-        offer=offer_direction,
-        cta=cta,
-        creative_format=creative_format,
-        creative_type=creative_type,
-        visual_direction=visual_direction,
-        copy_direction=copy_direction,
-        emotional_direction=(
-        f"{primary_emotion or ''} {secondary_emotion or ''}".strip()
-        if (primary_emotion or secondary_emotion)
-        else None
-    ),
-        reason_to_believe=reason_to_believe,
-        testing_hypothesis=testing_role or "baseline",
-        success_metric=success_metric,
-        evidence=evidence or {},
-        risks=risks or [],
-        status="draft",
-    )
-
-    db.add(brief)
-    db.commit()
-    db.refresh(brief)
-
-    return brief
-
-
-def create_creative_concept(
-    db: Session,
-    business_id: str,
-    *,
-    strategy_version: str = "v1",
-    positioning_reference: str | None = None,
-    offer_reference: str | None = None,
-    messaging_reference: str | None = None,
-    funnel_reference: str | None = None,
-    funnel_stage: str | None = None,
-    audience: str | None = None,
-    angle: str | None = None,
-    message: str | None = None,
-    hook_direction: str | None = None,
-    creative_format: str,
-    creative_type: str | None = None,
-    offer_direction: str | None = None,
-    cta: str | None = None,
-    visual_direction: str | None = None,
-    copy_direction: str | None = None,
-    primary_emotion: str | None = None,
-    secondary_emotion: str | None = None,
-    objection: str | None = None,
-    reason_to_believe: str | None = None,
-    testing_role: str | None = None,
-    success_metric: str | None = None,
-    evidence: dict[str, Any] | None = None,
-    risks: list[dict[str, Any]] | None = None,
-) -> CreativeConcept:
-    """Create a new CreativeConcept anchored in Phase 7 data.
-
-    All references (positioning, offer, messaging, funnel) must exist
-    in the database and belong to the same business. No LLM, no asset
-    generation, no performance learning.
-    """
-    from src.db.models.organizations import Organization
-    from src.db.models.businesses import Business
-
-    # Validate business exists
-    business = db.query(Business).filter(Business.id == business_id).first()
-    if not business:
-        raise ValueError(f"Business {business_id} not found")
-
-    # Validate positioning consistency if provided
-    if positioning_reference:
-        from src.db.models.strategy import PositioningStrategy
-        positioning = db.query(PositioningStrategy).filter(
-            PositioningStrategy.id == positioning_reference
-        ).first()
-        if not positioning:
-            raise ValueError(f"Positioning {positioning_reference} not found")
-
-        positioning_ok, positioning_error = validate_positioning_consistency(
-            None, positioning, business_id
-        )
-        if not positioning_ok:
-            raise ValueError(f"Positioning consistency failed: {positioning_error}")
-
-    # Validate offer availability if provided
-    if offer_reference:
-        from src.db.models.strategy import OfferCandidate
-        offer = db.query(OfferCandidate).filter(
-            OfferCandidate.id == offer_reference
-        ).first()
-        if not offer:
-            raise ValueError(f"Offer {offer_reference} not found")
-
-        offer_ok, offer_error = validate_offer_availability(
-            None, offer, business_id
-        )
-        if not offer_ok:
-            raise ValueError(f"Offer availability failed: {offer_error}")
-
-    # Validate messaging proof reference if provided
-    if messaging_reference:
-        from src.db.models.strategy import MessagingStrategy
-        messaging = db.query(MessagingStrategy).filter(
-            MessagingStrategy.id == messaging_reference
-        ).first()
-        if not messaging:
-            raise ValueError(f"Messaging {messaging_reference} not found")
-
-        proof_ok, proof_error = validate_proof_reference(
-            None, messaging
-        )
-        if not proof_ok:
-            raise ValueError(f"Proof reference failed: {proof_error}")
-
-    # Validate hook direction
-    is_valid, error = validate_hook_direction(hook_direction)
-    if not is_valid:
-        raise ValueError(f"Hook direction validation failed: {error}")
-
-    # Validate creative format
-    is_valid, error = validate_creative_format(creative_format)
-    if not is_valid:
-        raise ValueError(f"Creative format validation failed: {error}")
-
-    # Validate creative type
-    if creative_format and creative_type:
-        is_valid, error = validate_creative_type(creative_format, creative_type)
-        if not is_valid:
-            raise ValueError(f"Creative type validation failed: {error}")
-
-    # Validate emotional direction
-    is_valid, error = validate_emotional_direction(primary_emotion, secondary_emotion)
-    if not is_valid:
-        raise ValueError(f"Emotional direction validation failed: {error}")
-
-    # Map objective to success metric if not provided
-    if not success_metric and objective:
-        mapped = map_objective_to_metric(objective)
-        if mapped:
-            success_metric = mapped
-
-    # Determine funnel stage if not provided but objective suggests one
-    final_funnel_stage = funnel_stage
-    if not final_funnel_stage and objective:
-        # Try to infer from objective
-        from .objective_service import infer_funnel_stage_from_objective
-        inferred = infer_funnel_stage_from_objective(objective)
-        if inferred:
-            final_funnel_stage = inferred
-
-    # Create the concept
-    concept = CreativeConcept(
-        strategy_version=strategy_version,
-        positioning_reference=(
-            uuid.UUID(positioning_reference) if positioning_reference else None
-        ),
-        offer_reference=(
-            uuid.UUID(offer_reference) if offer_reference else None
-        ),
-        messaging_reference=(
-            uuid.UUID(messaging_reference) if messaging_reference else None
-        ),
-        funnel_reference=(
-            uuid.UUID(funnel_reference) if funnel_reference else None
-        ),
-        funnel_stage=final_funnel_stage,
-        audience=audience,
-        angle=angle,
-        message=message,
-        hook_direction=hook_direction,
-        creative_format=creative_format,
-        creative_type=creative_type,
-        offer_direction=offer_direction,
-        cta=cta,
-        visual_direction=visual_direction,
-        copy_direction=copy_direction,
-        primary_emotion=primary_emotion,
-        secondary_emotion=secondary_emotion,
-        objection=objection,
-        reason_to_believe=reason_to_believe,
-        testing_role=testing_role or "baseline",
-        success_metric=success_metric,
-        evidence=evidence or {},
-        risks=risks or [],
-        status="draft",
-        organization_id=business.organization_id,
-        business_id=business_id,
-    )
-
-    db.add(concept)
-    db.commit()
-    db.refresh(concept)
-
-    # Create provenance chain entry
-    from .provenance_service import create_provenance_entry
-    create_provenance_entry(
-        db,
-        concept_id=concept.id,
-        step="concept_created",
-        reference_type="strategy_version",
-        source=strategy_version,
-    )
-
-    return concept
-
-
-# Alias for backward compatibility
-generate_brief = generate_creative_brief
+    """Map objective to an existing KPI metric name (None when unavailable)."""
+    if not objective:
+        return None
+    return _KPI_METRIC_MAP.get(objective.lower())
 
 
 # ---------------------------------------------------------------------------
-# Matrix generation — Angle × Stage × Format coverage
+# Diversity / redundancy analysis (pure functions over concepts)
 # ---------------------------------------------------------------------------
 
-def generate_creative_matrix(
-    db: Session,
-    business_id: str,
-    angles: list[str],
-    funnel_stages: list[str],
-    formats: list[str],
-) -> list[CreativeMatrixEntry]:
-    """Generate matrix entries for Angle × Stage × Format coverage.
 
-    Only generates combos supported by evidence from Phase 7 data.
-    Returns list of matrix entries with status and evidence_strength.
-    """
-    from src.db.models.strategy import MessageAngle
-
-    entries = []
-
-    for angle in angles:
-        for stage in funnel_stages:
-            for fmt in formats:
-                # Check if this combo has support from messaging angles
-                angle_support = db.query(MessageAngle).filter(
-                    MessageAngle.angle_type == angle,
-                    MessageAngle.funnel_stage == stage,
-                ).count() > 0
-
-                # Check if format is valid for this angle/stage combo
-                is_valid, error = validate_creative_format(fmt)
-                if not is_valid:
-                    continue  # Skip invalid formats
-
-                entry = CreativeMatrixEntry(
-                    angle=angle,
-                    funnel_stage=stage,
-                    creative_format=fmt,
-                    creative_type="",  # Will be filled later
-                    audience="",  # Will be filled from research
-                    objective="",  # Will be filled from strategy
-                    status="draft",
-                    evidence_strength="insufficient_data",
-                    reason=f"matrix_entry_for_angle_{angle}_stage_{stage}_format_{fmt}",
-                )
-
-                # Determine evidence strength based on Phase 7 data
-                if angle_support:
-                    entry.evidence_strength = "supported"
-                else:
-                    entry.evidence_strength = "hypothesis"
-
-                db.add(entry)
-
-    db.commit()
-
-    # Refresh all entries to get generated IDs
-    all_entries = db.query(CreativeMatrixEntry).filter(
-        CreativeMatrixEntry.business_id == business_id
-    ).all()
-
-    return all_entries
-
-
-# ---------------------------------------------------------------------------
-# Angle diversity detection
-# ---------------------------------------------------------------------------
-
-def detect_angle_diversity(
-    concepts: list[CreativeConcept],
-) -> dict[str, Any]:
-    """Detect if all concepts share the same angle/format/hook_direction/offer.
+def detect_angle_diversity(concepts: Sequence[CreativeConcept]) -> dict[str, Any]:
+    """Detect whether concepts share the same angle/format/hook/offer.
 
     Returns diversity analysis with concentration risk flag.
     """
@@ -734,31 +315,25 @@ def detect_angle_diversity(
             "offer_distribution": {},
         }
 
-    # Count distributions
-    angle_counts = {}
-    format_counts = {}
-    hook_counts = {}
-    offer_counts = {}
+    angle_counts: dict[str, int] = {}
+    format_counts: dict[str, int] = {}
+    hook_counts: dict[str, int] = {}
+    offer_counts: dict[str, int] = {}
 
     for concept in concepts:
-        a = concept.angle or "unspecified"
-        f = concept.creative_format or "unspecified"
-        h = concept.hook_direction or "unspecified"
-        o = concept.offer_direction or "unspecified"[:20] if concept.offer_direction else "unspecified"
+        angle = concept.angle or "unspecified"
+        fmt = concept.creative_format or "unspecified"
+        hook = concept.hook_direction or "unspecified"
+        offer = (concept.offer_direction or "")[:20] or "unspecified"
 
-        angle_counts[a] = angle_counts.get(a, 0) + 1
-        format_counts[f] = format_counts.get(f, 0) + 1
-        hook_counts[h] = hook_counts.get(h, 0) + 1
-        offer_counts[o] = offer_counts.get(o, 0) + 1
+        angle_counts[angle] = angle_counts.get(angle, 0) + 1
+        format_counts[fmt] = format_counts.get(fmt, 0) + 1
+        hook_counts[hook] = hook_counts.get(hook, 0) + 1
+        offer_counts[offer] = offer_counts.get(offer, 0) + 1
 
     total = len(concepts)
-    concentration_risk = (
-        max(angle_counts.values()) / total > 0.5
-        if angle_counts
-        else False
-    )
+    concentration_risk = max(angle_counts.values()) / total > 0.5
 
-    # Determine diversity level
     unique_angles = len(angle_counts)
     if unique_angles == total:
         diversity_level = "maximum"
@@ -779,106 +354,676 @@ def detect_angle_diversity(
     }
 
 
-# ---------------------------------------------------------------------------
-# Creative Whitespace identification
-# ---------------------------------------------------------------------------
-
-def identify_creative_whitespace(
-    db: Session,
-    business_id: str,
-    competitor_patterns: list[dict[str, Any]] | None = None,
-    customer_evidence: list[dict[str, Any]] | None = None,
+def compute_redundancy_analysis(
+    concepts: Sequence[CreativeConcept],
 ) -> dict[str, Any]:
-    """Identify creative whitespace/gaps with hypothesis and confidence.
+    """Detect redundancy across creative concepts.
 
-    Based on observed competitor patterns and customer evidence.
-    Never guarantees winner — always presents as hypothesis with confidence.
+    Redundancy is determined by shared strategic attributes: angle,
+    creative_format, hook_direction and offer_direction.
     """
-    from src.db.models.strategy import MessageAngle, MessageComponent
+    if not concepts:
+        return {
+            "is_duplicate": False,
+            "shared_attributes": 0,
+            "total_attributes": 4,
+            "redundant_groups": [],
+            "redundancy_score": 0.0,
+        }
 
-    gaps = []
-    confidence = 0.0
+    total = len(concepts)
 
-    # Analyze competitor patterns
-    if competitor_patterns:
-        format_usage = {}
-        angle_usage = {}
-        for pattern in competitor_patterns:
-            fmt = pattern.get("creative_format", "unknown")
-            ang = pattern.get("angle", "unknown")
-            format_usage[fmt] = format_usage.get(fmt, 0) + 1
-            angle_usage[ang] = angle_usage.get(ang, 0) + 1
+    angle_freq: dict[str, int] = {}
+    format_freq: dict[str, int] = {}
+    hook_freq: dict[str, int] = {}
+    offer_freq: dict[str, int] = {}
 
-        # Identify underrepresented formats
-        total_competitor_formats = sum(format_usage.values())
-        for fmt, count in format_usage.items():
-            proportion = count / total_competitor_formats if total_competitor_formats else 0
-            if proportion < 0.1:  # Less than 10% of competitors
-                gaps.append(
-                    {
-                        "observed_competitor_pattern": f"{fmt} used by {proportion:.0%} of competitors",
-                        "potential_gap": f"Consider {fmt} format not commonly used in category",
-                        "hypothesis": f"{fmt} format could differentiate with right messaging",
-                        "confidence": round(0.4 + (0.1 * (1 - proportion)), 2),
-                    }
+    for concept in concepts:
+        angle = concept.angle or "unspecified"
+        fmt = concept.creative_format or "unspecified"
+        hook = concept.hook_direction or "unspecified"
+        offer = (concept.offer_direction or "")[:20] or "unspecified"
+
+        angle_freq[angle] = angle_freq.get(angle, 0) + 1
+        format_freq[fmt] = format_freq.get(fmt, 0) + 1
+        hook_freq[hook] = hook_freq.get(hook, 0) + 1
+        offer_freq[offer] = offer_freq.get(offer, 0) + 1
+
+    shared_attributes = 0
+    for freq in (angle_freq, format_freq, hook_freq, offer_freq):
+        if max(freq.values()) / total > Decimal("0.5"):
+            shared_attributes += 1
+    total_attributes = 4
+
+    redundant_groups: list[dict[str, Any]] = []
+    seen_pairs: set[tuple[str, str]] = set()
+
+    for i, c1 in enumerate(concepts):
+        for c2 in concepts[i + 1:]:
+            shared_attrs = sum(
+                (
+                    (c1.angle or "") == (c2.angle or ""),
+                    (c1.creative_format or "") == (c2.creative_format or ""),
+                    (c1.hook_direction or "") == (c2.hook_direction or ""),
                 )
+            )
+            if shared_attrs >= 2:
+                pair_key = tuple(sorted([str(c1.id), str(c2.id)]))
+                if pair_key not in seen_pairs:
+                    seen_pairs.add(pair_key)
+                    redundant_groups.append(
+                        {
+                            "concept_ids": [str(c1.id), str(c2.id)],
+                            "shared_attributes": shared_attrs,
+                        }
+                    )
 
-    # Analyze customer evidence
-    if customer_evidence:
-        customer_gaps = 0
-        for evidence in customer_evidence:
-            pain_points = evidence.get("pain_points", [])
-            if pain_points:
-                customer_gaps += 1
+    redundancy_score = round(shared_attributes / total_attributes, 2)
 
-        if customer_gaps > 0:
-            confidence = min(0.8, 0.3 + 0.1 * (customer_gaps / max(len(customer_evidence), 1)))
-
-    # If no explicit patterns provided, analyze existing concepts
-    if not competitor_patterns and not customer_evidence:
-        concepts = db.query(CreativeConcept).filter(
-            CreativeConcept.business_id == business_id
-        ).all()
-
-        if concepts:
-            # Check what's already been done
-            used_angles = set()
-            used_formats = set()
-            for c in concepts:
-                if c.angle:
-                    used_angles.add(c.angle)
-                if c.creative_format:
-                    used_formats.add(c.creative_format)
-
-            # Suggest underrepresented combinations
-            all_angles = {"problem_agitation", "benefit_focus", "objection_preempt", "curiosity_gap", "authority_establish", "social_proof", "urgency", "personal_story"}
-            all_formats = {"static", "carousel", "short_video", "ugc", "testimonial", "product_demo", "before_after", "founder_led", "screen_recording", "lifestyle", "comparison", "educational"}
-
-            for angle in all_angles:
-                if angle not in used_angles:
-                    for fmt in all_formats:
-                        if fmt not in used_formats:
-                            gaps.append(
-                                {
-                                    "observed_competitor_pattern": f"angle={angle}, format={fmt} not yet explored",
-                                    "potential_gap": f"Test angle={angle} with format={fmt}",
-                                    "hypothesis": f"This combination could reveal new engagement",
-                                    "confidence": round(0.3 + 0.1 * len(concepts) / 20, 2),
-                                }
-                            )
+    is_duplicate = total >= 2 and shared_attributes / total_attributes > 0.5
 
     return {
-        "gaps": gaps,
-        "confidence": round(confidence, 2),
-        "whitespace_summary": (
-            f"{len(gaps)} potential creative gaps identified, "
-            f"confidence {confidence:.0%} "
-            f"– these are hypotheses, not guaranteed winners"
-        ),
+        "is_duplicate": is_duplicate,
+        "shared_attributes": shared_attributes,
+        "total_attributes": total_attributes,
+        "redundant_groups": redundant_groups,
+        "redundancy_score": redundancy_score,
     }
 
 
-# Export public API
+# ---------------------------------------------------------------------------
+# Test prioritization (pure)
+# ---------------------------------------------------------------------------
+
+
+def prioritize_test_groups(
+    test_groups: list[dict[str, Any]],
+    concepts: Sequence[CreativeConcept] | None = None,
+) -> list[dict[str, Any]]:
+    """Prioritize test groups by learning value, evidence and redundancy.
+
+    Returns test groups sorted by priority score (high to low); ties keep
+    input order (stable sort).
+    """
+    if not test_groups:
+        return []
+
+    redundancy = compute_redundancy_analysis(concepts) if concepts and len(concepts) > 1 else None
+
+    scored_groups: list[dict[str, Any]] = []
+
+    for group in test_groups:
+        score = 0
+        reasons: list[str] = []
+
+        learning_value = group.get("learning_value", "low")
+        if learning_value == "high":
+            score += 3
+            reasons.append("high learning value")
+        elif learning_value == "medium":
+            score += 2
+            reasons.append("medium learning value")
+        else:
+            score += 1
+            reasons.append("low learning value")
+
+        evidence_strength = group.get("evidence_strength", "hypothesis")
+        if evidence_strength == "supported":
+            score += 2
+            reasons.append("supported by evidence")
+        elif evidence_strength == "hypothesis":
+            score += 1
+            reasons.append("hypothesis-based")
+
+        if redundancy is not None and redundancy["is_duplicate"]:
+            score -= 2
+            reasons.append("redundant with existing concepts")
+
+        status = group.get("status", "draft")
+        if status == "valid":
+            score += 1
+            reasons.append("valid strategy")
+        elif status == "needs_evidence":
+            reasons.append("needs evidence")
+        elif status == "insufficient_data":
+            score += 3
+            reasons.append("fills gap (insufficient data)")
+
+        scored_groups.append(
+            {
+                "group": group,
+                "priority_score": score,
+                "prioritization_reasons": reasons,
+            }
+        )
+
+    scored_groups.sort(key=lambda x: x["priority_score"], reverse=True)
+    return scored_groups
+
+
+# ---------------------------------------------------------------------------
+# Whitespace identification (pure)
+# ---------------------------------------------------------------------------
+
+_ALL_ANGLES = frozenset(_VALID_HOOK_DIRECTIONS)
+
+
+def identify_creative_whitespace(
+    *,
+    competitor_patterns: list[dict[str, Any]] | None = None,
+    customer_evidence: list[dict[str, Any]] | None = None,
+    concepts: Sequence[CreativeConcept] | None = None,
+) -> WhitespaceOut:
+    """Identify creative gaps as hypotheses — never guaranteed winners.
+
+    Deterministic confidence from evidence density; strength classification
+    low/medium/high. No LLM and no performance prediction.
+    """
+    gaps: list[WhitespaceGap] = []
+    confidence = 0.0
+    evidence_sources: set[str] = set()
+
+    if competitor_patterns:
+        format_usage: dict[str, int] = {}
+        for pattern in competitor_patterns:
+            fmt = str(pattern.get("creative_format", "unknown"))
+            format_usage[fmt] = format_usage.get(fmt, 0) + 1
+
+        total_competitor_formats = sum(format_usage.values())
+        for fmt, count in sorted(format_usage.items()):
+            proportion = count / total_competitor_formats if total_competitor_formats else 0.0
+            if proportion < 0.1:
+                underrep_factor = 1.0 - proportion
+                gap_confidence = round(0.35 + 0.15 * underrep_factor, 2)
+                gaps.append(
+                    WhitespaceGap(
+                        observed_competitor_pattern=(
+                            f"{fmt} used by {proportion:.0%} of competitors"
+                        ),
+                        potential_gap=(
+                            f"Consider {fmt} format not commonly used in category"
+                        ),
+                        hypothesis=(f"{fmt} format could differentiate with right messaging"),
+                        confidence=gap_confidence,
+                        strength=(
+                            "high"
+                            if underrep_factor > 0.5
+                            else "medium"
+                            if underrep_factor > 0.2
+                            else "low"
+                        ),
+                    )
+                )
+
+    if customer_evidence:
+        for evidence in customer_evidence:
+            pain_points = evidence.get("pain_points") or {}
+            if isinstance(pain_points, dict):
+                evidence_sources.update(str(key) for key in pain_points.keys())
+
+        raw_confidence = min(
+            0.95,
+            0.2
+            + 0.1 * min(len(customer_evidence), 10)
+            + 0.05 * min(len(evidence_sources), 10),
+        )
+        confidence = max(confidence, raw_confidence)
+
+    if not competitor_patterns and not customer_evidence and concepts:
+        used_angles = {c.angle for c in concepts if c.angle}
+        used_formats = {c.creative_format for c in concepts if c.creative_format}
+        unused_formats = sorted(_VALID_CREATIVE_FORMATS - used_formats)
+        unused_angles = sorted(_ALL_ANGLES - used_angles)
+        for angle in unused_angles[:3]:
+            for fmt in unused_formats[:3]:
+                confidence_base = max(0.1, 0.5 - 0.02 * len(concepts))
+                novelty_boost = 0.1 if len(gaps) < 3 else 0.0
+                gap_confidence = round(min(0.9, confidence_base + novelty_boost), 2)
+                gaps.append(
+                    WhitespaceGap(
+                        observed_competitor_pattern=(
+                            f"angle={angle}, format={fmt} not yet explored"
+                        ),
+                        potential_gap=f"Test angle={angle} with format={fmt}",
+                        hypothesis="This combination could reveal new engagement",
+                        confidence=gap_confidence,
+                        strength=(
+                            "high"
+                            if gap_confidence >= 0.7
+                            else "medium"
+                            if gap_confidence >= 0.4
+                            else "low"
+                        ),
+                    )
+                )
+        confidence = max(confidence, 0.1)
+
+    if competitor_patterns and customer_evidence and gaps:
+        gap_avg = sum(gap.confidence for gap in gaps) / len(gaps)
+        confidence = round((confidence + gap_avg) / 2, 2)
+
+    strength = "high" if confidence >= 0.7 else "medium" if confidence >= 0.4 else "low"
+
+    summary = (
+        f"{len(gaps)} potential creative gaps identified, "
+        f"confidence {confidence:.0%} ({strength}) — hypotheses, not guaranteed winners"
+    )
+
+    return WhitespaceOut(
+        gaps=gaps,
+        confidence=round(confidence, 2),
+        strength=strength,
+        whitespace_summary=summary,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Async persistence helpers
+# ---------------------------------------------------------------------------
+
+
+async def _resolve_reference(
+    session: AsyncSession,
+    model: type,
+    *,
+    reference_id: uuid.UUID | None,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    label: str,
+):
+    """Fetch a strategy reference scoped to org+business (404 semantics)."""
+    if reference_id is None:
+        return None
+    row = (
+        await session.execute(
+            select(model).where(
+                model.id == reference_id,
+                model.organization_id == organization_id,
+                model.business_id == business_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if row is None:
+        from src.core.exceptions import NotFoundError
+
+        raise NotFoundError(f"{label} not found in this business")
+    return row
+
+
+async def create_creative_concept(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    **fields: Any,
+) -> CreativeConcept:
+    """Create a CreativeConcept anchored in Phase 7 data.
+
+    All references are validated inside the same tenant/business. No LLM,
+    no asset generation, no performance learning.
+    """
+    hook_direction = fields.get("hook_direction")
+    creative_format = fields.get("creative_format")
+    creative_type = fields.get("creative_type")
+    primary_emotion = fields.get("primary_emotion")
+    secondary_emotion = fields.get("secondary_emotion")
+    success_metric = fields.get("success_metric")
+    funnel_stage = fields.get("funnel_stage")
+
+    is_valid, error = validate_hook_direction(hook_direction)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid hook direction")
+
+    is_valid, error = validate_creative_format(creative_format)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid creative format")
+
+    is_valid, error = validate_creative_type(creative_format, creative_type)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid creative type")
+
+    is_valid, error = validate_emotional_direction(primary_emotion, secondary_emotion)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid emotional direction")
+
+    positioning = await _resolve_reference(
+        session,
+        PositioningStrategy,
+        reference_id=fields.get("positioning_reference"),
+        organization_id=organization_id,
+        business_id=business_id,
+        label="Positioning strategy",
+    )
+    offer = await _resolve_reference(
+        session,
+        OfferCandidate,
+        reference_id=fields.get("offer_reference"),
+        organization_id=organization_id,
+        business_id=business_id,
+        label="Offer candidate",
+    )
+    messaging = await _resolve_reference(
+        session,
+        MessagingStrategy,
+        reference_id=fields.get("messaging_reference"),
+        organization_id=organization_id,
+        business_id=business_id,
+        label="Messaging strategy",
+    )
+
+    if positioning is not None:
+        is_valid, error = validate_positioning_consistency(
+            positioning,
+            organization_id=organization_id,
+            business_id=business_id,
+        )
+        if not is_valid:
+            raise InvalidCreativeInputError(error or "positioning inconsistent")
+
+    if fields.get("offer_reference") is not None:
+        is_valid, error = validate_offer_availability(offer)
+        if not is_valid:
+            raise InvalidCreativeInputError(error or "offer unavailable")
+
+    if fields.get("messaging_reference") is not None:
+        is_valid, error = validate_proof_reference(
+            fields.get("reason_to_believe"), messaging
+        )
+        if not is_valid:
+            raise InvalidCreativeInputError(error or "proof unavailable")
+
+    if not success_metric:
+        # Optional transient objective (not persisted) drives the KPI mapping.
+        success_metric = map_objective_to_metric(fields.get("objective"))
+
+    if not funnel_stage:
+        funnel_stage = infer_funnel_stage_from_objective(fields.get("objective"))
+
+    concept = CreativeConcept(
+        organization_id=organization_id,
+        business_id=business_id,
+        strategy_version=fields.get("strategy_version", "v1"),
+        positioning_reference=fields.get("positioning_reference"),
+        offer_reference=fields.get("offer_reference"),
+        messaging_reference=fields.get("messaging_reference"),
+        funnel_reference=fields.get("funnel_reference"),
+        funnel_stage=funnel_stage,
+        audience=fields.get("audience"),
+        angle=fields.get("angle"),
+        message=fields.get("message"),
+        hook_direction=hook_direction,
+        creative_format=creative_format,
+        creative_type=creative_type,
+        offer_direction=fields.get("offer_direction"),
+        cta=fields.get("cta"),
+        visual_direction=fields.get("visual_direction"),
+        copy_direction=fields.get("copy_direction"),
+        primary_emotion=primary_emotion,
+        secondary_emotion=secondary_emotion,
+        objection=fields.get("objection"),
+        reason_to_believe=fields.get("reason_to_believe"),
+        testing_role=fields.get("testing_role"),
+        success_metric=success_metric,
+        evidence=fields.get("evidence") or {},
+        risks=fields.get("risks") or [],
+        status="draft",
+    )
+    session.add(concept)
+    await session.flush()
+    return concept
+
+
+async def generate_creative_brief(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    objective: str,
+    creative_format: str,
+    **fields: Any,
+) -> CreativeBrief:
+    """Generate a CreativeBrief from Phase 7 strategy data (deterministic)."""
+    funnel_stage = fields.get("funnel_stage")
+    hook_direction = fields.get("hook_direction")
+    primary_emotion = fields.get("primary_emotion")
+    secondary_emotion = fields.get("secondary_emotion")
+
+    is_valid, error = validate_objective_funnel_stage(objective, funnel_stage)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "objective invalid")
+
+    is_valid, error = validate_hook_direction(hook_direction)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid hook direction")
+
+    is_valid, error = validate_creative_format(creative_format)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid creative format")
+
+    is_valid, error = validate_emotional_direction(primary_emotion, secondary_emotion)
+    if not is_valid:
+        raise InvalidCreativeInputError(error or "invalid emotional direction")
+
+    success_metric = fields.get("success_metric") or map_objective_to_metric(objective)
+
+    brief = CreativeBrief(
+        organization_id=organization_id,
+        business_id=business_id,
+        objective=objective,
+        target_audience=fields.get("audience"),
+        funnel_stage=funnel_stage,
+        customer_problem=fields.get("customer_problem"),
+        customer_desire=fields.get("customer_desire"),
+        core_message=fields.get("message"),
+        angle=fields.get("angle"),
+        hook_direction=hook_direction,
+        offer=fields.get("offer_direction"),
+        cta=fields.get("cta"),
+        creative_format=creative_format,
+        visual_direction=fields.get("visual_direction"),
+        copy_direction=fields.get("copy_direction"),
+        emotional_direction=(
+            f"{primary_emotion or ''} {secondary_emotion or ''}".strip()
+            if (primary_emotion or secondary_emotion)
+            else None
+        ),
+        reason_to_believe=fields.get("reason_to_believe"),
+        testing_hypothesis=fields.get("testing_role") or "baseline",
+        success_metric=success_metric,
+        evidence=fields.get("evidence") or {},
+        status="draft",
+    )
+    session.add(brief)
+    await session.flush()
+    return brief
+
+
+# ---------------------------------------------------------------------------
+# Read helpers (tenant/business scoped)
+# ---------------------------------------------------------------------------
+
+
+async def list_concepts(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    limit: int = 50,
+    cursor: datetime | None = None,
+    cursor_id: uuid.UUID | None = None,
+    include_archived: bool = False,
+) -> tuple[list[CreativeConcept], uuid.UUID | None]:
+    """Keyset-paginated concept listing; returns (items, next_cursor)."""
+    conditions = [
+        CreativeConcept.organization_id == organization_id,
+        CreativeConcept.business_id == business_id,
+    ]
+    if not include_archived:
+        conditions.append(CreativeConcept.status != "archived")
+    if cursor is not None and cursor_id is not None:
+        conditions.append(
+            (CreativeConcept.created_at, CreativeConcept.id) < (cursor, cursor_id)
+        )
+    rows = (
+        (
+            await session.execute(
+                select(CreativeConcept)
+                .where(*conditions)
+                .order_by(CreativeConcept.created_at.desc(), CreativeConcept.id.desc())
+                .limit(limit + 1)
+            )
+        )
+        .scalars()
+        .all()
+    )
+    next_cursor = None
+    if len(rows) > limit:
+        rows = rows[:limit]
+        next_cursor = rows[-1].id
+    return list(rows), next_cursor
+
+
+async def get_concept(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    concept_id: uuid.UUID,
+) -> CreativeConcept | None:
+    return (
+        await session.execute(
+            select(CreativeConcept).where(
+                CreativeConcept.id == concept_id,
+                CreativeConcept.organization_id == organization_id,
+                CreativeConcept.business_id == business_id,
+            )
+        )
+    ).scalar_one_or_none()
+
+
+async def list_strategies(
+    session: AsyncSession, *, organization_id: uuid.UUID, business_id: uuid.UUID
+) -> list[CreativeStrategy]:
+    rows = (
+        (
+            await session.execute(
+                select(CreativeStrategy)
+                .where(
+                    CreativeStrategy.organization_id == organization_id,
+                    CreativeStrategy.business_id == business_id,
+                )
+                .order_by(CreativeStrategy.created_at.desc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return list(rows)
+
+
+async def list_tests(
+    session: AsyncSession, *, organization_id: uuid.UUID, business_id: uuid.UUID
+) -> list[CreativeTest]:
+    rows = (
+        (
+            await session.execute(
+                select(CreativeTest)
+                .where(
+                    CreativeTest.organization_id == organization_id,
+                    CreativeTest.business_id == business_id,
+                )
+                .order_by(CreativeTest.created_at.desc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return list(rows)
+
+
+async def get_test(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    test_id: str,
+) -> CreativeTest | None:
+    return (
+        await session.execute(
+            select(CreativeTest).where(
+                CreativeTest.test_id == test_id,
+                CreativeTest.organization_id == organization_id,
+                CreativeTest.business_id == business_id,
+            )
+        )
+    ).scalar_one_or_none()
+
+
+async def list_test_variants(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    test_id: str,
+) -> list[CreativeTestVariant]:
+    rows = (
+        (
+            await session.execute(
+                select(CreativeTestVariant)
+                .where(
+                    CreativeTestVariant.test_id == test_id,
+                    CreativeTestVariant.organization_id == organization_id,
+                    CreativeTestVariant.business_id == business_id,
+                )
+                .order_by(CreativeTestVariant.created_at.asc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return list(rows)
+
+
+async def list_portfolios(
+    session: AsyncSession, *, organization_id: uuid.UUID, business_id: uuid.UUID
+) -> list[CreativePortfolio]:
+    rows = (
+        (
+            await session.execute(
+                select(CreativePortfolio)
+                .where(
+                    CreativePortfolio.organization_id == organization_id,
+                    CreativePortfolio.business_id == business_id,
+                )
+                .order_by(CreativePortfolio.created_at.asc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return list(rows)
+
+
+async def list_concept_portfolios(
+    session: AsyncSession, *, organization_id: uuid.UUID, business_id: uuid.UUID
+) -> list[CreativeConceptPortfolio]:
+    rows = (
+        (
+            await session.execute(
+                select(CreativeConceptPortfolio)
+                .where(
+                    CreativeConceptPortfolio.organization_id == organization_id,
+                    CreativeConceptPortfolio.business_id == business_id,
+                )
+                .order_by(CreativeConceptPortfolio.created_at.asc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return list(rows)
+
+
 __all__ = [
     "validate_objective_funnel_stage",
     "validate_positioning_consistency",
@@ -889,10 +1034,19 @@ __all__ = [
     "validate_creative_type",
     "validate_emotional_direction",
     "map_objective_to_metric",
+    "infer_funnel_stage_from_objective",
     "generate_creative_brief",
     "create_creative_concept",
-    "generate_creative_matrix",
     "detect_angle_diversity",
     "identify_creative_whitespace",
-    "generate_brief",
+    "compute_redundancy_analysis",
+    "prioritize_test_groups",
+    "list_concepts",
+    "get_concept",
+    "list_strategies",
+    "list_tests",
+    "get_test",
+    "list_test_variants",
+    "list_portfolios",
+    "list_concept_portfolios",
 ]
