@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ApiError } from "@/lib/api-client";
 import { CreativeLearningSection } from "./creative-learning-section";
+import { CreativeOptimizationSection } from "./creative-optimization-section";
 import { CreativePerformanceSection } from "./creative-performance-section";
 import { FunnelSection } from "./funnel-section";
 import {
@@ -300,6 +301,7 @@ export function StrategySection({ businessId }: { businessId: string }) {
       <FunnelSection businessId={businessId} />
       <CreativePerformanceSection businessId={businessId} />
       <CreativeLearningSection businessId={businessId} />
+      <CreativeOptimizationSection businessId={businessId} />
     </div>
   );
 }

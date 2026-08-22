@@ -333,3 +333,79 @@ export async function fetchLearningSection(
 ): Promise<LearningProjectionResponse> {
   return apiGet<LearningProjectionResponse>(learningUrl(businessId, `/${section}`));
 }
+
+// ---------------------------------------------------------------------------
+// Creative optimization intelligence (Phase 8E) - review-only plans
+// ---------------------------------------------------------------------------
+
+export type OptimizationOpportunity = {
+  opportunity_id: string;
+  type: string;
+  dimension: string;
+  target_reference: string;
+  status: string;
+  evidence_strength: string;
+  learning_value: string;
+  priority_score: string;
+  priority: "high" | "medium" | "low";
+  rationale: string;
+  supporting_entity_ids: string[];
+  contradicting_entity_ids: string[];
+  data_sufficiency: string;
+  review_only: boolean;
+};
+
+export type OptimizationSummaryResponse = {
+  status: string;
+  reason?: string | null;
+  optimization_status?: string;
+  entities_total?: number;
+  entities_sufficient?: number;
+  opportunities_total?: number;
+  blocked_total?: number;
+  by_priority?: Record<string, number>;
+  fingerprint?: string;
+  rules_version?: string;
+  note?: string | null;
+};
+
+export type OptimizationProjectionResponse = {
+  status: string;
+  reason?: string | null;
+  items?: Record<string, unknown>[];
+};
+
+function optimizationUrl(businessId: string, path = ""): string {
+  return `/api/v1/businesses/${businessId}/strategy/creative/optimization${path}`;
+}
+
+export function generateCreativeOptimization(
+  businessId: string,
+  rangeKind: string = "last_30_days"
+): Promise<{ business_id: string; snapshot_id: string | null; created: boolean }> {
+  return apiPost(
+    `${optimizationUrl(businessId, "/generate")}?range_kind=${encodeURIComponent(rangeKind)}`,
+    {}
+  );
+}
+
+export async function fetchOptimizationSummary(
+  businessId: string
+): Promise<OptimizationSummaryResponse> {
+  return apiGet<OptimizationSummaryResponse>(optimizationUrl(businessId, "/summary"));
+}
+
+export async function fetchOptimizationSection(
+  businessId: string,
+  section:
+    | "opportunities"
+    | "blocked"
+    | "tests"
+    | "refresh"
+    | "portfolio"
+    | "conflicts"
+): Promise<OptimizationProjectionResponse> {
+  return apiGet<OptimizationProjectionResponse>(
+    optimizationUrl(businessId, `/${section}`)
+  );
+}

@@ -221,5 +221,13 @@
   "observedPatterns": "الأنماط المرصودة",
   "recommendationsTitle": "التوصيات (مراجعة فقط)",
   "noLearningSnapshot": "لا توجد لقطة تعلّم بعد. أعد الحساب لإنشاء واحدة من الأداء المرصود.",
-  "noLearningItems": "لا يوجد للقطة الحالية."
+  "noLearningItems": "لا يوجد للقطة الحالية.",
+  "creativeOptimization": "ذكاء التحسين",
+  "creativeOptimizationDescription": "فرص تحسين للمراجعة فقط من الأدلة المرصودة. لا شيء يُنفَّذ تلقائيًا.",
+  "generateOptimization": "إعادة حساب الخطة",
+  "optimizationStatus": "حالة الخطة",
+  "opportunitiesCount": "الفرص",
+  "opportunitiesTitle": "الفرص ذات الأولوية",
+  "blockedTitle": "التوصيات المحجوبة",
+  "noOptimizationSnapshot": "لا توجد خطة تحسين بعد. أعد الحساب لبنائها من مصنّفات التعلّم."
 }

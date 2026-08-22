@@ -13,6 +13,7 @@ generates assets, executes actions or claims causation.
 | 8B | Creative strategies, tests, variants, portfolios, coverage/diversity | `creative_*` tables (migration 0018) |
 | 8C | Performance observations, signals, fatigue, classification, scaling readiness | `creative_performance_links`, `creative_performance_snapshots` (0019) |
 | 8D | Learning hierarchy: patterns, learnings, recommendations | `creative_learning_snapshots` (0020) |
+| 8E | Optimization plan: gated opportunities, blocked list, coverage/concentration analysis | `creative_optimization_snapshots` (0021) |
 
 ## Data flow (Phase 8C → 8D)
 
@@ -99,3 +100,46 @@ No LLMs, no asset generation, no campaign/budget/bid/provider mutations, no
 autonomous execution, no probability-of-success scores, no winner
 predictions, no causal claims, no client-side financial calculations.
 Recommendations are informational review inputs only.
+
+## Phase 8E — Optimization Intelligence
+
+Consumes the latest Phase 8D snapshot (or computes learning fresh when
+none exists), Phase 8C fatigue/classification evidence and Phase 7
+strategy-context availability to produce a review-only optimization plan.
+
+### Gates O1–O8
+
+Named gates with explicit precedence for POSITIVE expansion types:
+`O1 insufficient_data > O2 stale_data > O3 conflicting_evidence` block;
+`O7 supported_pattern` enables. `O4 fatigue_signal`, `O5 concentration_risk`,
+`O6 coverage_gap`, `O8 strategic_alignment` classify the other opportunity
+categories. Blocked candidates are reported in `blocked_opportunities`
+with their blocking gate — never dropped, never silently positive.
+
+### Opportunity taxonomy
+
+expand_supported_angle · test_new_angle · test_new_hook · test_new_format ·
+refresh_fatigued_creative · reduce_angle_concentration ·
+reduce_format_concentration · improve_funnel_coverage ·
+improve_proof_coverage · improve_objection_coverage ·
+investigate_underperformance · investigate_conflicting_evidence ·
+gather_more_evidence · validate_offer_alignment · validate_message_alignment
+
+### Plan states
+
+unavailable → insufficient_data → investigate → test_ready / review_ready.
+No "optimized"/"guaranteed" states exist.
+
+### Scoring
+
+Priority is a named-Decimal-weight sum (`opt_weight_*`,
+`opt_penalty_contradiction`) bucketed high/medium/low. It is a
+deterministic review-ordering score — explicitly NOT a probability of
+success; every opportunity carries that disclaimer in its payload.
+
+### API
+
+`/api/v1/businesses/{business_id}/strategy/creative/optimization/` —
+POST `/generate` (business:write); GET `/summary`, `/opportunities`,
+`/blocked`, `/tests`, `/refresh`, `/coverage`, `/portfolio`, `/conflicts`,
+`/snapshots`, `/snapshots/{id}` (business:read). Rules stamp: `copt-v1`.

@@ -221,5 +221,13 @@
   "observedPatterns": "Observed patterns",
   "recommendationsTitle": "Recommendations (review only)",
   "noLearningSnapshot": "No learning snapshot yet. Recalculate to generate one from observed performance.",
-  "noLearningItems": "None for the current snapshot."
+  "noLearningItems": "None for the current snapshot.",
+  "creativeOptimization": "Optimization intelligence",
+  "creativeOptimizationDescription": "Deterministic optimization opportunities surfaced for human review, built from observed evidence. Nothing executes automatically.",
+  "generateOptimization": "Recalculate plan",
+  "optimizationStatus": "Plan status",
+  "opportunitiesCount": "Opportunities",
+  "opportunitiesTitle": "Priority opportunities",
+  "blockedTitle": "Blocked recommendations",
+  "noOptimizationSnapshot": "No optimization plan yet. Recalculate to build one from learning artifacts."
 }
