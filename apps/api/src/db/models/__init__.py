@@ -2,6 +2,27 @@ from src.db.models.bundle import Bundle, BundleItem
 from src.db.models.business import Business
 from src.db.models.business_goal import BusinessGoal
 from src.db.models.business_profile import BusinessProfile
+from src.db.models.creative import (
+    CreativeBrief,
+    CreativeConcept,
+    CreativeConceptPortfolio,
+    CreativeCoverage,
+    CreativeDiversity,
+    CreativeEvidence,
+    CreativeMatrixEntry,
+    CreativePortfolio,
+    CreativeProvenance,
+    CreativeRisk,
+    CreativeSnapshot,
+    CreativeStrategy,
+    CreativeStrategySnapshot,
+    CreativeTest,
+    CreativeTestVariant,
+)
+from src.db.models.creative_performance import (
+    CreativePerformanceLink,
+    CreativePerformanceSnapshot,
+)
 from src.db.models.discount import Discount
 from src.db.models.forecast import Forecast, ForecastPoint
 from src.db.models.funnel import (
@@ -76,6 +97,23 @@ __all__ = [
     "BusinessProfile",
     "Campaign",
     "Creative",
+    "CreativeBrief",
+    "CreativeConcept",
+    "CreativeConceptPortfolio",
+    "CreativeCoverage",
+    "CreativeDiversity",
+    "CreativeEvidence",
+    "CreativeMatrixEntry",
+    "CreativePerformanceLink",
+    "CreativePerformanceSnapshot",
+    "CreativePortfolio",
+    "CreativeProvenance",
+    "CreativeRisk",
+    "CreativeSnapshot",
+    "CreativeStrategy",
+    "CreativeStrategySnapshot",
+    "CreativeTest",
+    "CreativeTestVariant",
     "Customer",
     "Discount",
     "Forecast",
