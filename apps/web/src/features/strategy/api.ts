@@ -409,3 +409,87 @@ export async function fetchOptimizationSection(
     optimizationUrl(businessId, `/${section}`)
   );
 }
+
+// ---------------------------------------------------------------------------
+// Creative decision plan & human review (Phase 8F) - review state only
+// ---------------------------------------------------------------------------
+
+export type DecisionPlanItem = {
+  opportunity_id: string;
+  type: string;
+  dimension: string;
+  target_reference: string;
+  priority: "high" | "medium" | "low";
+  priority_score: string;
+  evidence_strength: string;
+  learning_value: string;
+  rationale: string;
+  data_sufficiency: string;
+  review_only: boolean;
+  execution_status: string;
+  review_state: "proposed" | "acknowledged" | "dismissed" | "deferred";
+  suggested_review_focus: string;
+  review_note?: string | null;
+};
+
+export type DecisionPlanSummaryResponse = {
+  status: string;
+  reason?: string | null;
+  plan_status?: string;
+  total_items?: number;
+  blocked_count?: number;
+  by_priority?: Record<string, number>;
+  fingerprint?: string;
+  rules_version?: string;
+  source_optimization_fingerprint?: string | null;
+  review_progress?: {
+    proposed?: number;
+    acknowledged?: number;
+    dismissed?: number;
+    deferred?: number;
+    total_items?: number;
+    reviewed_items?: number;
+    remaining_items?: number;
+  };
+  note?: string | null;
+};
+
+export type DecisionItemsResponse = {
+  status: string;
+  items?: Record<string, unknown>[];
+};
+
+function decisionPlanUrl(businessId: string, path = ""): string {
+  return `/api/v1/businesses/${businessId}/strategy/creative/decision-plan${path}`;
+}
+
+export function generateDecisionPlan(businessId: string): Promise<{
+  business_id: string;
+  snapshot_id: string | null;
+  created: boolean;
+}> {
+  return apiPost(decisionPlanUrl(businessId, "/generate"), {});
+}
+
+export async function fetchDecisionPlanSummary(
+  businessId: string
+): Promise<DecisionPlanSummaryResponse> {
+  return apiGet<DecisionPlanSummaryResponse>(decisionPlanUrl(businessId, "/summary"));
+}
+
+export async function fetchDecisionPlanItems(
+  businessId: string
+): Promise<DecisionItemsResponse> {
+  return apiGet<DecisionItemsResponse>(decisionPlanUrl(businessId, "/items"));
+}
+
+export function reviewDecisionItem(
+  businessId: string,
+  opportunityId: string,
+  payload: { review_state: "acknowledged" | "dismissed" | "deferred"; note?: string }
+): Promise<{ id: string; review_state: string }> {
+  return apiPost(
+    decisionPlanUrl(businessId, `/items/${encodeURIComponent(opportunityId)}/review`),
+    payload
+  );
+}

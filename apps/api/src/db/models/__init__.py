@@ -19,6 +19,10 @@ from src.db.models.creative import (
     CreativeTest,
     CreativeTestVariant,
 )
+from src.db.models.creative_decision import (
+    CreativeDecisionItemReview,
+    CreativeDecisionPlan,
+)
 from src.db.models.creative_learning import CreativeLearningSnapshot
 from src.db.models.creative_optimization import CreativeOptimizationSnapshot
 from src.db.models.creative_performance import (
@@ -105,6 +109,8 @@ __all__ = [
     "CreativeCoverage",
     "CreativeDiversity",
     "CreativeEvidence",
+    "CreativeDecisionItemReview",
+    "CreativeDecisionPlan",
     "CreativeLearningSnapshot",
     "CreativeOptimizationSnapshot",
     "CreativeMatrixEntry",

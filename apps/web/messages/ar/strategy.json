@@ -229,5 +229,20 @@
   "opportunitiesCount": "الفرص",
   "opportunitiesTitle": "الفرص ذات الأولوية",
   "blockedTitle": "التوصيات المحجوبة",
-  "noOptimizationSnapshot": "لا توجد خطة تحسين بعد. أعد الحساب لبنائها من مصنّفات التعلّم."
+  "noOptimizationSnapshot": "لا توجد خطة تحسين بعد. أعد الحساب لبنائها من مصنّفات التعلّم.",
+  "decisionPlan": "خطة القرار",
+  "decisionPlanDescription": "خطة مراجعة فقط مبنية من فرص التحسين المرصودة. تسجيل الإقرار يعني أن إنسانًا راجع العنصر - لا شيء يُنفَّذ.",
+  "generateDecisionPlan": "تجميع خطة القرار",
+  "planStatus": "حالة الخطة",
+  "totalItems": "العناصر",
+  "blockedCount": "المحجوبة",
+  "reviewedItems": "تمت مراجعتها",
+  "remainingItems": "المتبقية",
+  "sourceOptimizationFingerprint": "لقطة التحسين المصدر",
+  "suggestedReviewFocus": "محور المراجعة المقترح",
+  "noDecisionSnapshot": "لا توجد خطة قرار بعد. أنشئ خطة تحسين أولًا ثم جمّع خطة القرار.",
+  "reviewOnlyNothingExecutes": "مراجعة فقط - لا شيء يُنفَّذ.",
+  "reviewAction_acknowledged": "إقرار",
+  "reviewAction_dismissed": "تجاهل",
+  "reviewAction_deferred": "تأجيل"
 }

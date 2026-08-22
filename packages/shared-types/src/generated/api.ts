@@ -2738,6 +2738,133 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Decision Plan
+         * @description Assemble the deterministic decision plan (idempotent persist).
+         */
+        post: operations["generate_decision_plan_api_v1_businesses__business_id__strategy_creative_decision_plan_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Decision Plan Summary */
+        get: operations["decision_plan_summary_api_v1_businesses__business_id__strategy_creative_decision_plan_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Decision Plan Items */
+        get: operations["decision_plan_items_api_v1_businesses__business_id__strategy_creative_decision_plan_items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/blocked": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Decision Plan Blocked */
+        get: operations["decision_plan_blocked_api_v1_businesses__business_id__strategy_creative_decision_plan_blocked_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/items/{opportunity_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review Decision Item
+         * @description Record human review state for one opportunity.
+         *
+         *     Writes review state ONLY. Nothing is executed, modified or triggered.
+         */
+        post: operations["review_decision_item_api_v1_businesses__business_id__strategy_creative_decision_plan_items__opportunity_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Snapshots */
+        get: operations["list_snapshots_api_v1_businesses__business_id__strategy_creative_decision_plan_snapshots_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/decision-plan/snapshots/{snapshot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Snapshot */
+        get: operations["get_snapshot_api_v1_businesses__business_id__strategy_creative_decision_plan_snapshots__snapshot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2910,6 +3037,22 @@ export interface components {
              */
             token_type: "bearer";
             user: components["schemas"]["UserRead"];
+        };
+        /** BlockedAppendixResponse */
+        BlockedAppendixResponse: {
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /**
+             * Actionable
+             * @default false
+             */
+            actionable: boolean;
+            /** Items */
+            items?: {
+                [key: string]: unknown;
+            }[];
         };
         /** BreakEvenRead */
         BreakEvenRead: {
@@ -3856,6 +3999,59 @@ export interface components {
             /** Goal Refs */
             goal_refs?: string[];
         };
+        /** DecisionItemsResponse */
+        DecisionItemsResponse: {
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Items */
+            items?: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** DecisionPlanGenerateResponse */
+        DecisionPlanGenerateResponse: {
+            /** Business Id */
+            business_id: string;
+            /** Snapshot Id */
+            snapshot_id?: string | null;
+            /** Created */
+            created: boolean;
+            /** Plan */
+            plan: {
+                [key: string]: unknown;
+            };
+        };
+        /** DecisionPlanSummaryResponse */
+        DecisionPlanSummaryResponse: {
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Plan Status */
+            plan_status?: string | null;
+            /** Total Items */
+            total_items?: number | null;
+            /** Blocked Count */
+            blocked_count?: number | null;
+            /** By Priority */
+            by_priority?: {
+                [key: string]: number;
+            } | null;
+            /** Fingerprint */
+            fingerprint?: string | null;
+            /** Rules Version */
+            rules_version?: string | null;
+            /** Source Optimization Fingerprint */
+            source_optimization_fingerprint?: string | null;
+            /** Review Progress */
+            review_progress?: {
+                [key: string]: number;
+            } | null;
+            /** Note */
+            note?: string | null;
+        };
         /** DecisionRead */
         DecisionRead: {
             /**
@@ -3901,6 +4097,48 @@ export interface components {
             created_at: string;
             /** Rules Version */
             rules_version: string;
+        };
+        /** DecisionSnapshotRead */
+        DecisionSnapshotRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Rules Version */
+            rules_version: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /** Source Optimization Fingerprint */
+            source_optimization_fingerprint?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /** DecisionSnapshotSummaryRead */
+        DecisionSnapshotSummaryRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Rules Version */
+            rules_version: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /** Source Optimization Fingerprint */
+            source_optimization_fingerprint?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** DecisionSummaryRead */
         DecisionSummaryRead: {
@@ -7142,6 +7380,47 @@ export interface components {
              * Format: date-time
              */
             last_30d_window_start: string;
+        };
+        /** ReviewStateRead */
+        ReviewStateRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Opportunity Id */
+            opportunity_id: string;
+            /** Source Plan Fingerprint */
+            source_plan_fingerprint: string;
+            /** Review State */
+            review_state: string;
+            /** Note */
+            note?: string | null;
+            /** Decided By */
+            decided_by?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /**
+         * ReviewStateUpdate
+         * @description Human review input. Records review state ONLY - nothing executes.
+         */
+        ReviewStateUpdate: {
+            /**
+             * Review State
+             * @description One of: proposed, acknowledged, dismissed, deferred
+             */
+            review_state: string;
+            /** Note */
+            note?: string | null;
         };
         /** ScalingReadinessRead */
         ScalingReadinessRead: {
@@ -13245,6 +13524,172 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["OptimizationSnapshotRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_decision_plan_api_v1_businesses__business_id__strategy_creative_decision_plan_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionPlanGenerateResponse"];
+                };
+            };
+        };
+    };
+    decision_plan_summary_api_v1_businesses__business_id__strategy_creative_decision_plan_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionPlanSummaryResponse"];
+                };
+            };
+        };
+    };
+    decision_plan_items_api_v1_businesses__business_id__strategy_creative_decision_plan_items_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionItemsResponse"];
+                };
+            };
+        };
+    };
+    decision_plan_blocked_api_v1_businesses__business_id__strategy_creative_decision_plan_blocked_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BlockedAppendixResponse"];
+                };
+            };
+        };
+    };
+    review_decision_item_api_v1_businesses__business_id__strategy_creative_decision_plan_items__opportunity_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                opportunity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewStateUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewStateRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_snapshots_api_v1_businesses__business_id__strategy_creative_decision_plan_snapshots_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionSnapshotSummaryRead"][];
+                };
+            };
+        };
+    };
+    get_snapshot_api_v1_businesses__business_id__strategy_creative_decision_plan_snapshots__snapshot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DecisionSnapshotRead"];
                 };
             };
             /** @description Validation Error */

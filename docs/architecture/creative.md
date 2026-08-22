@@ -14,6 +14,7 @@ generates assets, executes actions or claims causation.
 | 8C | Performance observations, signals, fatigue, classification, scaling readiness | `creative_performance_links`, `creative_performance_snapshots` (0019) |
 | 8D | Learning hierarchy: patterns, learnings, recommendations | `creative_learning_snapshots` (0020) |
 | 8E | Optimization plan: gated opportunities, blocked list, coverage/concentration analysis | `creative_optimization_snapshots` (0021) |
+| 8F | Decision plan assembly + human review state (review-only) | `creative_decision_plans`, `creative_decision_item_reviews` (0022) |
 
 ## Data flow (Phase 8C → 8D)
 
@@ -143,3 +144,39 @@ success; every opportunity carries that disclaimer in its payload.
 POST `/generate` (business:write); GET `/summary`, `/opportunities`,
 `/blocked`, `/tests`, `/refresh`, `/coverage`, `/portfolio`, `/conflicts`,
 `/snapshots`, `/snapshots/{id}` (business:read). Rules stamp: `copt-v1`.
+
+## Phase 8F — Decision Plan & Human Review
+
+Consumes the LATEST persisted Phase 8E snapshot verbatim — opportunities
+are never recomputed, re-scored or re-gated. The pure engine copies each
+non-blocked opportunity into a decision-plan item (adding only
+`execution_status="not_executed"`, default `review_state="proposed"` and a
+deterministic `suggested_review_focus` mapped from the 8E category).
+Blocked opportunities remain an informational appendix (`actionable:
+false`) and can never become items.
+
+### Human review state
+
+`creative_decision_item_reviews` is the repository's ONLY mutable
+human-review table. States are strictly non-executional:
+`proposed | acknowledged | dismissed | deferred` (CHECK-constrained).
+Acknowledging means "a human reviewed this item" — nothing executes,
+nothing is modified on any provider. Reviews key on the stable 8E
+`opportunity_id` so they survive regeneration; each row preserves the
+`source_plan_fingerprint` it was last made under. Review progress is
+derived at read time and never written into the immutable plan payload.
+
+### API
+
+`/api/v1/businesses/{business_id}/strategy/creative/decision-plan/` —
+POST `/generate` and POST `/items/{opportunity_id}/review`
+(business:write); GET `/summary`, `/items`, `/blocked`, `/snapshots`,
+`/snapshots/{id}` (business:read). Cross-tenant access → 404; viewer
+writes → 403. Rules stamp: `cdecision-v1`.
+
+### Boundary
+
+No LLM, no asset generation, no campaign/provider/budget mutations, no
+execution layer of any kind. The chain stops here:
+
+Optimization Intelligence → Decision Plan → Human Review.

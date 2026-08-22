@@ -229,5 +229,20 @@
   "opportunitiesCount": "Opportunities",
   "opportunitiesTitle": "Priority opportunities",
   "blockedTitle": "Blocked recommendations",
-  "noOptimizationSnapshot": "No optimization plan yet. Recalculate to build one from learning artifacts."
+  "noOptimizationSnapshot": "No optimization plan yet. Recalculate to build one from learning artifacts.",
+  "decisionPlan": "Decision plan",
+  "decisionPlanDescription": "A deterministic, review-only plan assembled from observed optimization opportunities. Acknowledging records human review - nothing executes.",
+  "generateDecisionPlan": "Assemble decision plan",
+  "planStatus": "Plan status",
+  "totalItems": "Items",
+  "blockedCount": "Blocked",
+  "reviewedItems": "Reviewed",
+  "remainingItems": "Remaining",
+  "sourceOptimizationFingerprint": "Source optimization snapshot",
+  "suggestedReviewFocus": "Suggested review focus",
+  "noDecisionSnapshot": "No decision plan yet. Generate an optimization plan first, then assemble the decision plan.",
+  "reviewOnlyNothingExecutes": "review only - nothing executes.",
+  "reviewAction_acknowledged": "Acknowledge",
+  "reviewAction_dismissed": "Dismiss",
+  "reviewAction_deferred": "Defer"
 }
