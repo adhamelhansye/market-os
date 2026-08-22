@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "@/lib/api-client";
+import { apiDelete, apiGet, apiPost } from "@/lib/api-client";
 import type { components } from "@marketing-os/shared-types";
 
 export type PositioningResponse = components["schemas"]["PositioningResponse"];
@@ -25,6 +25,12 @@ export type FunnelGapRead = components["schemas"]["FunnelGapRead"];
 export type FunnelGenerateRequest = components["schemas"]["FunnelGenerateRequest"];
 export type FunnelVersionsResponse = components["schemas"]["FunnelVersionsResponse"];
 export type FunnelProvenanceResponse = components["schemas"]["FunnelProvenanceResponse"];
+export type PerformanceLinkCreate = components["schemas"]["PerformanceLinkCreate"];
+export type PerformanceLinkRead = components["schemas"]["PerformanceLinkRead"];
+export type PerformanceReportResponse = components["schemas"]["PerformanceReportResponse"];
+export type EntityPerformanceResponse = components["schemas"]["EntityPerformanceResponse"];
+export type SnapshotCreatedResponse = components["schemas"]["SnapshotCreatedResponse"];
+export type SnapshotSummaryRead = components["schemas"]["SnapshotSummaryRead"];
 
 function strategyUrl(businessId: string, path: string): string {
   return `/api/v1/businesses/${businessId}/strategy/${path}`;
@@ -125,4 +131,133 @@ export function fetchFunnelProvenance(
   funnelId: string
 ): Promise<FunnelProvenanceResponse> {
   return apiGet<FunnelProvenanceResponse>(strategyUrl(businessId, `funnel/${funnelId}/provenance`));
+}
+
+// ---------------------------------------------------------------------------
+// Creative performance intelligence (Phase 8C) — observed data only
+//
+// Engine evidence blocks are versioned structured payloads on the wire
+// (each stamps its own rules_version), so their shapes are declared
+// explicitly here rather than via the loose generated dict types.
+// ---------------------------------------------------------------------------
+
+export type PerformanceSignal = {
+  code: string;
+  value: string | null;
+  status: string;
+  reason: string | null;
+  unit: string;
+  source: string;
+};
+
+export type PerformanceTrend = {
+  status: string;
+  metrics: Record<string, { direction?: string }>;
+};
+
+export type PerformanceFatigue = {
+  status: string;
+  signals: { code: string; triggered: boolean }[];
+};
+
+export type PerformanceClassification = {
+  status: string;
+  rule: string;
+  reasons: string[];
+};
+
+export type PerformanceReadinessGate = {
+  code: string;
+  met: boolean;
+  value: string | number | null;
+  threshold_value: string | number | null;
+};
+
+export type PerformanceReadiness = {
+  status: string;
+  ready_for_review: boolean;
+  gates: PerformanceReadinessGate[];
+};
+
+export type PerformanceEntityResult = {
+  link_id: string | null;
+  entity: { type: string; id: string };
+  attribution: { status: string; reason: string | null };
+  context: Record<string, unknown>;
+  observation: {
+    entity: { type: string; id: string };
+    range: { kind: string };
+    days_covered: number;
+    totals: Record<string, string | null>;
+  };
+  signals: PerformanceSignal[];
+  trend: PerformanceTrend;
+  fatigue: PerformanceFatigue & { score?: number | null };
+  classification: PerformanceClassification;
+  scaling_readiness: PerformanceReadiness;
+  provenance: { chain: { step: string; id?: string }[] };
+};
+
+export type PerformanceComparisonGroup = {
+  ranked: { rank: number; entity: { id: string }; value: string | null }[];
+  excluded: { entity: { id: string }; reasons: string[] }[];
+  spread: { absolute_change: string | null; percentage_change: string | null } | null;
+};
+
+export type CreativePerformanceReport = {
+  business_id: string;
+  currency: string;
+  range: { kind: string; start: string; end: string };
+  rules_versions: Record<string, string>;
+  break_even_roas_available: boolean;
+  attribution: { status: string; reason?: string; linked_entities: number };
+  entities: PerformanceEntityResult[];
+  comparisons: Record<string, Record<string, PerformanceComparisonGroup>>;
+  fingerprint: string;
+};
+
+function performanceUrl(businessId: string, path = ""): string {
+  return `/api/v1/businesses/${businessId}/strategy/creative/performance${path}`;
+}
+
+export async function fetchCreativePerformanceReport(
+  businessId: string,
+  rangeKind: string = "last_30_days"
+): Promise<CreativePerformanceReport> {
+  const raw = await apiGet<PerformanceReportResponse>(
+    `${performanceUrl(businessId, "/report")}?range_kind=${encodeURIComponent(rangeKind)}`
+  );
+  return raw as unknown as CreativePerformanceReport;
+}
+
+export function fetchCreativePerformanceEntity(
+  businessId: string,
+  entityType: "creative_concept" | "creative_test_variant",
+  entityId: string,
+  rangeKind: string = "last_30_days"
+): Promise<EntityPerformanceResponse> {
+  return apiGet<EntityPerformanceResponse>(
+    `${performanceUrl(businessId, `/entities/${entityType}/${entityId}`)}?range_kind=${encodeURIComponent(rangeKind)}`
+  );
+}
+
+export function fetchCreativePerformanceLinks(businessId: string): Promise<PerformanceLinkRead[]> {
+  return apiGet<PerformanceLinkRead[]>(performanceUrl(businessId, "/links"));
+}
+
+export async function deleteCreativePerformanceLink(
+  businessId: string,
+  linkId: string
+): Promise<void> {
+  await apiDelete(`/api/v1/businesses/${businessId}/strategy/creative/performance/links/${linkId}`);
+}
+
+export async function createCreativePerformanceSnapshot(
+  businessId: string,
+  rangeKind: string = "last_30_days"
+): Promise<SnapshotCreatedResponse> {
+  return apiPost<SnapshotCreatedResponse>(
+    `${performanceUrl(businessId, "/snapshots")}?range_kind=${encodeURIComponent(rangeKind)}`,
+    {}
+  );
 }

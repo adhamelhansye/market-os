@@ -2181,6 +2181,234 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/creative/concepts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Concepts
+         * @description List creative concepts (keyset pagination, newest first).
+         */
+        get: operations["list_concepts_api_v1_businesses__business_id__strategy_creative_concepts_get"];
+        put?: never;
+        /**
+         * Create Concept
+         * @description Create a creative concept anchored in Phase 7 strategy references.
+         */
+        post: operations["create_concept_api_v1_businesses__business_id__strategy_creative_concepts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/concepts/{concept_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Concept */
+        get: operations["get_concept_api_v1_businesses__business_id__strategy_creative_concepts__concept_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/strategies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Strategies */
+        get: operations["list_strategies_api_v1_businesses__business_id__strategy_creative_strategies_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/tests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Tests */
+        get: operations["list_tests_api_v1_businesses__business_id__strategy_creative_tests_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/tests/{test_id}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Test Variants */
+        get: operations["list_test_variants_api_v1_businesses__business_id__strategy_creative_tests__test_id__variants_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/portfolios": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Portfolios */
+        get: operations["list_portfolios_api_v1_businesses__business_id__strategy_creative_portfolios_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/performance/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Report
+         * @description Deterministic performance report over every linked creative entity.
+         */
+        get: operations["get_report_api_v1_businesses__business_id__strategy_creative_performance_report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/performance/entities/{entity_type}/{entity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Entity Performance
+         * @description Observed performance for one concept/variant; unavailable when unlinked.
+         */
+        get: operations["get_entity_performance_api_v1_businesses__business_id__strategy_creative_performance_entities__entity_type___entity_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/performance/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Links */
+        get: operations["list_links_api_v1_businesses__business_id__strategy_creative_performance_links_get"];
+        put?: never;
+        /**
+         * Create Link
+         * @description Declare an explicit attribution mapping (never inferred).
+         */
+        post: operations["create_link_api_v1_businesses__business_id__strategy_creative_performance_links_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/performance/links/{link_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete Link */
+        delete: operations["delete_link_api_v1_businesses__business_id__strategy_creative_performance_links__link_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/performance/snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Snapshots */
+        get: operations["list_snapshots_api_v1_businesses__business_id__strategy_creative_performance_snapshots_get"];
+        put?: never;
+        /**
+         * Create Snapshot
+         * @description Persist the current deterministic report as an immutable snapshot.
+         *
+         *     Idempotent on recompute: the same inputs return the existing snapshot
+         *     with ``created=false``.
+         */
+        post: operations["create_snapshot_api_v1_businesses__business_id__strategy_creative_performance_snapshots_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/performance/snapshots/{snapshot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Snapshot */
+        get: operations["get_snapshot_api_v1_businesses__business_id__strategy_creative_performance_snapshots__snapshot_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2942,6 +3170,335 @@ export interface components {
             /** Reason */
             reason?: string | null;
         };
+        /** CreativeConceptCreate */
+        CreativeConceptCreate: {
+            /**
+             * Strategy Version
+             * @default v1
+             */
+            strategy_version: string;
+            /** Positioning Reference */
+            positioning_reference?: string | null;
+            /** Offer Reference */
+            offer_reference?: string | null;
+            /** Messaging Reference */
+            messaging_reference?: string | null;
+            /** Funnel Reference */
+            funnel_reference?: string | null;
+            /** Funnel Stage */
+            funnel_stage?: string | null;
+            /** Audience */
+            audience?: string | null;
+            /** Angle */
+            angle?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Hook Direction */
+            hook_direction?: string | null;
+            /** Creative Format */
+            creative_format: string;
+            /** Creative Type */
+            creative_type?: string | null;
+            /** Offer Direction */
+            offer_direction?: string | null;
+            /** Cta */
+            cta?: string | null;
+            /** Visual Direction */
+            visual_direction?: string | null;
+            /** Copy Direction */
+            copy_direction?: string | null;
+            /** Primary Emotion */
+            primary_emotion?: string | null;
+            /** Secondary Emotion */
+            secondary_emotion?: string | null;
+            /** Objection */
+            objection?: string | null;
+            /** Reason To Believe */
+            reason_to_believe?: string | null;
+            /** Testing Role */
+            testing_role?: string | null;
+            /** Success Metric */
+            success_metric?: string | null;
+            /** Evidence */
+            evidence?: {
+                [key: string]: unknown;
+            };
+            /** Risks */
+            risks?: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** CreativeConceptPage */
+        CreativeConceptPage: {
+            /** Items */
+            items: components["schemas"]["CreativeConceptRead"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** CreativeConceptRead */
+        CreativeConceptRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Strategy Version */
+            strategy_version: string;
+            /** Positioning Reference */
+            positioning_reference?: string | null;
+            /** Offer Reference */
+            offer_reference?: string | null;
+            /** Messaging Reference */
+            messaging_reference?: string | null;
+            /** Funnel Reference */
+            funnel_reference?: string | null;
+            /** Funnel Stage */
+            funnel_stage?: string | null;
+            /** Audience */
+            audience?: string | null;
+            /** Angle */
+            angle?: string | null;
+            /** Message */
+            message?: string | null;
+            /** Hook Direction */
+            hook_direction?: string | null;
+            /** Creative Format */
+            creative_format: string;
+            /** Creative Type */
+            creative_type?: string | null;
+            /** Offer Direction */
+            offer_direction?: string | null;
+            /** Cta */
+            cta?: string | null;
+            /** Visual Direction */
+            visual_direction?: string | null;
+            /** Copy Direction */
+            copy_direction?: string | null;
+            /** Primary Emotion */
+            primary_emotion?: string | null;
+            /** Secondary Emotion */
+            secondary_emotion?: string | null;
+            /** Objection */
+            objection?: string | null;
+            /** Reason To Believe */
+            reason_to_believe?: string | null;
+            /** Testing Role */
+            testing_role?: string | null;
+            /** Success Metric */
+            success_metric?: string | null;
+            /** Evidence */
+            evidence: {
+                [key: string]: unknown;
+            };
+            /** Risks */
+            risks: {
+                [key: string]: unknown;
+            }[];
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CreativePortfolioRead */
+        CreativePortfolioRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Portfolio Id */
+            portfolio_id: string;
+            /** Name */
+            name: string;
+            /** Category */
+            category: string;
+            /** Description */
+            description?: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CreativeStrategyRead */
+        CreativeStrategyRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Strategy Id */
+            strategy_id: string;
+            /** Version */
+            version: string;
+            /** Status */
+            status: string;
+            /** Positioning Reference */
+            positioning_reference?: string | null;
+            /** Offer Reference */
+            offer_reference?: string | null;
+            /** Messaging Reference */
+            messaging_reference?: string | null;
+            /** Funnel Reference */
+            funnel_reference?: string | null;
+            /** Research Reference */
+            research_reference?: string | null;
+            /** Strategy Decision Reference */
+            strategy_decision_reference?: string | null;
+            /** Creative Intelligence Reference */
+            creative_intelligence_reference?: string | null;
+            /** Audience Coverage */
+            audience_coverage?: string | null;
+            /** Funnel Coverage */
+            funnel_coverage?: string | null;
+            /** Rules Version */
+            rules_version?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CreativeTestRead */
+        CreativeTestRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Test Id */
+            test_id: string;
+            /** Name */
+            name: string;
+            /** Objective */
+            objective: string;
+            /** Test Variable */
+            test_variable: string;
+            /** Control Variables */
+            control_variables: {
+                [key: string]: unknown;
+            };
+            /** Variants */
+            variants: {
+                [key: string]: unknown;
+            }[];
+            /** Hypothesis */
+            hypothesis: string;
+            /** Based On */
+            based_on?: string | null;
+            /** Success Metric */
+            success_metric?: string | null;
+            /** Minimum Data Requirement */
+            minimum_data_requirement?: {
+                [key: string]: unknown;
+            } | null;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CreativeTestVariantRead */
+        CreativeTestVariantRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Test Id */
+            test_id: string;
+            /** Variant Id */
+            variant_id: string;
+            /** Test Variable Value */
+            test_variable_value: string;
+            /**
+             * Control State Frozen At
+             * Format: date-time
+             */
+            control_state_frozen_at: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** DataQualityRead */
         DataQualityRead: {
             /**
@@ -3267,6 +3824,27 @@ export interface components {
             /** Inventory Value */
             inventory_value: string | null;
             current_goal: components["schemas"]["GoalRead"] | null;
+        };
+        /**
+         * EntityPerformanceResponse
+         * @description One entity's performance; ``attribution`` carries the unavailable
+         *     reason when no link exists, otherwise ``result`` holds the payload.
+         */
+        EntityPerformanceResponse: {
+            /** Business Id */
+            business_id: string;
+            /** Range */
+            range: {
+                [key: string]: unknown;
+            };
+            /** Attribution */
+            attribution?: {
+                [key: string]: unknown;
+            } | null;
+            /** Result */
+            result?: {
+                [key: string]: unknown;
+            } | null;
         };
         /** EvidenceComparisonRead */
         EvidenceComparisonRead: {
@@ -4519,6 +5097,88 @@ export interface components {
             role_name: string;
             /** Permissions */
             permissions: string[];
+        };
+        /**
+         * PerformanceLinkCreate
+         * @description Explicit attribution mapping authored by a user.
+         */
+        PerformanceLinkCreate: {
+            /** Label */
+            label?: string | null;
+            /** Creative Concept Id */
+            creative_concept_id?: string | null;
+            /** Creative Test Variant Id */
+            creative_test_variant_id?: string | null;
+            /** Ad Id */
+            ad_id?: string | null;
+            /** Provider Creative Id */
+            provider_creative_id?: string | null;
+        };
+        /** PerformanceLinkRead */
+        PerformanceLinkRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Organization Id
+             * Format: uuid
+             */
+            organization_id: string;
+            /**
+             * Business Id
+             * Format: uuid
+             */
+            business_id: string;
+            /** Creative Concept Id */
+            creative_concept_id?: string | null;
+            /** Creative Test Variant Id */
+            creative_test_variant_id?: string | null;
+            /** Ad Id */
+            ad_id?: string | null;
+            /** Provider Creative Id */
+            provider_creative_id?: string | null;
+            /** Label */
+            label?: string | null;
+            /** Status */
+            status: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** PerformanceReportResponse */
+        PerformanceReportResponse: {
+            /** Business Id */
+            business_id: string;
+            /** Currency */
+            currency: string;
+            /** Range */
+            range: {
+                [key: string]: unknown;
+            };
+            /** Rules Versions */
+            rules_versions: {
+                [key: string]: string | null;
+            };
+            /** Break Even Roas Available */
+            break_even_roas_available: boolean;
+            /** Attribution */
+            attribution: {
+                [key: string]: unknown;
+            };
+            /** Entities */
+            entities: {
+                [key: string]: unknown;
+            }[];
+            /** Comparisons */
+            comparisons: {
+                [key: string]: unknown;
+            };
+            /** Fingerprint */
+            fingerprint: string;
         };
         /** PositioningCandidateCreate */
         PositioningCandidateCreate: {
@@ -6303,6 +6963,88 @@ export interface components {
             total: number;
             /** Simulations */
             simulations?: components["schemas"]["SimulationRead"][];
+        };
+        /** SnapshotCreatedResponse */
+        SnapshotCreatedResponse: {
+            /**
+             * Snapshot Id
+             * Format: uuid
+             */
+            snapshot_id: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /** Created */
+            created: boolean;
+        };
+        /** SnapshotRead */
+        SnapshotRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Range Kind */
+            range_kind: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Currency */
+            currency: string;
+            /** Entity Scope */
+            entity_scope: string;
+            /** Rules Version */
+            rules_version: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Payload */
+            payload: {
+                [key: string]: unknown;
+            };
+        };
+        /** SnapshotSummaryRead */
+        SnapshotSummaryRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Range Kind */
+            range_kind: string;
+            /**
+             * Start Date
+             * Format: date
+             */
+            start_date: string;
+            /**
+             * End Date
+             * Format: date
+             */
+            end_date: string;
+            /** Currency */
+            currency: string;
+            /** Entity Scope */
+            entity_scope: string;
+            /** Rules Version */
+            rules_version: string;
+            /** Fingerprint */
+            fingerprint: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** StrategyDecisionEvaluateRequest */
         StrategyDecisionEvaluateRequest: {
@@ -11055,6 +11797,435 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FunnelProvenanceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_concepts_api_v1_businesses__business_id__strategy_creative_concepts_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: string | null;
+                include_archived?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativeConceptPage"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_concept_api_v1_businesses__business_id__strategy_creative_concepts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreativeConceptCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativeConceptRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_concept_api_v1_businesses__business_id__strategy_creative_concepts__concept_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                concept_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativeConceptRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_strategies_api_v1_businesses__business_id__strategy_creative_strategies_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativeStrategyRead"][];
+                };
+            };
+        };
+    };
+    list_tests_api_v1_businesses__business_id__strategy_creative_tests_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativeTestRead"][];
+                };
+            };
+        };
+    };
+    list_test_variants_api_v1_businesses__business_id__strategy_creative_tests__test_id__variants_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                test_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativeTestVariantRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_portfolios_api_v1_businesses__business_id__strategy_creative_portfolios_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreativePortfolioRead"][];
+                };
+            };
+        };
+    };
+    get_report_api_v1_businesses__business_id__strategy_creative_performance_report_get: {
+        parameters: {
+            query?: {
+                range_kind?: string;
+                /** @description Custom range start */
+                start?: string | null;
+                /** @description Custom range end */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PerformanceReportResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_entity_performance_api_v1_businesses__business_id__strategy_creative_performance_entities__entity_type___entity_id__get: {
+        parameters: {
+            query?: {
+                range_kind?: string;
+                /** @description Custom range start */
+                start?: string | null;
+                /** @description Custom range end */
+                end?: string | null;
+            };
+            header?: never;
+            path: {
+                entity_type: string;
+                entity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EntityPerformanceResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_links_api_v1_businesses__business_id__strategy_creative_performance_links_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PerformanceLinkRead"][];
+                };
+            };
+        };
+    };
+    create_link_api_v1_businesses__business_id__strategy_creative_performance_links_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PerformanceLinkCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PerformanceLinkRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_link_api_v1_businesses__business_id__strategy_creative_performance_links__link_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                link_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_snapshots_api_v1_businesses__business_id__strategy_creative_performance_snapshots_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SnapshotSummaryRead"][];
+                };
+            };
+        };
+    };
+    create_snapshot_api_v1_businesses__business_id__strategy_creative_performance_snapshots_post: {
+        parameters: {
+            query?: {
+                range_kind?: string;
+                /** @description Custom range start */
+                start?: string | null;
+                /** @description Custom range end */
+                end?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SnapshotCreatedResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_snapshot_api_v1_businesses__business_id__strategy_creative_performance_snapshots__snapshot_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SnapshotRead"];
                 };
             };
             /** @description Validation Error */
