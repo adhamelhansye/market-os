@@ -7,7 +7,7 @@ campaign scoping, and cross-tenant isolation (404, never a leak).
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date, timedelta
 from decimal import Decimal
 
 import pytest
@@ -21,12 +21,22 @@ from tests.test_metrics import (
     _insight,
     _order,
     _product,
-    _today,
 )
 
 
+def _sim_today() -> date:
+    """Anchor for simulator test data.
+
+    Mirrors the server clock used by
+    ``src/modules/simulator/inputs.py::build_assumption_set`` (``date.today()``,
+    server-local) so seeded history always lands inside the historical window
+    the API resolves, regardless of UTC/local offsets.
+    """
+    return date.today()
+
+
 def _days_ago(n: int) -> str:
-    return str(_today() - timedelta(days=n))
+    return str(_sim_today() - timedelta(days=n))
 
 
 async def _seed_constant_history(session, tenant: dict, *, days: int = 7) -> dict:
@@ -40,7 +50,7 @@ async def _seed_constant_history(session, tenant: dict, *, days: int = 7) -> dic
     stack = await _ad_stack(session, business)
     product = await _product(session, business, name="Widget", sku="W-1")
     for offset in range(days, 0, -1):
-        day = _today() - timedelta(days=offset)
+        day = _sim_today() - timedelta(days=offset)
         await _insight(
             session,
             business,
@@ -252,7 +262,7 @@ async def test_rerun_reflects_new_history(client: AsyncClient, session, tenant) 
     # strengthen one day inside the window: replace yesterday's insight
     # with a much better one (10x clicks) and add a large order so
     # totals now reflect 8 ad rows / 9 purchases
-    day = _today() - timedelta(days=1)
+    day = _sim_today() - timedelta(days=1)
     ad_id = stack["ads"][0].id
     await session.execute(
         delete(AdInsight).where(
