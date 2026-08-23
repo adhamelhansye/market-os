@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ApiError } from "@/lib/api-client";
 import { CreativeLearningSection } from "./creative-learning-section";
 import { CreativeDecisionPlanSection } from "./creative-decision-plan-section";
+import { CreativeActionPreparationSection } from "./creative-action-preparation-section";
 import { CreativeOptimizationSection } from "./creative-optimization-section";
 import { CreativePerformanceSection } from "./creative-performance-section";
 import { FunnelSection } from "./funnel-section";
@@ -304,6 +305,7 @@ export function StrategySection({ businessId }: { businessId: string }) {
       <CreativeLearningSection businessId={businessId} />
       <CreativeOptimizationSection businessId={businessId} />
       <CreativeDecisionPlanSection businessId={businessId} />
+      <CreativeActionPreparationSection businessId={businessId} />
     </div>
   );
 }

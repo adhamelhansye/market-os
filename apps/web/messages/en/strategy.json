@@ -244,5 +244,17 @@
   "reviewOnlyNothingExecutes": "review only - nothing executes.",
   "reviewAction_acknowledged": "Acknowledge",
   "reviewAction_dismissed": "Dismiss",
-  "reviewAction_deferred": "Defer"
+  "reviewAction_deferred": "Defer",
+  "draftKind": {
+    "expansion": "Expansion",
+    "coverage_gap": "Coverage gap",
+    "fatigue": "Refresh"
+  },
+  "creativeActionPreparation": "Creative action preparation",
+  "creativeActionDescription": "Acknowledged opportunities become reviewable creative test drafts using the existing taxonomy. Drafts stay drafts.",
+  "prepareDrafts": "Prepare drafts",
+  "draftsPrepared": "{count} draft(s) prepared",
+  "noActionDrafts": "No action drafts yet. Acknowledge a decision item, then prepare drafts.",
+  "sourceOpportunity": "Source opportunity",
+  "stillADraft": "Still a draft - nothing executes."
 }

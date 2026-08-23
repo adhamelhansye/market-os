@@ -2865,10 +2865,139 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/creative/action-preparation/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generate Action Drafts
+         * @description Assemble 8B test drafts from acknowledged decision items (idempotent).
+         */
+        post: operations["generate_action_drafts_api_v1_businesses__business_id__strategy_creative_action_preparation_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/action-preparation/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Action Items
+         * @description Drafts with second-stage review state plus skip/exclusion detail.
+         */
+        get: operations["action_items_api_v1_businesses__business_id__strategy_creative_action_preparation_items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/action-preparation/drafts/{draft_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Review Action Draft
+         * @description Record second-stage human review of a draft.
+         *
+         *     Writes review state ONLY. The underlying CreativeTest remains a draft;
+         *     nothing is executed, launched or modified.
+         */
+        post: operations["review_action_draft_api_v1_businesses__business_id__strategy_creative_action_preparation_drafts__draft_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActionDraftRead */
+        ActionDraftRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Source Opportunity Id */
+            source_opportunity_id: string;
+            /** Source Plan Fingerprint */
+            source_plan_fingerprint: string;
+            /** Draft Test Id */
+            draft_test_id: string;
+            /** Draft Kind */
+            draft_kind: string;
+            /** Review State */
+            review_state: string;
+            /** Note */
+            note?: string | null;
+            /** Decided By */
+            decided_by?: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** ActionGenerateResponse */
+        ActionGenerateResponse: {
+            /** Business Id */
+            business_id: string;
+            /** Created Count */
+            created_count: number;
+            /** Report */
+            report: {
+                [key: string]: unknown;
+            };
+        };
+        /** ActionItemsResponse */
+        ActionItemsResponse: {
+            /** Status */
+            status: string;
+            /** Reason */
+            reason?: string | null;
+            /** Drafts */
+            drafts?: {
+                [key: string]: unknown;
+            }[];
+            /** Skipped */
+            skipped?: {
+                [key: string]: unknown;
+            }[];
+            /** Excluded */
+            excluded?: {
+                [key: string]: unknown;
+            }[];
+            /** Orphaned */
+            orphaned?: {
+                [key: string]: unknown;
+            }[];
+        };
         /** AdMetrics */
         AdMetrics: {
             /**
@@ -7409,19 +7538,6 @@ export interface components {
              */
             updated_at: string;
         };
-        /**
-         * ReviewStateUpdate
-         * @description Human review input. Records review state ONLY - nothing executes.
-         */
-        ReviewStateUpdate: {
-            /**
-             * Review State
-             * @description One of: proposed, acknowledged, dismissed, deferred
-             */
-            review_state: string;
-            /** Note */
-            note?: string | null;
-        };
         /** ScalingReadinessRead */
         ScalingReadinessRead: {
             /** Status */
@@ -8237,6 +8353,29 @@ export interface components {
              * @default true
              */
             received: boolean;
+        };
+        /** ReviewStateUpdate */
+        src__modules__creative__action__schemas__ReviewStateUpdate: {
+            /**
+             * Review State
+             * @description One of: proposed, acknowledged, dismissed, deferred
+             */
+            review_state: string;
+            /** Note */
+            note?: string | null;
+        };
+        /**
+         * ReviewStateUpdate
+         * @description Human review input. Records review state ONLY - nothing executes.
+         */
+        src__modules__creative__decision__schemas__ReviewStateUpdate: {
+            /**
+             * Review State
+             * @description One of: proposed, acknowledged, dismissed, deferred
+             */
+            review_state: string;
+            /** Note */
+            note?: string | null;
         };
     };
     responses: never;
@@ -13628,7 +13767,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ReviewStateUpdate"];
+                "application/json": components["schemas"]["src__modules__creative__decision__schemas__ReviewStateUpdate"];
             };
         };
         responses: {
@@ -13690,6 +13829,81 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DecisionSnapshotRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_action_drafts_api_v1_businesses__business_id__strategy_creative_action_preparation_generate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionGenerateResponse"];
+                };
+            };
+        };
+    };
+    action_items_api_v1_businesses__business_id__strategy_creative_action_preparation_items_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionItemsResponse"];
+                };
+            };
+        };
+    };
+    review_action_draft_api_v1_businesses__business_id__strategy_creative_action_preparation_drafts__draft_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["src__modules__creative__action__schemas__ReviewStateUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDraftRead"];
                 };
             };
             /** @description Validation Error */

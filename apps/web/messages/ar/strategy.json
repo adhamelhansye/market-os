@@ -244,5 +244,17 @@
   "reviewOnlyNothingExecutes": "مراجعة فقط - لا شيء يُنفَّذ.",
   "reviewAction_acknowledged": "إقرار",
   "reviewAction_dismissed": "تجاهل",
-  "reviewAction_deferred": "تأجيل"
+  "reviewAction_deferred": "تأجيل",
+  "draftKind": {
+    "expansion": "توسيع",
+    "coverage_gap": "فجوة تغطية",
+    "fatigue": "تحديث"
+  },
+  "creativeActionPreparation": "تجهيز الإجراءات الإبداعية",
+  "creativeActionDescription": "الفرص المُقرّة تصبح مسودات اختبار إبداعي قابلة للمراجعة باستخدام التصنيف الحالي. المسودات تبقى مسودات.",
+  "prepareDrafts": "تجهيز المسودات",
+  "draftsPrepared": "تم تجهيز {count} مسودة",
+  "noActionDrafts": "لا توجد مسودات بعد. أقرّ ببند قرار ثم جهّز المسودات.",
+  "sourceOpportunity": "الفرصة المصدر",
+  "stillADraft": "لا تزال مسودة - لا شيء يُنفَّذ."
 }

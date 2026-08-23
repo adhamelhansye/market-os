@@ -118,6 +118,7 @@ async def clean_tables(session: AsyncSession) -> AsyncIterator[None]:
     """Wipes all rows between tests (children first)."""
     yield
     for table in (
+        "creative_action_drafts",
         "creative_decision_item_reviews",
         "creative_decision_plans",
         "creative_optimization_snapshots",

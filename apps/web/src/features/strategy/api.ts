@@ -493,3 +493,51 @@ export function reviewDecisionItem(
     payload
   );
 }
+
+// ---------------------------------------------------------------------------
+// Creative action preparation (Phase 8G) - acknowledged -> 8B test drafts
+// ---------------------------------------------------------------------------
+
+export type ActionDraft = {
+  id: string;
+  source_opportunity_id: string;
+  draft_test_id: string;
+  draft_kind: "expansion" | "coverage_gap" | "fatigue";
+  review_state: "proposed" | "acknowledged" | "dismissed" | "deferred";
+  note?: string | null;
+  payload?: Record<string, unknown>;
+};
+
+export type ActionGenerateResponse = {
+  business_id: string;
+  created_count: number;
+  report: {
+    summary?: Record<string, unknown>;
+    drafts?: Record<string, unknown>[];
+    skipped?: Record<string, unknown>[];
+    excluded?: Record<string, unknown>[];
+  };
+};
+
+function actionUrl(businessId: string, path = ""): string {
+  return `/api/v1/businesses/${businessId}/strategy/creative/action-preparation${path}`;
+}
+
+export function generateActionDrafts(businessId: string): Promise<ActionGenerateResponse> {
+  return apiPost(actionUrl(businessId, "/generate"), {});
+}
+
+export async function fetchActionDrafts(businessId: string): Promise<ActionDraft[]> {
+  const res = await apiGet<{ status: string; drafts?: ActionDraft[] }>(
+    actionUrl(businessId, "/items")
+  );
+  return res.drafts ?? [];
+}
+
+export function reviewActionDraft(
+  businessId: string,
+  draftId: string,
+  payload: { review_state: "acknowledged" | "dismissed" | "deferred"; note?: string }
+): Promise<{ id: string; review_state: string }> {
+  return apiPost(actionUrl(businessId, `/drafts/${draftId}/review`), payload);
+}
