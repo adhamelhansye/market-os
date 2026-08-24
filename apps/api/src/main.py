@@ -17,6 +17,7 @@ from src.modules.businesses.router import router as businesses_router
 from src.modules.creative.action.router import router as creative_action_router
 from src.modules.creative.decision.router import router as creative_decision_router
 from src.modules.creative.learning.router import router as creative_learning_router
+from src.modules.creative.measurement.router import router as creative_measurement_router
 from src.modules.creative.optimization.router import router as creative_optimization_router
 from src.modules.creative.performance.router import router as creative_performance_router
 from src.modules.creative.router import router as creative_router
@@ -96,6 +97,7 @@ def create_app() -> FastAPI:
     app.include_router(creative_learning_router, prefix=API_PREFIX)
     app.include_router(creative_optimization_router, prefix=API_PREFIX)
     app.include_router(creative_decision_router, prefix=API_PREFIX)
+    app.include_router(creative_measurement_router, prefix=API_PREFIX)
     app.include_router(creative_action_router, prefix=API_PREFIX)
 
     return app

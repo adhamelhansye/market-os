@@ -259,5 +259,10 @@
   "stillADraft": "لا تزال مسودة - لا شيء يُنفَّذ.",
   "activateTest": "تنشيط الاختبار",
   "markCompleted": "وضع علامة مكتمل",
-  "markCancelled": "وضع علامة ملغى"
+  "markCancelled": "وضع علامة ملغى",
+  "creativeTestReport": "تقرير الاختبار",
+  "creativeTestReportDescription": "عرض موحد لدورة الحياة والملاحظات والإرهاق والتعلّم لاختبار إبداعي مُنشَّط. للقراءة فقط.",
+  "observationStatus": "الملاحظة",
+  "classification": "التصنيف",
+  "learningTitle": "التعلّم"
 }

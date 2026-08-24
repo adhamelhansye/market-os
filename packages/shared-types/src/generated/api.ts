@@ -2865,6 +2865,29 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/creative/tests/{test_external_ref}/report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Test Report
+         * @description Unified measurement report assembled from canonical 8H/8C/8D state.
+         *
+         *     Read-only. Values from upstream layers are surfaced verbatim; missing
+         *     data appears as explicit unavailable/insufficient states.
+         */
+        get: operations["test_report_api_v1_businesses__business_id__strategy_creative_tests__test_external_ref__report_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/businesses/{business_id}/strategy/creative/action-preparation/generate": {
         parameters: {
             query?: never;
@@ -13882,6 +13905,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DecisionSnapshotRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    test_report_api_v1_businesses__business_id__strategy_creative_tests__test_external_ref__report_get: {
+        parameters: {
+            query?: {
+                range_kind?: string;
+            };
+            header?: never;
+            path: {
+                test_external_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

@@ -581,3 +581,42 @@ export async function fetchLifecycleHistory(
   const suffix = testRef ? `?test_external_ref=${encodeURIComponent(testRef)}` : "";
   return apiGet<LifecycleEvent[]>(actionUrl(businessId, `/tests${suffix}/lifecycle`));
 }
+
+// ---------------------------------------------------------------------------
+// Creative test measurement report (Phase 8I) - read-only
+// ---------------------------------------------------------------------------
+
+export type TestReportResponse = {
+  status?: string;
+  rules_versions?: Record<string, string>;
+  test?: Record<string, unknown>;
+  lifecycle?: {
+    current_status?: string;
+    events?: Record<string, unknown>[];
+  };
+  measurement?: {
+    observation_status?: string;
+    reason?: string | null;
+    days_observed_max?: number | null;
+    entities?: Record<string, unknown>[];
+  };
+  learning?: {
+    status?: string;
+    reason?: string;
+    patterns?: Record<string, unknown>[];
+    learnings?: Record<string, unknown>[];
+  };
+  completion_note?: string;
+  fingerprint?: string;
+};
+
+export async function fetchTestReport(
+  businessId: string,
+  testRef: string,
+  rangeKind: string = "last_30_days"
+): Promise<TestReportResponse> {
+  return apiGet<TestReportResponse>(
+    `/api/v1/businesses/${businessId}/strategy/creative/tests/${encodeURIComponent(testRef)}/report` +
+    `?range_kind=${encodeURIComponent(rangeKind)}`
+  );
+}

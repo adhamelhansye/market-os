@@ -259,5 +259,10 @@
   "stillADraft": "Still a draft - nothing executes.",
   "activateTest": "Activate test",
   "markCompleted": "Mark completed",
-  "markCancelled": "Mark cancelled"
+  "markCancelled": "Mark cancelled",
+  "creativeTestReport": "Test report",
+  "creativeTestReportDescription": "Unified view of lifecycle, observations, fatigue and learning for an activated creative test. Read-only.",
+  "observationStatus": "Observation",
+  "classification": "Classification",
+  "learningTitle": "Learning"
 }
