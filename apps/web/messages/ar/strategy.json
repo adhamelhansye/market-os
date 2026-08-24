@@ -256,5 +256,8 @@
   "draftsPrepared": "تم تجهيز {count} مسودة",
   "noActionDrafts": "لا توجد مسودات بعد. أقرّ ببند قرار ثم جهّز المسودات.",
   "sourceOpportunity": "الفرصة المصدر",
-  "stillADraft": "لا تزال مسودة - لا شيء يُنفَّذ."
+  "stillADraft": "لا تزال مسودة - لا شيء يُنفَّذ.",
+  "activateTest": "تنشيط الاختبار",
+  "markCompleted": "وضع علامة مكتمل",
+  "markCancelled": "وضع علامة ملغى"
 }

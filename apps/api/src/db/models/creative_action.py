@@ -99,3 +99,61 @@ class CreativeActionDraft(Base):
 
 
 __all__ = ["CreativeActionDraft"]
+
+
+class CreativeTestActivation(Base):
+    """Immutable lifecycle event for a Phase 8G creative test draft.
+
+    One row per state transition. Activation requires the strict gate
+    (review acknowledged + previous status draft) and records the human
+    actor. Rows are never updated or deleted.
+    """
+
+    __tablename__ = "creative_test_activations"
+    __table_args__ = (
+        CheckConstraint(
+            "previous_status IN ('draft','active','completed','cancelled')",
+            name="ck_activation_previous_status_allowed",
+        ),
+        CheckConstraint(
+            "new_status IN ('draft','active','completed','cancelled')",
+            name="ck_activation_new_status_allowed",
+        ),
+        Index(
+            "ix_creative_test_activations_test_created",
+            "creative_test_id",
+            "created_at",
+        ),
+        Index(
+            "ix_creative_test_activations_business_created",
+            "business_id",
+            "created_at",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
+    organization_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"), nullable=False
+    )
+    business_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("businesses.id", ondelete="CASCADE"), nullable=False
+    )
+    creative_test_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    creative_test_external_ref: Mapped[str] = mapped_column(String(80), nullable=False)
+    source_action_draft_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
+    source_opportunity_id: Mapped[str] = mapped_column(String(200), nullable=False)
+    source_plan_fingerprint: Mapped[str] = mapped_column(String(64), nullable=False)
+    previous_status: Mapped[str] = mapped_column(String(20), nullable=False)
+    new_status: Mapped[str] = mapped_column(String(20), nullable=False)
+    activated_by: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+
+
+__all__ = [
+    "CreativeActionDraft",
+    "CreativeTestActivation",
+]

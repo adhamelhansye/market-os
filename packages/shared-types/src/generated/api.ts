@@ -2928,6 +2928,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/businesses/{business_id}/strategy/creative/action-preparation/drafts/{draft_id}/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activate Action Draft
+         * @description Activate an acknowledged 8G draft (draft -> active).
+         *
+         *     Strict gates: second-stage review must be acknowledged; the test must
+         *     currently be a draft; single activation per test. Internal lifecycle
+         *     only - no provider calls, no campaign mutations, no scheduling.
+         */
+        post: operations["activate_action_draft_api_v1_businesses__business_id__strategy_creative_action_preparation_drafts__draft_id__activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/businesses/{business_id}/strategy/creative/action-preparation/tests/{test_external_ref}/lifecycle": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lifecycle History */
+        get: operations["lifecycle_history_api_v1_businesses__business_id__strategy_creative_action_preparation_tests__test_external_ref__lifecycle_get"];
+        put?: never;
+        /**
+         * Transition Lifecycle
+         * @description Apply a bounded lifecycle transition (active -> completed/cancelled).
+         *
+         *     Internal lifecycle only. Direct transitions from any other state are
+         *     rejected; every accepted transition records an immutable event.
+         */
+        post: operations["transition_lifecycle_api_v1_businesses__business_id__strategy_creative_action_preparation_tests__test_external_ref__lifecycle_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -5505,6 +5553,11 @@ export interface components {
             range?: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** LifecycleTransition */
+        LifecycleTransition: {
+            /** Target Status */
+            target_status: string;
         };
         /** LoginRequest */
         LoginRequest: {
@@ -13904,6 +13957,107 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ActionDraftRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_action_draft_api_v1_businesses__business_id__strategy_creative_action_preparation_drafts__draft_id__activate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ActionDraftRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lifecycle_history_api_v1_businesses__business_id__strategy_creative_action_preparation_tests__test_external_ref__lifecycle_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                test_external_ref: string | null;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    }[];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    transition_lifecycle_api_v1_businesses__business_id__strategy_creative_action_preparation_tests__test_external_ref__lifecycle_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                test_external_ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LifecycleTransition"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

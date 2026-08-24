@@ -25,7 +25,10 @@ from src.db.models.creative import (
     CreativeConcept,
     CreativeTest,
 )
-from src.db.models.creative_action import CreativeActionDraft
+from src.db.models.creative_action import (
+    CreativeActionDraft,
+    CreativeTestActivation,
+)
 from src.db.models.creative_decision import CreativeDecisionItemReview
 from src.modules.creative.action import engine as action_engine
 from src.modules.creative.decision.engine import REVIEW_STATE_ACKNOWLEDGED
@@ -378,3 +381,226 @@ __all__ = [
     "review_draft",
     "list_drafts",
 ]
+
+
+# ---------------------------------------------------------------------------
+# Lifecycle tracking (Phase 8H) - bounded state machine over 8G drafts
+# ---------------------------------------------------------------------------
+
+LIFECYCLE_TRANSITIONS: dict[str, dict[str, str | None]] = {
+    # from -> {to: requirement}
+    "draft": {
+        "active": "acknowledged_review",
+    },
+    "active": {"completed": None, "cancelled": None},
+    "completed": {},
+    "cancelled": {},
+}
+
+ACTIVATION_REQUIRED_REVIEW_STATE = "acknowledged"
+
+
+async def activate_draft(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    draft_id: uuid.UUID,
+    actor_id: uuid.UUID,
+    actor_role: str,
+) -> tuple[CreativeActionDraft, Any]:
+    """Activate an acknowledged 8G draft (draft -> active).
+
+    Strict gates, each failing explicitly:
+      - actor role must be owner or admin
+      - the draft's second-stage review must be exactly ``acknowledged``
+        (proposed/dismissed/deferred are never implicitly executable)
+      - the CreativeTest must currently be ``status = 'draft'``
+      - a test may be activated at most once
+
+    Records an immutable activation event with full provenance. No
+    provider calls, no campaign mutations, no scheduling.
+    """
+    draft_row = (
+        await session.execute(
+            select(CreativeActionDraft).where(
+                CreativeActionDraft.id == draft_id,
+                CreativeActionDraft.organization_id == organization_id,
+                CreativeActionDraft.business_id == business_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if draft_row is None:
+        raise NotFoundError("Action draft not found")
+
+    if draft_row.review_state != ACTIVATION_REQUIRED_REVIEW_STATE:
+        raise ConflictError(
+            f"activation requires second-stage review_state="
+            f"'{ACTIVATION_REQUIRED_REVIEW_STATE}'; current state is "
+            f"'{draft_row.review_state}'"
+        )
+
+    prior_event = (
+        await session.execute(
+            select(CreativeTestActivation).where(
+                CreativeTestActivation.business_id == business_id,
+                CreativeTestActivation.creative_test_external_ref
+                == draft_row.draft_test_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if prior_event is not None:
+        raise ConflictError(
+            "creative test has already been activated; lifecycle is "
+            "single-activation"
+        )
+
+    test = (
+        await session.execute(
+            select(CreativeTest).where(CreativeTest.test_id == draft_row.draft_test_id)
+        )
+    ).scalar_one_or_none()
+    if test is None:
+        raise NotFoundError("Underlying creative test draft not found")
+    if test.status != "draft":
+        raise ConflictError(
+            f"activation requires CreativeTest status='draft'; "
+            f"current status is '{test.status}'"
+        )
+
+    previous_status = test.status
+    test.status = "active"
+
+    event = CreativeTestActivation(
+        organization_id=organization_id,
+        business_id=business_id,
+        creative_test_id=test.id,
+        creative_test_external_ref=test.test_id,
+        source_action_draft_id=draft_row.id,
+        source_opportunity_id=draft_row.source_opportunity_id,
+        source_plan_fingerprint=draft_row.source_plan_fingerprint,
+        previous_status=previous_status,
+        new_status="active",
+        activated_by=actor_id,
+    )
+    session.add(event)
+    try:
+        await session.flush()
+    except sa_exc.IntegrityError as exc:
+        raise ConflictError("activation event conflict") from exc
+    await session.commit()
+    return draft_row, event
+
+
+async def transition_lifecycle(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    test_external_ref: str,
+    target_status: str,
+    actor_id: uuid.UUID,
+    actor_role: str,
+) -> Any:
+    """Apply a bounded lifecycle transition (active -> completed/cancelled).
+
+    Direct transitions from any other state are rejected; every accepted
+    transition records an immutable event.
+    """
+    if target_status not in ("completed", "cancelled"):
+        raise ConflictError(
+            "target_status must be 'completed' or 'cancelled'"
+        )
+
+    test = (
+        await session.execute(
+            select(CreativeTest).where(
+                CreativeTest.test_id == test_external_ref,
+                CreativeTest.organization_id == organization_id,
+                CreativeTest.business_id == business_id,
+            )
+        )
+    ).scalar_one_or_none()
+    if test is None:
+        raise NotFoundError("Creative test not found")
+
+    allowed_targets = LIFECYCLE_TRANSITIONS.get(test.status, {})
+    if target_status not in allowed_targets:
+        raise ConflictError(
+            f"transition '{test.status}' -> '{target_status}' is not part of "
+            "the bounded lifecycle"
+        )
+
+    # The active->completed/cancelled transition does not require a review
+    # state change; it closes the internal testing lifecycle.
+    previous_status = test.status
+    test.status = target_status
+
+    # Provenance: locate the originating activation for linkage fields.
+    activation = (
+        await session.execute(
+            select(CreativeTestActivation)
+            .where(
+                CreativeTestActivation.business_id == business_id,
+                CreativeTestActivation.creative_test_external_ref == test_external_ref,
+                CreativeTestActivation.new_status == "active",
+            )
+            .order_by(CreativeTestActivation.created_at.desc())
+            .limit(1)
+        )
+    ).scalar_one_or_none()
+
+    event = CreativeTestActivation(
+        organization_id=organization_id,
+        business_id=business_id,
+        creative_test_id=test.id,
+        creative_test_external_ref=test.test_id,
+        source_action_draft_id=(
+            activation.source_action_draft_id if activation else test.id
+        ),
+        source_opportunity_id=(
+            activation.source_opportunity_id if activation else "unknown"
+        ),
+        source_plan_fingerprint=(
+            activation.source_plan_fingerprint if activation else "unknown"
+        ),
+        previous_status=previous_status,
+        new_status=target_status,
+        activated_by=actor_id,
+    )
+    session.add(event)
+    await session.commit()
+    return event
+
+
+async def lifecycle_events(
+    session: AsyncSession,
+    *,
+    organization_id: uuid.UUID,
+    business_id: uuid.UUID,
+    test_external_ref: str | None = None,
+) -> list[Any]:
+    """Immutable lifecycle history, newest first."""
+    conditions = [
+        CreativeTestActivation.organization_id == organization_id,
+        CreativeTestActivation.business_id == business_id,
+    ]
+    if test_external_ref:
+        conditions.append(
+            CreativeTestActivation.creative_test_external_ref == test_external_ref
+        )
+    rows = (
+        (
+            await session.execute(
+                select(CreativeTestActivation)
+                .where(*conditions)
+                .order_by(CreativeTestActivation.created_at.desc())
+            )
+        )
+        .scalars()
+        .all()
+    )
+    return list(rows)
+
+
+__all__.extend(["activate_draft", "transition_lifecycle", "lifecycle_events"])

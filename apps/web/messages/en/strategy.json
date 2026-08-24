@@ -256,5 +256,8 @@
   "draftsPrepared": "{count} draft(s) prepared",
   "noActionDrafts": "No action drafts yet. Acknowledge a decision item, then prepare drafts.",
   "sourceOpportunity": "Source opportunity",
-  "stillADraft": "Still a draft - nothing executes."
+  "stillADraft": "Still a draft - nothing executes.",
+  "activateTest": "Activate test",
+  "markCompleted": "Mark completed",
+  "markCancelled": "Mark cancelled"
 }

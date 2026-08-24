@@ -7,9 +7,12 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  activateCreativeTest,
   fetchActionDrafts,
+  fetchLifecycleHistory,
   generateActionDrafts,
   reviewActionDraft,
+  transitionCreativeTestLifecycle,
   type ActionDraft,
 } from "./api";
 
@@ -73,9 +76,117 @@ function DraftRow({
           </Button>
         ))}
       </div>
-      <p className="mt-2 text-[10px] uppercase tracking-wide text-muted-foreground">
-        {t("stillADraft")}
+      {draft.review_state === "acknowledged" &&
+       draft.draft_kind !== undefined ? (
+        <ActivateControls draft={draft} businessId={businessId} t={t} />
+      ) : null}
+    </div>
+  );
+}
+
+function ActivateControls({
+  draft,
+  businessId,
+  t,
+}: {
+  draft: ActionDraft;
+  businessId: string;
+  t: (key: string) => string;
+}) {
+  const queryClient = useQueryClient();
+  const activateMutation = useMutation({
+    mutationFn: () => activateCreativeTest(businessId, draft.id),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: ["action-drafts", businessId],
+      });
+    },
+  });
+  const lifecycleQuery = useQuery({
+    queryKey: ["action-lifecycle", businessId, draft.draft_test_id],
+    queryFn: () => fetchLifecycleHistory(businessId, draft.draft_test_id),
+    enabled: Boolean(businessId) && draft.review_state === "acknowledged",
+  });
+
+  if (activateMutation.isError) {
+    return (
+      <p className="text-xs text-destructive" data-testid="activation-error">
+        {t("performanceError")}
       </p>
+    );
+  }
+
+  const events = lifecycleQuery.data ?? [];
+  const current =
+    events.length > 0 ? events[0].new_status : undefined;
+
+  return (
+    <div className="mt-2 space-y-1" data-testid="activation-controls">
+      {current === undefined ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={activateMutation.isPending}
+          onClick={() => activateMutation.mutate()}
+          data-testid={`action-activate-${draft.id}`}
+        >
+          {activateMutation.isPending ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            t("activateTest")
+          )}
+        </Button>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-md border px-2 py-0.5">{current}</span>
+          {current === "active" ? (
+            <>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  transitionCreativeTestLifecycle(
+                    businessId,
+                    draft.draft_test_id,
+                    "completed"
+                  ).then(() =>
+                    queryClient.invalidateQueries({
+                      queryKey: ["action-lifecycle", businessId, draft.draft_test_id],
+                    })
+                  )
+                }
+              >
+                {t("markCompleted")}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  transitionCreativeTestLifecycle(
+                    businessId,
+                    draft.draft_test_id,
+                    "cancelled"
+                  ).then(() =>
+                    queryClient.invalidateQueries({
+                      queryKey: ["action-lifecycle", businessId, draft.draft_test_id],
+                    })
+                  )
+                }
+              >
+                {t("markCancelled")}
+              </Button>
+            </>
+          ) : null}
+        </div>
+      )}
+      {events.length > 0 ? (
+        <div className="text-[10px] text-muted-foreground">
+          {events.map((event) => `${event.previous_status} -> ${event.new_status}`).join(" | ")}
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -541,3 +541,43 @@ export function reviewActionDraft(
 ): Promise<{ id: string; review_state: string }> {
   return apiPost(actionUrl(businessId, `/drafts/${draftId}/review`), payload);
 }
+
+// ---------------------------------------------------------------------------
+// Creative test lifecycle (Phase 8H) - activation + bounded transitions
+// ---------------------------------------------------------------------------
+
+export type LifecycleEvent = {
+  id: string;
+  creative_test_external_ref: string;
+  previous_status: string;
+  new_status: string;
+  source_opportunity_id: string;
+  source_plan_fingerprint: string;
+  activated_by?: string | null;
+  created_at: string;
+};
+
+export function activateCreativeTest(
+  businessId: string,
+  draftId: string
+): Promise<{ id: string; review_state: string }> {
+  return apiPost(actionUrl(businessId, `/drafts/${draftId}/activate`), {});
+}
+
+export function transitionCreativeTestLifecycle(
+  businessId: string,
+  testRef: string,
+  target_status: "completed" | "cancelled"
+): Promise<{ new_status: string; previous_status: string }> {
+  return apiPost(actionUrl(businessId, `/tests/${testRef}/lifecycle`), {
+    target_status,
+  });
+}
+
+export async function fetchLifecycleHistory(
+  businessId: string,
+  testRef?: string
+): Promise<LifecycleEvent[]> {
+  const suffix = testRef ? `?test_external_ref=${encodeURIComponent(testRef)}` : "";
+  return apiGet<LifecycleEvent[]>(actionUrl(businessId, `/tests${suffix}/lifecycle`));
+}
